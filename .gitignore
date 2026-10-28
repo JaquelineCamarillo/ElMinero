@@ -1,0 +1,56 @@
+# ==========================================
+#  .gitignore para Unity — El Minero
+#  Colócalo en la raíz: C:\Users\juana\ElMinero\.gitignore
+# ==========================================
+
+# Carpetas que Unity regenera solo (NUNCA se suben)
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# Builds (el .exe, el APK y el WebGL se publican aparte, no en el repo)
+/[Bb]uild/
+/[Bb]uilds/
+*.apk
+*.aab
+*.app
+
+# Archivos que generan Visual Studio / VS Code / Rider
+.vs/
+.idea/
+.gradle/
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Otros archivos temporales
+sysinfo.txt
+crashlytics-build.properties
+*.unitypackage
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Sistema operativo
+Thumbs.db
+Desktop.ini
+.DS_Store

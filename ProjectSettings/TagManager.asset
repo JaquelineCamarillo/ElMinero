@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 3
+  tags:
+  - Player
+  - Hazard
+  - Collectible
+  - Checkpoint
+  - Exit
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - Suelo
+  - Jugador
+  - Peligro
+  - Coleccionable
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Fondo
+    uniqueID: 304247
+    locked: 0
+  - name: FondoMedio
+    uniqueID: 702318
+    locked: 0
+  - name: Escenario
+    uniqueID: 141485
+    locked: 0
+  - name: Objetos
+    uniqueID: 937633
+    locked: 0
+  - name: Jugador
+    uniqueID: 406727
+    locked: 0
+  - name: Primer plano
+    uniqueID: 774625
+    locked: 0
+  - name: UI
+    uniqueID: 164661
+    locked: 0
+  m_RenderingLayers:
+  - Default
+  m_MigratedRenderPipelines: []

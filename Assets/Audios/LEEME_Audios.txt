@@ -1,0 +1,42 @@
+====================================================================
+GUÍA DE AUDIOS — PROYECTO "EL MINERO"
+====================================================================
+
+Todos los audios pueden ser descargados gratuitamente desde la Unity Asset Store
+(por ejemplo paquetes como "Casual Game SFX", "Universal Sound FX", "2D Pixel Art Audio", etc.)
+o desde freesound.org.
+
+El AudioManager es 100% tolerante a fallos: el juego funciona perfectamente
+incluso si los audios no están colocados. Cuando los descargues en formato .mp3,
+.wav u .ogg, simplemente colócalos en las carpetas correspondientes con estos nombres:
+
+--------------------------------------------------------------------
+1. MÚSICA DE FONDO (colocar en: Assets/Audios/Musica/)
+--------------------------------------------------------------------
+- MusicaMenu.mp3        : Tema misterioso y oscuro para el Menú Principal.
+- MusicaNivel1.mp3      : Nivel 1 (Mina Rayas) — Tensa, baja, misteriosa.
+- MusicaNivel2.mp3      : Nivel 2 (El Nopal) — Rítmica, sensación de ascenso y peligro.
+- MusicaNivel3.mp3      : Nivel 3 (La Valenciana) — Urgente, carrera contra el colapso final.
+- MusicaVictoria.mp3    : Fanfarria de victoria y escape exitoso al exterior.
+- MusicaDerrota.mp3     : Tema corto y melancólico al ser atrapado por el derrumbe.
+
+--------------------------------------------------------------------
+2. EFECTOS DE SONIDO SFX (colocar en: Assets/Audios/SFX/)
+--------------------------------------------------------------------
+- Pasos.wav             : Pisadas sobre grava/roca de mina.
+- Salto.wav             : Sonido ágil de impulso de salto.
+- CaidaRoca.wav         : Silbido o desprendimiento de roca en el techo.
+- ImpactoRoca.wav       : Golpe contundente de la roca al impactar contra el suelo.
+- RecolectarPlata.wav   : Tintineo metálico de monedas o veta de plata.
+- RecolectarGema.wav    : Brillo cristalino resonante (amatista).
+- ColapsoPlataforma.wav : Madera crujiendo y rompiéndose.
+- Temblor.wav           : Rumble grave de terremoto en la caverna.
+- DerrumbeSorpresa.wav  : Estruendo masivo de bloques de roca cayendo.
+- PerderVida.wav        : Quejido o golpe recibido por el minero.
+- Checkpoint.wav        : Tono místico de campana o encendido de linterna.
+- Click.wav             : Clic de madera para los botones de la interfaz.
+
+Para asignarlos en el AudioManager:
+1. Selecciona el prefab [AudioManager] en Assets/Prefabs/Sistemas/ o en la escena.
+2. Arrastra cada clip a su casilla correspondiente en el Inspector.
+====================================================================

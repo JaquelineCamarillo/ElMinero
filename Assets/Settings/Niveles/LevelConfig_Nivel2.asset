@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd8e682ebd4cf61418d31cf10c93a351, type: 3}
+  m_Name: LevelConfig_Nivel2
+  m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Niveles.LevelConfig
+  levelName: "Nivel 2 \u2014 El Nopal"
+  levelIndex: 2
+  timeLimit: 120
+  silverVeinCount: 8
+  amethystGemCount: 3
+  silverVeinPoints: 10
+  amethystGemPoints: 25
+  allSilverBonus: 50
+  rockSpawnInterval: 1.8
+  cameraBackgroundColor: {r: 0.16, g: 0.1, b: 0.05, a: 1}
