@@ -23,11 +23,13 @@
 .vs/
 .idea/
 .gradle/
+.vscode/
 ExportedObj/
 .consulo/
 *.csproj
 *.unityproj
 *.sln
+*.slnx
 *.suo
 *.tmp
 *.user
