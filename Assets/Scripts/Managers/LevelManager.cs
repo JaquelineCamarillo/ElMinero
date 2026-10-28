@@ -31,6 +31,11 @@ namespace ElMinero.Managers
         [SerializeField] private PlayerController playerController;
         [SerializeField] private HUDController hudController;
 
+        [Header("Paneles de Interfaz")]
+        [SerializeField] private ResultsPanel resultsPanel;
+        [SerializeField] private GameOverPanel gameOverPanel;
+        [SerializeField] private LevelStartCard levelStartCard;
+
         [Header("Puntos de Aparición")]
         [Tooltip("Posición inicial del jugador.")]
         [SerializeField] private Vector3 initialSpawnPoint;
@@ -114,6 +119,10 @@ namespace ElMinero.Managers
             if (playerHealth == null) playerHealth = FindAnyObjectByType<PlayerHealth>();
             if (playerController == null) playerController = FindAnyObjectByType<PlayerController>();
             if (hudController == null) hudController = FindAnyObjectByType<HUDController>();
+
+            if (resultsPanel == null) resultsPanel = FindAnyObjectByType<ResultsPanel>(FindObjectsInactive.Include);
+            if (gameOverPanel == null) gameOverPanel = FindAnyObjectByType<GameOverPanel>(FindObjectsInactive.Include);
+            if (levelStartCard == null) levelStartCard = FindAnyObjectByType<LevelStartCard>(FindObjectsInactive.Include);
         }
 
         private void ConfigurarPuntoAparicion()
@@ -162,6 +171,35 @@ namespace ElMinero.Managers
             {
                 timer.Iniciar(tiempo);
             }
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.DiscardLevelScore();
+            }
+
+            NotificarPuntaje();
+
+            // Mostrar tarjeta de inicio con datos históricos si está configurada
+            if (levelStartCard != null)
+            {
+                string scName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+                string minaNombre = "1 · Mina de Rayas";
+                string dato = "Mina de Rayas, descubierta en 1558 por Juan Rayas. Tiene el tiro más profundo de Guanajuato (425 m).";
+                Sprite miniatura = null;
+
+                if (scName.Contains("ElNopal"))
+                {
+                    minaNombre = "2 · El Nopal";
+                    dato = "El Nopal, mina de exploración iniciada en 1868. Hoy es la mina didáctica de la Universidad de Guanajuato.";
+                }
+                else if (scName.Contains("LaValenciana"))
+                {
+                    minaNombre = "3 · La Valenciana";
+                    dato = "La Valenciana, descubierta en 1760. Llegó a producir la quinta parte de la plata de todo el mundo.";
+                }
+
+                levelStartCard.ConfigurarYMostrar(scName, minaNombre, miniatura, dato);
+            }
         }
 
         // ====================================================================
@@ -206,12 +244,14 @@ namespace ElMinero.Managers
         private void ManejarMuerte()
         {
             Debug.Log("[El Minero] ¡Sin vidas! Derrota.");
-            if (GameManager.Instance != null)
+            if (timer != null) timer.Detener();
+
+            if (gameOverPanel != null)
             {
-                GameManager.Instance.DefeatReason = "Te has quedado sin vidas bajo la mina...";
-                GameManager.Instance.LastLevelSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-                GameManager.Instance.DiscardLevelScore();
-                SceneLoader.LoadScene(Constantes.Escenas.Derrota);
+                int gemas = collectibleManager != null ? collectibleManager.CollectedGems : 0;
+                int plata = collectibleManager != null ? collectibleManager.CollectedSilver : 0;
+                int score = GameManager.Instance != null ? GameManager.Instance.CurrentLevelScore : 0;
+                gameOverPanel.MostrarGameOver("Te has quedado sin vidas bajo la mina...", gemas, plata, score);
             }
             else
             {
@@ -222,12 +262,14 @@ namespace ElMinero.Managers
         private void ManejarTiempoAgotado()
         {
             Debug.Log("[El Minero] ¡Tiempo agotado! Derrota inmediata.");
-            if (GameManager.Instance != null)
+            if (timer != null) timer.Detener();
+
+            if (gameOverPanel != null)
             {
-                GameManager.Instance.DefeatReason = "Se acabó el tiempo y el derrumbe sepultó la mina.";
-                GameManager.Instance.LastLevelSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-                GameManager.Instance.DiscardLevelScore();
-                SceneLoader.LoadScene(Constantes.Escenas.Derrota);
+                int gemas = collectibleManager != null ? collectibleManager.CollectedGems : 0;
+                int plata = collectibleManager != null ? collectibleManager.CollectedSilver : 0;
+                int score = GameManager.Instance != null ? GameManager.Instance.CurrentLevelScore : 0;
+                gameOverPanel.MostrarGameOver("¡El derrumbe te alcanzó! Se acabó el tiempo.", gemas, plata, score);
             }
             else
             {
@@ -344,8 +386,39 @@ namespace ElMinero.Managers
 
             Debug.Log("[El Minero] ¡Nivel completado exitosamente!");
 
-            // Avanzar al siguiente nivel mediante el GameManager
-            if (GameManager.Instance != null)
+            // Animación de celebración en el jugador
+            if (playerController != null)
+            {
+                var anim = playerController.GetComponent<PlayerAnimator>();
+                if (anim != null) anim.PlayWinAnimation();
+            }
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayNivelCompletado();
+                AudioManager.Instance.PlayMusicVictoria();
+            }
+
+            if (resultsPanel != null)
+            {
+                string scName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+                int numNivel = 1;
+                if (scName.Contains("ElNopal")) numNivel = 2;
+                else if (scName.Contains("LaValenciana")) numNivel = 3;
+
+                int score = GameManager.Instance != null ? GameManager.Instance.CurrentLevelScore : 0;
+                int gemas = collectibleManager != null ? collectibleManager.CollectedGems : 0;
+                int totalGemas = collectibleManager != null ? collectibleManager.TotalGemsInLevel : 0;
+                int plata = collectibleManager != null ? collectibleManager.CollectedSilver : 0;
+                int totalPlata = collectibleManager != null ? collectibleManager.TotalSilverInLevel : 0;
+                bool minDist = collectibleManager != null && collectibleManager.HasCollectedDistinctiveMineral;
+                float remTime = timer != null ? timer.RemainingTime : 0f;
+                float initTime = timer != null ? timer.InitialTime : 100f;
+                int hp = playerHealth != null ? playerHealth.CurrentLives : 1;
+
+                resultsPanel.MostrarResultados(scName, numNivel, gemas, totalGemas, minDist, plata, totalPlata, remTime, initTime, hp, score);
+            }
+            else if (GameManager.Instance != null)
             {
                 GameManager.Instance.AvanzarNivel();
             }
