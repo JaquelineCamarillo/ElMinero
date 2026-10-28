@@ -17,17 +17,21 @@ namespace ElMinero.UI
         [SerializeField] private GameObject pausePanel;
         [SerializeField] private Button resumeButton;
         [SerializeField] private Button restartButton;
+        [SerializeField] private Button optionsButton;
         [SerializeField] private Button mainMenuButton;
         [SerializeField] private Button pauseIconButton; // Botón en la esquina del HUD
+        [SerializeField] private OptionsPanel optionsPanel;
 
         private bool isPaused = false;
 
         private void Start()
         {
             if (pausePanel != null) pausePanel.SetActive(false);
+            if (optionsPanel != null) optionsPanel.gameObject.SetActive(false);
 
             if (resumeButton != null) resumeButton.onClick.AddListener(ResumeGame);
             if (restartButton != null) restartButton.onClick.AddListener(RestartLevel);
+            if (optionsButton != null) optionsButton.onClick.AddListener(OpenOptions);
             if (mainMenuButton != null) mainMenuButton.onClick.AddListener(GoToMainMenu);
             if (pauseIconButton != null) pauseIconButton.onClick.AddListener(TogglePause);
         }
@@ -77,6 +81,13 @@ namespace ElMinero.UI
             isPaused = false;
             Time.timeScale = 1f;
             if (pausePanel != null) pausePanel.SetActive(false);
+            if (optionsPanel != null) optionsPanel.gameObject.SetActive(false);
+        }
+
+        public void OpenOptions()
+        {
+            if (AudioManager.Instance != null) AudioManager.Instance.PlayClickUI();
+            if (optionsPanel != null) optionsPanel.gameObject.SetActive(true);
         }
 
         public void RestartLevel()
