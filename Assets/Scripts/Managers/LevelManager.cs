@@ -263,6 +263,34 @@ namespace ElMinero.Managers
             NotificarPuntaje();
         }
 
+        public void RecolectarMineralDistintivo(DistinctiveMineral mineral)
+        {
+            int basePts = mineral.BasePoints;
+            int finalPts = streakSystem != null ? streakSystem.AplicarMultiplicador(basePts) : basePts;
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.AddScore(finalPts);
+            }
+
+            if (collectibleManager != null)
+            {
+                collectibleManager.RegistrarMineralDistintivoRecolectado();
+            }
+
+            if (streakSystem != null)
+            {
+                streakSystem.RegistrarColeccionable();
+            }
+
+            if (hudController != null)
+            {
+                hudController.MostrarNotificacionMineral(mineral.MineralName, mineral.HistoricalDescription);
+            }
+
+            NotificarPuntaje();
+        }
+
         public void RecolectarGema(AmethystGem gema)
         {
             int basePts = levelConfig != null ? levelConfig.AmethystGemPoints : gema.BasePoints;
@@ -291,6 +319,8 @@ namespace ElMinero.Managers
             int puntaje = GameManager.Instance != null ? GameManager.Instance.CombinedScore : 0;
             OnScoreUpdated?.Invoke(puntaje);
         }
+
+
 
         // ====================================================================
         // SALIDA Y FINALIZACIÓN

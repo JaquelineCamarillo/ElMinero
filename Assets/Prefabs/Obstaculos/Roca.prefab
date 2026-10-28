@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 8045178575299980062}
   - component: {fileID: 7467158365265000317}
   - component: {fileID: 3312004097929042646}
-  - component: {fileID: 366882515879521652}
   - component: {fileID: 5220290452966028592}
+  - component: {fileID: 366882515879521652}
   m_Layer: 10
   m_Name: Roca
   m_TagString: Hazard
@@ -131,7 +131,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 0.45
+  m_Radius: 0.5
 --- !u!50 &3312004097929042646
 Rigidbody2D:
   serializedVersion: 5
@@ -147,7 +147,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 2.5
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -159,20 +159,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &366882515879521652
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8938801215025607106}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ab42ab5b84386948a0975e1f85dbf89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Obstaculos.FallingRock
-  rotationSpeed: 360
-  dustEffectPrefab: {fileID: 0}
 --- !u!95 &5220290452966028592
 Animator:
   serializedVersion: 7
@@ -195,3 +181,17 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &366882515879521652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8938801215025607106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ab42ab5b84386948a0975e1f85dbf89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Obstaculos.FallingRock
+  rotationSpeed: 360
+  dustEffectPrefab: {fileID: 0}

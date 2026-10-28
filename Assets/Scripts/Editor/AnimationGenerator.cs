@@ -8,7 +8,7 @@ namespace ElMinero.Editor
 {
     /// <summary>
     /// Genera proceduralmente todos los clips de animación (.anim) y Animator Controllers (.controller)
-    /// del proyecto "El Minero" utilizando los sprites importados.
+    /// del proyecto "El Minero" utilizando los sprites importados (paquetes v1 y v2).
     /// </summary>
     public static class AnimationGenerator
     {
@@ -27,11 +27,13 @@ namespace ElMinero.Editor
                     "Assets/Animaciones/Obstaculos",
                     "Assets/Animaciones/Entorno",
                     "Assets/Animaciones/UI",
+                    "Assets/Animaciones/Enemigos",
                     "Assets/Controladores/Jugador",
                     "Assets/Controladores/Coleccionables",
                     "Assets/Controladores/Obstaculos",
                     "Assets/Controladores/Entorno",
-                    "Assets/Controladores/UI"
+                    "Assets/Controladores/UI",
+                    "Assets/Controladores/Enemigos"
                 };
 
                 foreach (var dir in carpetas)
@@ -42,17 +44,24 @@ namespace ElMinero.Editor
                 // 1. Animaciones y Controlador del Jugador
                 GenerarAnimacionesJugador();
 
-                // 2. Animaciones y Controlador de Entorno (Antorcha)
+                // 2. Animaciones y Controlador de Entorno (Antorcha y Malacate)
                 GenerarAnimacionAntorcha();
+                GenerarAnimacionMalacate();
 
-                // 3. Animaciones y Controlador de Coleccionables (Veta y Gema)
+                // 3. Animaciones y Controlador de Coleccionables (Veta, Gema y Minerales Distintivos)
                 GenerarAnimacionesColeccionables();
+                GenerarAnimacionesMineralesDistintivos();
+                GenerarAnimacionCheckpointCapilla();
 
-                // 4. Animaciones y Controlador de Obstáculos (Roca y Plataforma Quebradiza)
+                // 4. Animaciones y Controlador de Obstáculos (Roca, Plataforma Quebradiza y Fuego)
                 GenerarAnimacionesObstaculos();
+                GenerarAnimacionFuego();
 
                 // 5. Animación de UI (Insignia x2)
                 GenerarAnimacionUI();
+
+                // 6. Animaciones y Controladores de Enemigos (Murciélagos, Araña, Alacrán, Vagoneta)
+                GenerarAnimacionesEnemigos();
 
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
@@ -69,7 +78,6 @@ namespace ElMinero.Editor
         // ====================================================================
         private static void GenerarAnimacionesJugador()
         {
-            // Cargar sprites
             Sprite[] idleSprites = CargarSpritesSub("Assets/Sprites/Jugador/Minero_Idle.png", 2);
             Sprite[] walkSprites = CargarSpritesSub("Assets/Sprites/Jugador/Minero_Caminar.png", 4);
             Sprite[] jumpSprites = CargarSpritesSub("Assets/Sprites/Jugador/Minero_Saltar.png", 1);
@@ -78,7 +86,6 @@ namespace ElMinero.Editor
             Sprite[] dieSprites = CargarSpritesSub("Assets/Sprites/Jugador/Minero_Morir.png", 3);
             Sprite[] winSprites = CargarSpritesSub("Assets/Sprites/Jugador/Minero_Celebrar.png", 2);
 
-            // Crear clips
             AnimationClip clipIdle = CrearClipSprite("Assets/Animaciones/Jugador/Minero_Idle.anim", idleSprites, 3, true);
             AnimationClip clipWalk = CrearClipSprite("Assets/Animaciones/Jugador/Minero_Caminar.anim", walkSprites, 10, true);
             AnimationClip clipJump = CrearClipSprite("Assets/Animaciones/Jugador/Minero_Saltar.anim", jumpSprites, 1, false);
@@ -87,11 +94,9 @@ namespace ElMinero.Editor
             AnimationClip clipDie = CrearClipSprite("Assets/Animaciones/Jugador/Minero_Morir.anim", dieSprites, 6, false);
             AnimationClip clipWin = CrearClipSprite("Assets/Animaciones/Jugador/Minero_Celebrar.anim", winSprites, 4, true);
 
-            // Crear Animator Controller
             string ctrlPath = "Assets/Controladores/Jugador/Minero.controller";
             AnimatorController ctrl = AnimatorController.CreateAnimatorControllerAtPath(ctrlPath);
 
-            // Parámetros obligatorios del GDD
             ctrl.AddParameter("Speed", AnimatorControllerParameterType.Float);
             ctrl.AddParameter("IsGrounded", AnimatorControllerParameterType.Bool);
             ctrl.AddParameter("VelocityY", AnimatorControllerParameterType.Float);
@@ -101,104 +106,87 @@ namespace ElMinero.Editor
 
             var rootSm = ctrl.layers[0].stateMachine;
 
-            // Estados
-            var stateIdle = rootSm.AddState("Idle");
-            stateIdle.motion = clipIdle;
-            rootSm.defaultState = stateIdle;
+            var stIdle = rootSm.AddState("Idle");
+            stIdle.motion = clipIdle;
+            rootSm.defaultState = stIdle;
 
-            var stateWalk = rootSm.AddState("Caminar");
-            stateWalk.motion = clipWalk;
+            var stWalk = rootSm.AddState("Caminar");
+            stWalk.motion = clipWalk;
 
-            var stateJump = rootSm.AddState("Saltar");
-            stateJump.motion = clipJump;
+            var stJump = rootSm.AddState("Saltar");
+            stJump.motion = clipJump;
 
-            var stateFall = rootSm.AddState("Caer");
-            stateFall.motion = clipFall;
+            var stFall = rootSm.AddState("Caer");
+            stFall.motion = clipFall;
 
-            var stateHurt = rootSm.AddState("Golpe");
-            stateHurt.motion = clipHurt;
+            var stHurt = rootSm.AddState("Golpe");
+            stHurt.motion = clipHurt;
 
-            var stateDie = rootSm.AddState("Morir");
-            stateDie.motion = clipDie;
+            var stDie = rootSm.AddState("Morir");
+            stDie.motion = clipDie;
 
-            var stateWin = rootSm.AddState("Celebrar");
-            stateWin.motion = clipWin;
+            var stWin = rootSm.AddState("Celebrar");
+            stWin.motion = clipWin;
 
-            // Transiciones Locomoción
-            // Idle <-> Caminar
-            var tIdleWalk = stateIdle.AddTransition(stateWalk);
-            tIdleWalk.AddCondition(AnimatorConditionMode.Greater, 0.1f, "Speed");
-            tIdleWalk.hasExitTime = false;
-            tIdleWalk.duration = 0f;
+            // Idle <-> Walk
+            var tIdleToWalk = stIdle.AddTransition(stWalk);
+            tIdleToWalk.AddCondition(AnimatorConditionMode.Greater, 0.1f, "Speed");
+            tIdleToWalk.hasExitTime = false;
+            tIdleToWalk.duration = 0f;
 
-            var tWalkIdle = stateWalk.AddTransition(stateIdle);
-            tWalkIdle.AddCondition(AnimatorConditionMode.Less, 0.1f, "Speed");
-            tWalkIdle.hasExitTime = false;
-            tWalkIdle.duration = 0f;
+            var tWalkToIdle = stWalk.AddTransition(stIdle);
+            tWalkToIdle.AddCondition(AnimatorConditionMode.Less, 0.1f, "Speed");
+            tWalkToIdle.hasExitTime = false;
+            tWalkToIdle.duration = 0f;
 
-            // Salto (desde Idle y Caminar)
-            var tIdleJump = stateIdle.AddTransition(stateJump);
-            tIdleJump.AddCondition(AnimatorConditionMode.IfNot, 0f, "IsGrounded");
-            tIdleJump.AddCondition(AnimatorConditionMode.Greater, 0.1f, "VelocityY");
-            tIdleJump.hasExitTime = false;
-            tIdleJump.duration = 0f;
+            // Transiciones a Saltando/Cayendo
+            var tAnyToJump = rootSm.AddAnyStateTransition(stJump);
+            tAnyToJump.AddCondition(AnimatorConditionMode.IfNot, 0f, "IsGrounded");
+            tAnyToJump.AddCondition(AnimatorConditionMode.Greater, 0.1f, "VelocityY");
+            tAnyToJump.hasExitTime = false;
+            tAnyToJump.duration = 0f;
 
-            var tWalkJump = stateWalk.AddTransition(stateJump);
-            tWalkJump.AddCondition(AnimatorConditionMode.IfNot, 0f, "IsGrounded");
-            tWalkJump.AddCondition(AnimatorConditionMode.Greater, 0.1f, "VelocityY");
-            tWalkJump.hasExitTime = false;
-            tWalkJump.duration = 0f;
+            var tAnyToFall = rootSm.AddAnyStateTransition(stFall);
+            tAnyToFall.AddCondition(AnimatorConditionMode.IfNot, 0f, "IsGrounded");
+            tAnyToFall.AddCondition(AnimatorConditionMode.Less, -0.1f, "VelocityY");
+            tAnyToFall.hasExitTime = false;
+            tAnyToFall.duration = 0f;
 
-            // Caída (desde Saltar, Idle o Caminar si cae de repisa)
-            var tJumpFall = stateJump.AddTransition(stateFall);
-            tJumpFall.AddCondition(AnimatorConditionMode.Less, -0.1f, "VelocityY");
-            tJumpFall.hasExitTime = false;
-            tJumpFall.duration = 0f;
+            // Salir de caer a Idle
+            var tFallToIdle = stFall.AddTransition(stIdle);
+            tFallToIdle.AddCondition(AnimatorConditionMode.If, 0f, "IsGrounded");
+            tFallToIdle.hasExitTime = false;
+            tFallToIdle.duration = 0f;
 
-            var tIdleFall = stateIdle.AddTransition(stateFall);
-            tIdleFall.AddCondition(AnimatorConditionMode.IfNot, 0f, "IsGrounded");
-            tIdleFall.AddCondition(AnimatorConditionMode.Less, -0.1f, "VelocityY");
-            tIdleFall.hasExitTime = false;
-            tIdleFall.duration = 0f;
+            var tJumpToIdle = stJump.AddTransition(stIdle);
+            tJumpToIdle.AddCondition(AnimatorConditionMode.If, 0f, "IsGrounded");
+            tJumpToIdle.hasExitTime = false;
+            tJumpToIdle.duration = 0f;
 
-            var tWalkFall = stateWalk.AddTransition(stateFall);
-            tWalkFall.AddCondition(AnimatorConditionMode.IfNot, 0f, "IsGrounded");
-            tWalkFall.AddCondition(AnimatorConditionMode.Less, -0.1f, "VelocityY");
-            tWalkFall.hasExitTime = false;
-            tWalkFall.duration = 0f;
+            // Daño, muerte y victoria desde AnyState
+            var tAnyToHurt = rootSm.AddAnyStateTransition(stHurt);
+            tAnyToHurt.AddCondition(AnimatorConditionMode.If, 0f, "Hurt");
+            tAnyToHurt.hasExitTime = false;
+            tAnyToHurt.duration = 0f;
 
-            // Aterrizaje
-            var tFallIdle = stateFall.AddTransition(stateIdle);
-            tFallIdle.AddCondition(AnimatorConditionMode.If, 0f, "IsGrounded");
-            tFallIdle.hasExitTime = false;
-            tFallIdle.duration = 0f;
+            var tHurtToIdle = stHurt.AddTransition(stIdle);
+            tHurtToIdle.hasExitTime = true;
+            tHurtToIdle.exitTime = 1.0f;
+            tHurtToIdle.duration = 0f;
 
-            // AnyState -> Golpe (Hurt)
-            var tAnyHurt = rootSm.AddAnyStateTransition(stateHurt);
-            tAnyHurt.AddCondition(AnimatorConditionMode.If, 0f, "Hurt");
-            tAnyHurt.hasExitTime = false;
-            tAnyHurt.duration = 0f;
+            var tAnyToDie = rootSm.AddAnyStateTransition(stDie);
+            tAnyToDie.AddCondition(AnimatorConditionMode.If, 0f, "Dead");
+            tAnyToDie.hasExitTime = false;
+            tAnyToDie.duration = 0f;
 
-            var tHurtIdle = stateHurt.AddTransition(stateIdle);
-            tHurtIdle.hasExitTime = true;
-            tHurtIdle.exitTime = 1f;
-            tHurtIdle.duration = 0.1f;
-
-            // AnyState -> Morir (Dead)
-            var tAnyDie = rootSm.AddAnyStateTransition(stateDie);
-            tAnyDie.AddCondition(AnimatorConditionMode.If, 0f, "Dead");
-            tAnyDie.hasExitTime = false;
-            tAnyDie.duration = 0f;
-
-            // AnyState -> Celebrar (Win)
-            var tAnyWin = rootSm.AddAnyStateTransition(stateWin);
-            tAnyWin.AddCondition(AnimatorConditionMode.If, 0f, "Win");
-            tAnyWin.hasExitTime = false;
-            tAnyWin.duration = 0f;
+            var tAnyToWin = rootSm.AddAnyStateTransition(stWin);
+            tAnyToWin.AddCondition(AnimatorConditionMode.If, 0f, "Win");
+            tAnyToWin.hasExitTime = false;
+            tAnyToWin.duration = 0f;
         }
 
         // ====================================================================
-        // 2. ENTORNO (Antorcha)
+        // 2. ENTORNO (Antorcha y Malacate)
         // ====================================================================
         private static void GenerarAnimacionAntorcha()
         {
@@ -212,12 +200,23 @@ namespace ElMinero.Editor
             ctrl.layers[0].stateMachine.defaultState = state;
         }
 
+        private static void GenerarAnimacionMalacate()
+        {
+            Sprite[] sprites = CargarSpritesSub("Assets/Sprites/Entorno/Malacate.png", 4);
+            AnimationClip clip = CrearClipSprite("Assets/Animaciones/Entorno/MalacateGirar.anim", sprites, 8, true);
+
+            string ctrlPath = "Assets/Controladores/Entorno/Malacate.controller";
+            AnimatorController ctrl = AnimatorController.CreateAnimatorControllerAtPath(ctrlPath);
+            var state = ctrl.layers[0].stateMachine.AddState("Girar");
+            state.motion = clip;
+            ctrl.layers[0].stateMachine.defaultState = state;
+        }
+
         // ====================================================================
-        // 3. COLECCIONABLES (Veta y Gema)
+        // 3. COLECCIONABLES (Veta, Gema y Minerales Distintivos)
         // ====================================================================
         private static void GenerarAnimacionesColeccionables()
         {
-            // Veta de Plata
             Sprite[] vetaSprites = CargarSpritesSub("Assets/Sprites/Coleccionables/Veta_Plata.png", 3);
             AnimationClip clipVeta = CrearClipSprite("Assets/Animaciones/Coleccionables/VetaBrillo.anim", vetaSprites, 6, true);
             string ctrlVetaPath = "Assets/Controladores/Coleccionables/Veta.controller";
@@ -226,7 +225,6 @@ namespace ElMinero.Editor
             stateVeta.motion = clipVeta;
             ctrlVeta.layers[0].stateMachine.defaultState = stateVeta;
 
-            // Gema de Amatista
             Sprite[] gemaSprites = CargarSpritesSub("Assets/Sprites/Coleccionables/Gema_Amatista.png", 3);
             AnimationClip clipGema = CrearClipSprite("Assets/Animaciones/Coleccionables/GemaBrillo.anim", gemaSprites, 6, true);
             string ctrlGemaPath = "Assets/Controladores/Coleccionables/Gema.controller";
@@ -236,19 +234,60 @@ namespace ElMinero.Editor
             ctrlGema.layers[0].stateMachine.defaultState = stateGema;
         }
 
+        private static void GenerarAnimacionesMineralesDistintivos()
+        {
+            // Aguilarita (N1)
+            Sprite[] spAguilarita = CargarSpritesSub("Assets/Sprites/Coleccionables/Aguilarita.png", 3);
+            AnimationClip clipAguilarita = CrearClipSprite("Assets/Animaciones/Coleccionables/AguilaritaBrillo.anim", spAguilarita, 6, true);
+            CrearSimpleController("Assets/Controladores/Coleccionables/Aguilarita.controller", clipAguilarita);
+
+            // Pepita de Oro (N2)
+            Sprite[] spOro = CargarSpritesSub("Assets/Sprites/Coleccionables/Pepita_Oro.png", 3);
+            AnimationClip clipOro = CrearClipSprite("Assets/Animaciones/Coleccionables/PepitaOroBrillo.anim", spOro, 6, true);
+            CrearSimpleController("Assets/Controladores/Coleccionables/PepitaOro.controller", clipOro);
+
+            // Pirargirita (N3)
+            Sprite[] spPirargirita = CargarSpritesSub("Assets/Sprites/Coleccionables/Pirargirita.png", 3);
+            AnimationClip clipPirargirita = CrearClipSprite("Assets/Animaciones/Coleccionables/PirargiritaBrillo.anim", spPirargirita, 6, true);
+            CrearSimpleController("Assets/Controladores/Coleccionables/Pirargirita.controller", clipPirargirita);
+        }
+
+        private static void GenerarAnimacionCheckpointCapilla()
+        {
+            Sprite[] sprites = CargarSpritesSub("Assets/Sprites/Coleccionables/Checkpoint_Capilla.png", 2);
+            if (sprites != null && sprites.Length >= 2)
+            {
+                AnimationClip clipApagado = CrearClipSprite("Assets/Animaciones/Coleccionables/CapillaApagada.anim", new Sprite[] { sprites[0] }, 1, false);
+                AnimationClip clipEncendido = CrearClipSprite("Assets/Animaciones/Coleccionables/CapillaEncendida.anim", new Sprite[] { sprites[1] }, 1, false);
+
+                string ctrlPath = "Assets/Controladores/Coleccionables/CheckpointCapilla.controller";
+                AnimatorController ctrl = AnimatorController.CreateAnimatorControllerAtPath(ctrlPath);
+                ctrl.AddParameter("Activar", AnimatorControllerParameterType.Trigger);
+
+                var sm = ctrl.layers[0].stateMachine;
+                var stApagado = sm.AddState("Apagado");
+                stApagado.motion = clipApagado;
+                sm.defaultState = stApagado;
+
+                var stEncendido = sm.AddState("Encendido");
+                stEncendido.motion = clipEncendido;
+
+                var t = stApagado.AddTransition(stEncendido);
+                t.AddCondition(AnimatorConditionMode.If, 0f, "Activar");
+                t.hasExitTime = false;
+                t.duration = 0f;
+            }
+        }
+
         // ====================================================================
-        // 4. OBSTÁCULOS (Roca y Plataforma Quebradiza)
+        // 4. OBSTÁCULOS
         // ====================================================================
         private static void GenerarAnimacionesObstaculos()
         {
             // Roca rodando/girando
             Sprite[] rocaSprites = CargarSpritesSub("Assets/Sprites/Obstaculos/Roca.png", 4);
             AnimationClip clipRoca = CrearClipSprite("Assets/Animaciones/Obstaculos/RocaGirando.anim", rocaSprites, 12, true);
-            string ctrlRocaPath = "Assets/Controladores/Obstaculos/Roca.controller";
-            AnimatorController ctrlRoca = AnimatorController.CreateAnimatorControllerAtPath(ctrlRocaPath);
-            var stateRoca = ctrlRoca.layers[0].stateMachine.AddState("Girando");
-            stateRoca.motion = clipRoca;
-            ctrlRoca.layers[0].stateMachine.defaultState = stateRoca;
+            CrearSimpleController("Assets/Controladores/Obstaculos/Roca.controller", clipRoca);
 
             // Plataforma Quebradiza
             Sprite[] platSprites = CargarSpritesSub("Assets/Sprites/Plataformas/Plataforma_Quebradiza.png", 3);
@@ -292,6 +331,13 @@ namespace ElMinero.Editor
             }
         }
 
+        private static void GenerarAnimacionFuego()
+        {
+            Sprite[] fuegoSprites = CargarSpritesSub("Assets/Sprites/Obstaculos/Fuego.png", 4);
+            AnimationClip clipFuego = CrearClipSprite("Assets/Animaciones/Obstaculos/FuegoArder.anim", fuegoSprites, 10, true);
+            CrearSimpleController("Assets/Controladores/Obstaculos/Fuego.controller", clipFuego);
+        }
+
         // ====================================================================
         // 5. UI (Insignia x2)
         // ====================================================================
@@ -299,12 +345,70 @@ namespace ElMinero.Editor
         {
             Sprite[] x2Sprites = CargarSpritesSub("Assets/Sprites/UI/Insignia_x2.png", 2);
             AnimationClip clipX2 = CrearClipSprite("Assets/Animaciones/UI/InsigniaX2Pulso.anim", x2Sprites, 4, true);
+            CrearSimpleController("Assets/Controladores/UI/InsigniaX2.controller", clipX2);
+        }
 
-            string ctrlX2Path = "Assets/Controladores/UI/InsigniaX2.controller";
-            AnimatorController ctrlX2 = AnimatorController.CreateAnimatorControllerAtPath(ctrlX2Path);
-            var stateX2 = ctrlX2.layers[0].stateMachine.AddState("Pulso");
-            stateX2.motion = clipX2;
-            ctrlX2.layers[0].stateMachine.defaultState = stateX2;
+        // ====================================================================
+        // 6. ENEMIGOS (v2)
+        // ====================================================================
+        private static void GenerarAnimacionesEnemigos()
+        {
+            // Murciélago (16x16, 4 cuadros, 10 fps)
+            Sprite[] batSprites = CargarSpritesSub("Assets/Sprites/Enemigos/Murcielago.png", 4);
+            AnimationClip clipBat = CrearClipSprite("Assets/Animaciones/Enemigos/MurcielagoVolar.anim", batSprites, 10, true);
+            CrearSimpleController("Assets/Controladores/Enemigos/Murcielago.controller", clipBat);
+
+            // Murciélago Rojo (16x16, 4 cuadros, 10 fps)
+            Sprite[] redBatSprites = CargarSpritesSub("Assets/Sprites/Enemigos/Murcielago_Rojo.png", 4);
+            AnimationClip clipRedBat = CrearClipSprite("Assets/Animaciones/Enemigos/MurcielagoRojoVolar.anim", redBatSprites, 10, true);
+            CrearSimpleController("Assets/Controladores/Enemigos/MurcielagoRojo.controller", clipRedBat);
+
+            // Araña (16x16, 3 cuadros, 6 fps)
+            Sprite[] spiderSprites = CargarSpritesSub("Assets/Sprites/Enemigos/Arana.png", 3);
+            AnimationClip clipSpider = CrearClipSprite("Assets/Animaciones/Enemigos/AranaBajar.anim", spiderSprites, 6, true);
+            CrearSimpleController("Assets/Controladores/Enemigos/Arana.controller", clipSpider);
+
+            // Alacrán: Caminar (4 cuadros, 8 fps) y Ataque (2 cuadros, 6 fps, no loop)
+            Sprite[] alacranWalk = CargarSpritesSub("Assets/Sprites/Enemigos/Alacran_Caminar.png", 4);
+            Sprite[] alacranAttack = CargarSpritesSub("Assets/Sprites/Enemigos/Alacran_Ataque.png", 2);
+
+            AnimationClip clipAlacranWalk = CrearClipSprite("Assets/Animaciones/Enemigos/AlacranCaminar.anim", alacranWalk, 8, true);
+            AnimationClip clipAlacranAttack = CrearClipSprite("Assets/Animaciones/Enemigos/AlacranAtaque.anim", alacranAttack, 6, false);
+
+            string ctrlAlacranPath = "Assets/Controladores/Enemigos/Alacran.controller";
+            AnimatorController ctrlAlacran = AnimatorController.CreateAnimatorControllerAtPath(ctrlAlacranPath);
+            ctrlAlacran.AddParameter("Atacar", AnimatorControllerParameterType.Trigger);
+
+            var smAlacran = ctrlAlacran.layers[0].stateMachine;
+            var stWalk = smAlacran.AddState("Caminar");
+            stWalk.motion = clipAlacranWalk;
+            smAlacran.defaultState = stWalk;
+
+            var stAttack = smAlacran.AddState("Ataque");
+            stAttack.motion = clipAlacranAttack;
+
+            var tAttack = stWalk.AddTransition(stAttack);
+            tAttack.AddCondition(AnimatorConditionMode.If, 0f, "Atacar");
+            tAttack.hasExitTime = false;
+            tAttack.duration = 0f;
+
+            var tBack = stAttack.AddTransition(stWalk);
+            tBack.hasExitTime = true;
+            tBack.exitTime = 1.0f;
+            tBack.duration = 0f;
+
+            // Vagoneta Desbocada (32x24, 2 cuadros, 12 fps)
+            Sprite[] cartSprites = CargarSpritesSub("Assets/Sprites/Enemigos/Vagoneta_Desbocada.png", 2);
+            AnimationClip clipCart = CrearClipSprite("Assets/Animaciones/Obstaculos/VagonetaRodar.anim", cartSprites, 12, true);
+            CrearSimpleController("Assets/Controladores/Obstaculos/Vagoneta.controller", clipCart);
+        }
+
+        private static void CrearSimpleController(string path, AnimationClip defaultClip)
+        {
+            AnimatorController ctrl = AnimatorController.CreateAnimatorControllerAtPath(path);
+            var state = ctrl.layers[0].stateMachine.AddState("Default");
+            state.motion = defaultClip;
+            ctrl.layers[0].stateMachine.defaultState = state;
         }
 
         // ====================================================================

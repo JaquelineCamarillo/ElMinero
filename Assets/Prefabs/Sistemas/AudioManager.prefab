@@ -44,23 +44,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d392f27ba0ca3847938e307a5a5b334, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Managers.AudioManager
-  musicSource: {fileID: 0}
-  sfxPoolSize: 8
+  audioMixer: {fileID: 0}
+  musicGroup: {fileID: 0}
+  sfxGroup: {fileID: 0}
+  musicSourceA: {fileID: 0}
+  musicSourceB: {fileID: 0}
+  sfxPoolSize: 12
   musicMenu: {fileID: 0}
   musicNivel1: {fileID: 0}
   musicNivel2: {fileID: 0}
   musicNivel3: {fileID: 0}
   musicVictoria: {fileID: 0}
-  musicDerrota: {fileID: 0}
-  sfxPasos: {fileID: 0}
+  musicGameOver: {fileID: 0}
   sfxSalto: {fileID: 0}
-  sfxCaidaRoca: {fileID: 0}
-  sfxImpactoRoca: {fileID: 0}
+  sfxAterrizar: {fileID: 0}
+  sfxPaso1: {fileID: 0}
+  sfxPaso2: {fileID: 0}
+  sfxDanio: {fileID: 0}
+  sfxPerderVida: {fileID: 0}
   sfxRecolectarPlata: {fileID: 0}
   sfxRecolectarGema: {fileID: 0}
-  sfxColapsoPlataforma: {fileID: 0}
+  sfxRecolectarMineral: {fileID: 0}
+  sfxRachaX2: {fileID: 0}
+  sfxRocaCae: {fileID: 0}
+  sfxRocaImpacto: {fileID: 0}
+  sfxPlataformaCruje: {fileID: 0}
+  sfxPlataformaColapso: {fileID: 0}
   sfxTemblor: {fileID: 0}
-  sfxDerrumbeSorpresa: {fileID: 0}
-  sfxPerderVida: {fileID: 0}
+  sfxDerrumbe: {fileID: 0}
   sfxCheckpoint: {fileID: 0}
-  sfxClick: {fileID: 0}
+  sfxNivelCompletado: {fileID: 0}
+  sfxTicReloj: {fileID: 0}
+  sfxMurcielagoChillido: {fileID: 0}
+  sfxAranaBaja: {fileID: 0}
+  sfxAlacranAtaque: {fileID: 0}
+  sfxVagonetaLoop: {fileID: 0}
+  sfxFuegoLoop: {fileID: 0}
+  sfxMalacateLoop: {fileID: 0}
+  sfxClickUI: {fileID: 0}
+  sfxHoverUI: {fileID: 0}
+  sfxPausa: {fileID: 0}
+  sfxEstrella1: {fileID: 0}
+  sfxEstrella2: {fileID: 0}
+  sfxEstrella3: {fileID: 0}
+  sfxDesbloqueoNivel: {fileID: 0}

@@ -6,6 +6,7 @@ using TMPro;
 using Unity.Cinemachine;
 using ElMinero.Camara;
 using ElMinero.Coleccionables;
+using ElMinero.Enemigos;
 using ElMinero.Entorno;
 using ElMinero.Jugador;
 using ElMinero.Managers;
@@ -18,7 +19,7 @@ using ElMinero.Utilidades;
 namespace ElMinero.Editor
 {
     /// <summary>
-    /// Genera todos los Prefabs requeridos por la arquitectura del proyecto (Sección 2 del GDD).
+    /// Genera todos los Prefabs requeridos por la arquitectura del proyecto (Sección 2 del GDD y paquete v2).
     /// </summary>
     public static class PrefabGenerator
     {
@@ -47,6 +48,7 @@ namespace ElMinero.Editor
                 CrearPrefabPlataformaFija(layerSuelo);
                 CrearPrefabPlataformaMovil(layerSuelo);
                 CrearPrefabPlataformaQuebradiza(layerSuelo);
+                CrearPrefabElevadorMalacate(layerSuelo);
 
                 // 3. Obstáculos
                 CrearPrefabRoca(layerPeligro);
@@ -54,18 +56,29 @@ namespace ElMinero.Editor
                 CrearPrefabHuecoLetal();
                 CrearPrefabZonaDerrumbe();
                 CrearPrefabBloqueDerrumbe();
+                CrearPrefabFuego(layerPeligro);
+                CrearPrefabVagoneta(layerPeligro);
 
                 // 4. Coleccionables
                 CrearPrefabVetaPlata(layerColeccionable);
                 CrearPrefabGemaAmatista(layerColeccionable);
+                CrearPrefabsMineralesDistintivos(layerColeccionable);
 
-                // 5. Niveles
+                // 5. Niveles y Entorno
                 CrearPrefabCheckpoint();
+                CrearPrefabCheckpointCapilla();
                 CrearPrefabSalidaNivel();
                 CrearPrefabAntorcha();
                 CrearPrefabViga();
+                CrearPrefabLetrero();
 
-                // 6. Sistemas
+                // 6. Enemigos
+                CrearPrefabMurcielago(layerPeligro);
+                CrearPrefabMurcielagoRojo(layerPeligro);
+                CrearPrefabArana(layerPeligro);
+                CrearPrefabAlacran(layerPeligro, layerSuelo);
+
+                // 7. Sistemas
                 CrearPrefabSistemas();
 
                 AssetDatabase.SaveAssets();
@@ -88,7 +101,8 @@ namespace ElMinero.Editor
                 "Assets/Prefabs/Coleccionables",
                 "Assets/Prefabs/Niveles",
                 "Assets/Prefabs/UI",
-                "Assets/Prefabs/Sistemas"
+                "Assets/Prefabs/Sistemas",
+                "Assets/Prefabs/Enemigos"
             };
 
             foreach (var d in dirs)
@@ -105,66 +119,57 @@ namespace ElMinero.Editor
             go.layer = layerJugador;
 
             var sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Jugador/Minero_Idle.png");
             sr.sortingLayerName = Constantes.SortingLayers.Jugador;
-
-            var rb = go.AddComponent<Rigidbody2D>();
-            rb.bodyType = RigidbodyType2D.Dynamic;
-            rb.interpolation = RigidbodyInterpolation2D.Interpolate;
-            rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-            rb.freezeRotation = true;
-            rb.gravityScale = 3f;
-
-            var col = go.AddComponent<CapsuleCollider2D>();
-            col.direction = CapsuleDirection2D.Vertical;
-            col.size = new Vector2(0.75f, 1.4f);
-            col.offset = new Vector2(0f, 0.7f);
-            col.sharedMaterial = AssetDatabase.LoadAssetAtPath<PhysicsMaterial2D>("Assets/Materiales/Fisica/SinFriccion.physicsMaterial2D");
-
-            go.AddComponent<PlayerInputHandler>();
-            var ctrl = go.AddComponent<PlayerController>();
-            go.AddComponent<PlayerHealth>();
+            sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Jugador/Minero_Idle.png");
 
             var anim = go.AddComponent<Animator>();
             anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Jugador/Minero.controller");
+
+            var rb = go.AddComponent<Rigidbody2D>();
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.gravityScale = 3.0f;
+            rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            rb.freezeRotation = true;
+
+            var col = go.AddComponent<CapsuleCollider2D>();
+            col.size = new Vector2(0.8f, 1.6f);
+            col.offset = new Vector2(0f, 0.8f);
+            col.sharedMaterial = AssetDatabase.LoadAssetAtPath<PhysicsMaterial2D>("Assets/Settings/SinFriccion.physicsMaterial2D");
+
+            go.AddComponent<PlayerController>();
+            go.AddComponent<PlayerHealth>();
+            go.AddComponent<PlayerInputHandler>();
             go.AddComponent<PlayerAnimator>();
 
-            SerializedObject soCtrl = new SerializedObject(ctrl);
-            soCtrl.FindProperty("groundLayer").intValue = 1 << layerSuelo;
-            soCtrl.FindProperty("spriteRenderer").objectReferenceValue = sr;
-            soCtrl.ApplyModifiedProperties();
-
-            // Etiqueta Nombre
-            GameObject label = new GameObject("EtiquetaNombre");
-            label.transform.SetParent(go.transform);
-            label.transform.localPosition = new Vector3(0f, 1.8f, 0f);
-            var tmp = label.AddComponent<TextMeshPro>();
+            // Nombre flotante
+            GameObject nameGo = new GameObject("NameLabel");
+            nameGo.transform.SetParent(go.transform);
+            nameGo.transform.localPosition = new Vector3(0f, 1.9f, 0f);
+            var tmp = nameGo.AddComponent<TextMeshPro>();
             tmp.text = "Refugio";
-            tmp.fontSize = 3.5f;
+            tmp.fontSize = 2.5f;
             tmp.alignment = TextAlignmentOptions.Center;
-            tmp.sortingLayerID = SortingLayer.NameToID(Constantes.SortingLayers.UI);
-            tmp.color = Color.yellow;
-            label.AddComponent<NameLabel>();
+            nameGo.AddComponent<NameLabel>();
 
-            // Luz Casco
-            GameObject luz = new GameObject("Luz_Casco");
-            luz.transform.SetParent(go.transform);
-            luz.transform.localPosition = new Vector3(0.2f, 1.2f, 0f);
-            var l2d = luz.AddComponent<Light2D>();
-            l2d.lightType = Light2D.LightType.Point;
-            l2d.pointLightInnerRadius = 0.5f;
-            l2d.pointLightOuterRadius = 4f;
-            l2d.intensity = 1.0f;
-            l2d.color = new Color(1f, 0.95f, 0.8f);
-            ElMineroBuilder.AsignarCapasALuz2D(l2d);
+            // Luz suave sobre el minero (lámpara del casco)
+            GameObject lightGo = new GameObject("LuzMinero");
+            lightGo.transform.SetParent(go.transform);
+            lightGo.transform.localPosition = new Vector3(0f, 1.2f, 0f);
+            var luz = lightGo.AddComponent<Light2D>();
+            luz.lightType = Light2D.LightType.Point;
+            luz.pointLightInnerRadius = 0.5f;
+            luz.pointLightOuterRadius = 4.0f;
+            luz.intensity = 1.1f;
+            luz.color = new Color(1f, 0.92f, 0.7f);
+            ElMineroBuilder.AsignarCapasALuz2D(luz);
 
             GuardarYDestruir(go, path);
         }
 
         private static void CrearPrefabPlataformaFija(int layerSuelo)
         {
-            string path = "Assets/Prefabs/Plataformas/PlataformaFija.prefab";
-            GameObject go = new GameObject("PlataformaFija");
+            string path = "Assets/Prefabs/Plataformas/Plataforma_Fija.prefab";
+            GameObject go = new GameObject("Plataforma_Fija");
             go.layer = layerSuelo;
 
             var sr = go.AddComponent<SpriteRenderer>();
@@ -179,42 +184,29 @@ namespace ElMinero.Editor
 
         private static void CrearPrefabPlataformaMovil(int layerSuelo)
         {
-            string path = "Assets/Prefabs/Plataformas/PlataformaMovil.prefab";
-            GameObject go = new GameObject("PlataformaMovil");
+            string path = "Assets/Prefabs/Plataformas/Plataforma_Movil.prefab";
+            GameObject go = new GameObject("Plataforma_Movil");
             go.layer = layerSuelo;
 
             var sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Plataformas/Plataforma_Movil.png");
             sr.sortingLayerName = Constantes.SortingLayers.Escenario;
 
-            var rb = go.AddComponent<Rigidbody2D>();
-            rb.bodyType = RigidbodyType2D.Kinematic;
-
             var col = go.AddComponent<BoxCollider2D>();
             col.size = new Vector2(3f, 0.5f);
 
-            GameObject pA = new GameObject("PuntoA");
-            pA.transform.SetParent(go.transform);
-            pA.transform.localPosition = Vector3.zero;
+            var rb = go.AddComponent<Rigidbody2D>();
+            rb.bodyType = RigidbodyType2D.Kinematic;
 
-            GameObject pB = new GameObject("PuntoB");
-            pB.transform.SetParent(go.transform);
-            pB.transform.localPosition = new Vector3(5f, 0f, 0f);
-
-            var mov = go.AddComponent<MovingPlatform>();
-            SerializedObject so = new SerializedObject(mov);
-            so.FindProperty("pointA").objectReferenceValue = pA.transform;
-            so.FindProperty("pointB").objectReferenceValue = pB.transform;
-            so.FindProperty("speed").floatValue = 2.0f;
-            so.ApplyModifiedProperties();
+            go.AddComponent<MovingPlatform>();
 
             GuardarYDestruir(go, path);
         }
 
         private static void CrearPrefabPlataformaQuebradiza(int layerSuelo)
         {
-            string path = "Assets/Prefabs/Plataformas/PlataformaQuebradiza.prefab";
-            GameObject go = new GameObject("PlataformaQuebradiza");
+            string path = "Assets/Prefabs/Plataformas/Plataforma_Quebradiza.prefab";
+            GameObject go = new GameObject("Plataforma_Quebradiza");
             go.layer = layerSuelo;
 
             var sr = go.AddComponent<SpriteRenderer>();
@@ -224,9 +216,42 @@ namespace ElMinero.Editor
             var col = go.AddComponent<BoxCollider2D>();
             col.size = new Vector2(3f, 0.5f);
 
-            go.AddComponent<BreakablePlatform>();
             var anim = go.AddComponent<Animator>();
             anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Obstaculos/PlataformaQuebradiza.controller");
+
+            go.AddComponent<BreakablePlatform>();
+
+            GuardarYDestruir(go, path);
+        }
+
+        private static void CrearPrefabElevadorMalacate(int layerSuelo)
+        {
+            string path = "Assets/Prefabs/Plataformas/Elevador_Malacate.prefab";
+            GameObject go = new GameObject("Elevador_Malacate");
+            go.layer = layerSuelo;
+
+            // Jaula del elevador
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Plataformas/Elevador_Jaula.png");
+            sr.sortingLayerName = Constantes.SortingLayers.Escenario;
+
+            var col = go.AddComponent<BoxCollider2D>();
+            col.size = new Vector2(3f, 0.4f);
+            col.offset = new Vector2(0f, -0.4f);
+
+            var rb = go.AddComponent<Rigidbody2D>();
+            rb.bodyType = RigidbodyType2D.Kinematic;
+
+            // Rueda de malacate superior
+            GameObject wheelGo = new GameObject("RuedaMalacate");
+            wheelGo.transform.SetParent(go.transform);
+            wheelGo.transform.localPosition = new Vector3(0f, 9f, 0f);
+            var srWheel = wheelGo.AddComponent<SpriteRenderer>();
+            srWheel.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Entorno/Malacate.png");
+            srWheel.sortingLayerName = Constantes.SortingLayers.Escenario;
+
+            var elevator = go.AddComponent<MineElevator>();
+            elevator.ConfigurarPuntos(Vector3.zero, new Vector3(0f, 8f, 0f), wheelGo.transform);
 
             GuardarYDestruir(go, path);
         }
@@ -243,22 +268,24 @@ namespace ElMinero.Editor
             sr.sortingLayerName = Constantes.SortingLayers.Objetos;
 
             var col = go.AddComponent<CircleCollider2D>();
-            col.radius = 0.45f;
+            col.radius = 0.5f;
 
             var rb = go.AddComponent<Rigidbody2D>();
             rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.gravityScale = 2.5f;
 
-            go.AddComponent<FallingRock>();
             var anim = go.AddComponent<Animator>();
             anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Obstaculos/Roca.controller");
+
+            go.AddComponent<FallingRock>();
 
             GuardarYDestruir(go, path);
         }
 
         private static void CrearPrefabRockSpawner()
         {
-            string path = "Assets/Prefabs/Obstaculos/GeneradorRocas.prefab";
-            GameObject go = new GameObject("GeneradorRocas");
+            string path = "Assets/Prefabs/Obstaculos/RockSpawner.prefab";
+            GameObject go = new GameObject("RockSpawner");
             go.AddComponent<RockSpawner>();
             GuardarYDestruir(go, path);
         }
@@ -268,10 +295,13 @@ namespace ElMinero.Editor
             string path = "Assets/Prefabs/Obstaculos/HuecoLetal.prefab";
             GameObject go = new GameObject("HuecoLetal");
             go.tag = Constantes.Tags.Hazard;
+
             var col = go.AddComponent<BoxCollider2D>();
             col.isTrigger = true;
             col.size = new Vector2(4f, 2f);
+
             go.AddComponent<DeathPit>();
+
             GuardarYDestruir(go, path);
         }
 
@@ -279,11 +309,13 @@ namespace ElMinero.Editor
         {
             string path = "Assets/Prefabs/Obstaculos/ZonaDerrumbe.prefab";
             GameObject go = new GameObject("ZonaDerrumbe");
+
             var col = go.AddComponent<BoxCollider2D>();
             col.isTrigger = true;
-            col.size = new Vector2(2.5f, 4f);
-            go.AddComponent<CinemachineImpulseSource>();
+            col.size = new Vector2(2f, 4f);
+
             go.AddComponent<CaveInZone>();
+
             GuardarYDestruir(go, path);
         }
 
@@ -292,20 +324,83 @@ namespace ElMinero.Editor
             string path = "Assets/Prefabs/Obstaculos/BloqueDerrumbe.prefab";
             GameObject go = new GameObject("BloqueDerrumbe");
             go.tag = Constantes.Tags.Hazard;
-            var col = go.AddComponent<BoxCollider2D>();
-            col.size = new Vector2(2f, 3f);
-            col.offset = new Vector2(0f, 1.5f);
+
             var sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Obstaculos/Bloque_Derrumbe.png");
             sr.sortingLayerName = Constantes.SortingLayers.Escenario;
+
+            var col = go.AddComponent<BoxCollider2D>();
+            col.size = new Vector2(1f, 1f);
+
+            var rb = go.AddComponent<Rigidbody2D>();
+            rb.bodyType = RigidbodyType2D.Dynamic;
+
             go.AddComponent<BloqueDerrumbe>();
+
+            GuardarYDestruir(go, path);
+        }
+
+        private static void CrearPrefabFuego(int layerPeligro)
+        {
+            string path = "Assets/Prefabs/Obstaculos/Fuego.prefab";
+            GameObject go = new GameObject("Fuego");
+            go.tag = Constantes.Tags.Hazard;
+            go.layer = layerPeligro;
+
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Obstaculos/Fuego.png");
+            sr.sortingLayerName = Constantes.SortingLayers.Objetos;
+
+            var anim = go.AddComponent<Animator>();
+            anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Obstaculos/Fuego.controller");
+
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(0.9f, 0.9f);
+            col.offset = new Vector2(0f, 0.45f);
+
+            go.AddComponent<FireHazard>();
+
+            GuardarYDestruir(go, path);
+        }
+
+        private static void CrearPrefabVagoneta(int layerPeligro)
+        {
+            string path = "Assets/Prefabs/Obstaculos/Vagoneta_Desbocada.prefab";
+            GameObject go = new GameObject("Vagoneta_Desbocada");
+            go.tag = Constantes.Tags.Hazard;
+            go.layer = layerPeligro;
+
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Enemigos/Vagoneta_Desbocada.png");
+            sr.sortingLayerName = Constantes.SortingLayers.Objetos;
+
+            var anim = go.AddComponent<Animator>();
+            anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Obstaculos/Vagoneta.controller");
+
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(1.8f, 1.2f);
+
+            // Aviso "¡!"
+            GameObject avisoGo = new GameObject("Aviso");
+            avisoGo.transform.SetParent(go.transform);
+            avisoGo.transform.localPosition = new Vector3(0f, 1.5f, 0f);
+            var tmp = avisoGo.AddComponent<TextMeshPro>();
+            tmp.text = "¡!";
+            tmp.fontSize = 4f;
+            tmp.color = Color.red;
+            tmp.alignment = TextAlignmentOptions.Center;
+
+            var cart = go.AddComponent<RunawayCart>();
+
             GuardarYDestruir(go, path);
         }
 
         private static void CrearPrefabVetaPlata(int layerColeccionable)
         {
-            string path = "Assets/Prefabs/Coleccionables/VetaPlata.prefab";
-            GameObject go = new GameObject("VetaPlata");
+            string path = "Assets/Prefabs/Coleccionables/Veta_Plata.prefab";
+            GameObject go = new GameObject("Veta_Plata");
             go.tag = Constantes.Tags.Collectible;
             go.layer = layerColeccionable;
 
@@ -313,21 +408,22 @@ namespace ElMinero.Editor
             sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Coleccionables/Veta_Plata.png");
             sr.sortingLayerName = Constantes.SortingLayers.Objetos;
 
+            var anim = go.AddComponent<Animator>();
+            anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Coleccionables/Veta.controller");
+
             var col = go.AddComponent<CircleCollider2D>();
             col.isTrigger = true;
             col.radius = 0.5f;
 
             go.AddComponent<SilverVein>();
-            var anim = go.AddComponent<Animator>();
-            anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Coleccionables/Veta.controller");
 
             GuardarYDestruir(go, path);
         }
 
         private static void CrearPrefabGemaAmatista(int layerColeccionable)
         {
-            string path = "Assets/Prefabs/Coleccionables/GemaAmatista.prefab";
-            GameObject go = new GameObject("GemaAmatista");
+            string path = "Assets/Prefabs/Coleccionables/Gema_Amatista.prefab";
+            GameObject go = new GameObject("Gema_Amatista");
             go.tag = Constantes.Tags.Collectible;
             go.layer = layerColeccionable;
 
@@ -335,13 +431,53 @@ namespace ElMinero.Editor
             sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Coleccionables/Gema_Amatista.png");
             sr.sortingLayerName = Constantes.SortingLayers.Objetos;
 
+            var anim = go.AddComponent<Animator>();
+            anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Coleccionables/Gema.controller");
+
             var col = go.AddComponent<CircleCollider2D>();
             col.isTrigger = true;
             col.radius = 0.5f;
 
             go.AddComponent<AmethystGem>();
+
+            GuardarYDestruir(go, path);
+        }
+
+        private static void CrearPrefabsMineralesDistintivos(int layerColeccionable)
+        {
+            // Aguilarita (N1)
+            CrearMineralPrefab("Aguilarita", "Assets/Sprites/Coleccionables/Aguilarita.png", "Assets/Controladores/Coleccionables/Aguilarita.controller",
+                "Aguilarita (Ag₄SeS): mineral de plata y selenio. La encontró Ponciano Aguilar en la mina San Carlos, vecina de Rayas, y se describió en 1891.", 1, layerColeccionable);
+
+            // Pepita de oro (N2)
+            CrearMineralPrefab("Pepita_Oro", "Assets/Sprites/Coleccionables/Pepita_Oro.png", "Assets/Controladores/Coleccionables/PepitaOro.controller",
+                "Pepita de oro: El Nopal no solo dio plata; también oro, zinc y cobre.", 2, layerColeccionable);
+
+            // Pirargirita (N3)
+            CrearMineralPrefab("Pirargirita", "Assets/Sprites/Coleccionables/Pirargirita.png", "Assets/Controladores/Coleccionables/Pirargirita.controller",
+                "Pirargirita (Ag₃SbS₃): la 'plata roja' de Guanajuato, un mineral de plata de color rojo oscuro.", 3, layerColeccionable);
+        }
+
+        private static void CrearMineralPrefab(string nombre, string spritePath, string ctrlPath, string descripcion, int nivel, int layerColeccionable)
+        {
+            string path = $"Assets/Prefabs/Coleccionables/{nombre}.prefab";
+            GameObject go = new GameObject(nombre);
+            go.tag = Constantes.Tags.Collectible;
+            go.layer = layerColeccionable;
+
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
+            sr.sortingLayerName = Constantes.SortingLayers.Objetos;
+
             var anim = go.AddComponent<Animator>();
-            anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Coleccionables/Gema.controller");
+            anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(ctrlPath);
+
+            var col = go.AddComponent<CircleCollider2D>();
+            col.isTrigger = true;
+            col.radius = 0.5f;
+
+            var mineral = go.AddComponent<DistinctiveMineral>();
+            mineral.ConfigurarMineral(nombre, descripcion, nivel);
 
             GuardarYDestruir(go, path);
         }
@@ -352,29 +488,71 @@ namespace ElMinero.Editor
             GameObject go = new GameObject("Checkpoint");
             go.tag = Constantes.Tags.Checkpoint;
 
+            var sr = go.AddComponent<SpriteRenderer>();
+            var sprites = AssetDatabase.LoadAllAssetsAtPath("Assets/Sprites/Coleccionables/Checkpoint.png");
+            Sprite spOff = null, spOn = null;
+            foreach (var s in sprites)
+            {
+                if (s is Sprite sp)
+                {
+                    if (spOff == null) spOff = sp;
+                    else if (spOn == null) spOn = sp;
+                }
+            }
+            sr.sprite = spOff;
+            sr.sortingLayerName = Constantes.SortingLayers.Objetos;
+
             var col = go.AddComponent<BoxCollider2D>();
             col.isTrigger = true;
             col.size = new Vector2(1f, 2f);
             col.offset = new Vector2(0f, 1f);
 
-            var sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Coleccionables/Checkpoint.png");
-            sr.sortingLayerName = Constantes.SortingLayers.Objetos;
-
             var luz = go.AddComponent<Light2D>();
             luz.lightType = Light2D.LightType.Point;
             luz.pointLightInnerRadius = 0.5f;
             luz.pointLightOuterRadius = 3f;
-            luz.intensity = 1.2f;
-            luz.color = new Color(0.4f, 0.9f, 1f);
+            luz.color = new Color(0.3f, 0.7f, 1f);
             luz.enabled = false;
             ElMineroBuilder.AsignarCapasALuz2D(luz);
 
-            var cp = go.AddComponent<Checkpoint>();
-            SerializedObject so = new SerializedObject(cp);
-            so.FindProperty("checkpointLight").objectReferenceValue = luz;
-            so.ApplyModifiedProperties();
+            go.AddComponent<Checkpoint>();
+            GuardarYDestruir(go, path);
+        }
 
+        private static void CrearPrefabCheckpointCapilla()
+        {
+            string path = "Assets/Prefabs/Niveles/Checkpoint_Capilla.prefab";
+            GameObject go = new GameObject("Checkpoint_Capilla");
+            go.tag = Constantes.Tags.Checkpoint;
+
+            var sr = go.AddComponent<SpriteRenderer>();
+            var sprites = AssetDatabase.LoadAllAssetsAtPath("Assets/Sprites/Coleccionables/Checkpoint_Capilla.png");
+            Sprite spOff = null, spOn = null;
+            foreach (var s in sprites)
+            {
+                if (s is Sprite sp)
+                {
+                    if (spOff == null) spOff = sp;
+                    else if (spOn == null) spOn = sp;
+                }
+            }
+            sr.sprite = spOff;
+            sr.sortingLayerName = Constantes.SortingLayers.Objetos;
+
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(1.5f, 2f);
+            col.offset = new Vector2(0f, 1f);
+
+            var luz = go.AddComponent<Light2D>();
+            luz.lightType = Light2D.LightType.Point;
+            luz.pointLightInnerRadius = 0.8f;
+            luz.pointLightOuterRadius = 4f;
+            luz.color = new Color(1f, 0.8f, 0.4f); // Luz cálida de velas
+            luz.enabled = false;
+            ElMineroBuilder.AsignarCapasALuz2D(luz);
+
+            go.AddComponent<Checkpoint>();
             GuardarYDestruir(go, path);
         }
 
@@ -382,16 +560,19 @@ namespace ElMinero.Editor
         {
             string path = "Assets/Prefabs/Niveles/SalidaNivel.prefab";
             GameObject go = new GameObject("SalidaNivel");
-            var col = go.AddComponent<BoxCollider2D>();
-            col.isTrigger = true;
-            col.size = new Vector2(2f, 3f);
-            col.offset = new Vector2(0f, 1.5f);
+            go.tag = Constantes.Tags.Exit;
 
             var sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Entorno/Salida_Tunel.png");
-            sr.sortingLayerName = Constantes.SortingLayers.Objetos;
+            sr.sortingLayerName = Constantes.SortingLayers.Escenario;
+
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(1.5f, 2.5f);
+            col.offset = new Vector2(0f, 1.25f);
 
             go.AddComponent<LevelExit>();
+
             GuardarYDestruir(go, path);
         }
 
@@ -429,21 +610,150 @@ namespace ElMinero.Editor
             GuardarYDestruir(go, path);
         }
 
+        private static void CrearPrefabLetrero()
+        {
+            string path = "Assets/Prefabs/Niveles/Letrero.prefab";
+            GameObject go = new GameObject("Letrero");
+
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Entorno/Letrero.png");
+            sr.sortingLayerName = Constantes.SortingLayers.Escenario;
+
+            GameObject textGo = new GameObject("TextoLetrero");
+            textGo.transform.SetParent(go.transform);
+            textGo.transform.localPosition = new Vector3(0f, 1.2f, 0f);
+            var tmp = textGo.AddComponent<TextMeshPro>();
+            tmp.text = "Aviso";
+            tmp.fontSize = 2f;
+            tmp.alignment = TextAlignmentOptions.Center;
+
+            GuardarYDestruir(go, path);
+        }
+
+        // ====================================================================
+        // ENEMIGOS
+        // ====================================================================
+
+        private static void CrearPrefabMurcielago(int layerPeligro)
+        {
+            string path = "Assets/Prefabs/Enemigos/Murcielago.prefab";
+            GameObject go = new GameObject("Murcielago");
+            go.tag = Constantes.Tags.Hazard;
+            go.layer = layerPeligro;
+
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Enemigos/Murcielago.png");
+            sr.sortingLayerName = Constantes.SortingLayers.Jugador;
+
+            var anim = go.AddComponent<Animator>();
+            anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Enemigos/Murcielago.controller");
+
+            var col = go.AddComponent<CircleCollider2D>();
+            col.isTrigger = true;
+            col.radius = 0.45f;
+
+            go.AddComponent<BatPatrol>();
+
+            GuardarYDestruir(go, path);
+        }
+
+        private static void CrearPrefabMurcielagoRojo(int layerPeligro)
+        {
+            string path = "Assets/Prefabs/Enemigos/Murcielago_Rojo.prefab";
+            GameObject go = new GameObject("Murcielago_Rojo");
+            go.tag = Constantes.Tags.Hazard;
+            go.layer = layerPeligro;
+
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Enemigos/Murcielago_Rojo.png");
+            sr.sortingLayerName = Constantes.SortingLayers.Jugador;
+
+            var anim = go.AddComponent<Animator>();
+            anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Enemigos/MurcielagoRojo.controller");
+
+            var col = go.AddComponent<CircleCollider2D>();
+            col.isTrigger = true;
+            col.radius = 0.45f;
+
+            go.AddComponent<BatDiver>();
+
+            GuardarYDestruir(go, path);
+        }
+
+        private static void CrearPrefabArana(int layerPeligro)
+        {
+            string path = "Assets/Prefabs/Enemigos/Arana.prefab";
+            GameObject go = new GameObject("Arana");
+            go.tag = Constantes.Tags.Hazard;
+            go.layer = layerPeligro;
+
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Enemigos/Arana.png");
+            sr.sortingLayerName = Constantes.SortingLayers.Jugador;
+
+            var anim = go.AddComponent<Animator>();
+            anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Enemigos/Arana.controller");
+
+            var col = go.AddComponent<CircleCollider2D>();
+            col.isTrigger = true;
+            col.radius = 0.45f;
+
+            // Hilo superior
+            GameObject hiloGo = new GameObject("Hilo");
+            hiloGo.transform.SetParent(go.transform);
+            var srHilo = hiloGo.AddComponent<SpriteRenderer>();
+            srHilo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Enemigos/Hilo_Arana.png");
+            srHilo.sortingLayerName = Constantes.SortingLayers.Escenario;
+            srHilo.drawMode = SpriteDrawMode.Tiled;
+
+            go.AddComponent<SpiderDrop>();
+
+            GuardarYDestruir(go, path);
+        }
+
+        private static void CrearPrefabAlacran(int layerPeligro, int layerSuelo)
+        {
+            string path = "Assets/Prefabs/Enemigos/Alacran.prefab";
+            GameObject go = new GameObject("Alacran");
+            go.tag = Constantes.Tags.Hazard;
+            go.layer = layerPeligro;
+
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Enemigos/Alacran_Caminar.png");
+            sr.sortingLayerName = Constantes.SortingLayers.Jugador;
+
+            var anim = go.AddComponent<Animator>();
+            anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Enemigos/Alacran.controller");
+
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(1.2f, 0.6f);
+            col.offset = new Vector2(0f, 0.3f);
+
+            var rb = go.AddComponent<Rigidbody2D>();
+            rb.bodyType = RigidbodyType2D.Kinematic;
+
+            go.AddComponent<ScorpionAI>();
+
+            GuardarYDestruir(go, path);
+        }
+
+        // ====================================================================
+        // SISTEMAS
+        // ====================================================================
+
         private static void CrearPrefabSistemas()
         {
-            // GameManager
             string pathGm = "Assets/Prefabs/Sistemas/GameManager.prefab";
             GameObject goGm = new GameObject("GameManager");
             goGm.AddComponent<GameManager>();
             GuardarYDestruir(goGm, pathGm);
 
-            // AudioManager
             string pathAm = "Assets/Prefabs/Sistemas/AudioManager.prefab";
             GameObject goAm = new GameObject("AudioManager");
             goAm.AddComponent<AudioManager>();
             GuardarYDestruir(goAm, pathAm);
 
-            // CamaraNivel
             string pathCam = "Assets/Prefabs/Sistemas/CamaraNivel.prefab";
             GameObject goCam = new GameObject("Main Camera");
             goCam.tag = "MainCamera";

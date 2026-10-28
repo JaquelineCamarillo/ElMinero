@@ -19,6 +19,8 @@ namespace ElMinero.Managers
 
         private readonly List<Collectible> registeredCollectibles = new List<Collectible>();
 
+        private bool hasCollectedDistinctiveMineral = false;
+
         // Eventos C#
         public event Action<int, int> OnSilverUpdated; // (recolectadas, total)
         public event Action<int, int> OnGemsUpdated;   // (recolectadas, total)
@@ -27,6 +29,7 @@ namespace ElMinero.Managers
         public int CollectedSilver => collectedSilver;
         public int TotalGemsInLevel => totalGemsInLevel;
         public int CollectedGems => collectedGems;
+        public bool HasCollectedDistinctiveMineral => hasCollectedDistinctiveMineral;
         public bool AllSilverCollected => totalSilverInLevel > 0 && collectedSilver >= totalSilverInLevel;
 
         private void Start()
@@ -44,11 +47,12 @@ namespace ElMinero.Managers
             totalGemsInLevel = 0;
             collectedSilver = 0;
             collectedGems = 0;
+            hasCollectedDistinctiveMineral = false;
 
             foreach (var col in registeredCollectibles)
             {
                 if (col is SilverVein) totalSilverInLevel++;
-                else if (col is AmethystGem) totalGemsInLevel++;
+                else if (col is AmethystGem || col is DistinctiveMineral) totalGemsInLevel++;
             }
 
             OnSilverUpdated?.Invoke(collectedSilver, totalSilverInLevel);
@@ -75,10 +79,18 @@ namespace ElMinero.Managers
             OnGemsUpdated?.Invoke(collectedGems, totalGemsInLevel);
         }
 
+        public void RegistrarMineralDistintivoRecolectado()
+        {
+            hasCollectedDistinctiveMineral = true;
+            collectedGems++;
+            OnGemsUpdated?.Invoke(collectedGems, totalGemsInLevel);
+        }
+
         public void ResetObject()
         {
             collectedSilver = 0;
             collectedGems = 0;
+            hasCollectedDistinctiveMineral = false;
 
             foreach (var c in registeredCollectibles)
             {
