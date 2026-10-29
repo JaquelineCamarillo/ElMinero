@@ -84,7 +84,7 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // 1. MENÃš PRINCIPAL
+        // 1. MENÃš PRINCIPAL (Parallax 3 capas, Logo Grande, Panel 620x740)
         // ====================================================================
         public static void ConstruirMenuPrincipal()
         {
@@ -102,20 +102,64 @@ namespace ElMinero.Editor
             camObj.AddComponent<AudioListener>();
             camObj.AddComponent<UniversalAdditionalCameraData>();
 
-            // Fondo visual del menÃº
-            GameObject fondo = new GameObject("Fondo_Menu");
-            var srFondo = fondo.AddComponent<SpriteRenderer>();
-            srFondo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Fondos/Fondo_Menu.png");
-            srFondo.sortingLayerName = Constantes.SortingLayers.Fondo;
-            fondo.transform.position = new Vector3(0f, 0f, 0f);
-            fondo.transform.localScale = new Vector3(1.2f, 1.2f, 1f);
+            // Fondo visual con efecto Parallax de 3 capas
+            GameObject rootFondo = new GameObject("Fondo_Parallax_Menu");
+            var parallaxComp = rootFondo.AddComponent<MenuParallax>();
 
-            // Luz tenue
+            // Capa 0: Cielo nocturno con luna
+            GameObject goCapa0 = new GameObject("Capa0_Cielo");
+            goCapa0.transform.SetParent(rootFondo.transform);
+            goCapa0.transform.position = new Vector3(0f, 0f, 0f);
+            goCapa0.transform.localScale = new Vector3(1.15f, 1.15f, 1f);
+            var sr0 = goCapa0.AddComponent<SpriteRenderer>();
+            sr0.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Fondos/Menu/FondoMenu_Capa0_Cielo.png");
+            sr0.sortingLayerName = Constantes.SortingLayers.Fondo;
+            sr0.sortingOrder = -10;
+
+            // Capa 1: CaÃ±ada de Guanajuato y BasÃ­lica
+            GameObject goCapa1 = new GameObject("Capa1_Ciudad");
+            goCapa1.transform.SetParent(rootFondo.transform);
+            goCapa1.transform.position = new Vector3(0f, -0.2f, 0f);
+            goCapa1.transform.localScale = new Vector3(1.15f, 1.15f, 1f);
+            var sr1 = goCapa1.AddComponent<SpriteRenderer>();
+            sr1.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Fondos/Menu/FondoMenu_Capa1_Ciudad.png");
+            sr1.sortingLayerName = Constantes.SortingLayers.Fondo;
+            sr1.sortingOrder = -5;
+
+            // Capa 2: Frente (Bocamina, rieles, faroles, vagoneta)
+            GameObject goCapa2 = new GameObject("Capa2_Frente");
+            goCapa2.transform.SetParent(rootFondo.transform);
+            goCapa2.transform.position = new Vector3(0f, -0.3f, 0f);
+            goCapa2.transform.localScale = new Vector3(1.15f, 1.15f, 1f);
+            var sr2 = goCapa2.AddComponent<SpriteRenderer>();
+            sr2.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Fondos/Menu/FondoMenu_Capa2_Frente.png");
+            sr2.sortingLayerName = Constantes.SortingLayers.Fondo;
+            sr2.sortingOrder = 0;
+
+            // Configurar referencias en MenuParallax
+            SerializedObject soParallax = new SerializedObject(parallaxComp);
+            soParallax.FindProperty("capaCielo").objectReferenceValue = goCapa0.transform;
+            soParallax.FindProperty("capaCiudad").objectReferenceValue = goCapa1.transform;
+            soParallax.FindProperty("capaFrente").objectReferenceValue = goCapa2.transform;
+            soParallax.ApplyModifiedProperties();
+
+            // Luz global
             GameObject luz = new GameObject("LuzGlobal");
             var l2d = luz.AddComponent<Light2D>();
             l2d.lightType = Light2D.LightType.Global;
             l2d.intensity = 1.0f;
             ElMineroBuilder.AsignarCapasALuz2D(l2d);
+
+            // Personaje Minero en Idle sobre los rieles a la izquierda (~200px visual)
+            GameObject mineroObj = new GameObject("Minero_Menu");
+            mineroObj.transform.position = new Vector3(-4.5f, -2.5f, 0f);
+            mineroObj.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
+            var srM = mineroObj.AddComponent<SpriteRenderer>();
+            srM.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Jugador/Minero_Idle.png");
+            srM.sortingLayerName = Constantes.SortingLayers.Escenario;
+            srM.sortingOrder = 5;
+            var animM = mineroObj.AddComponent<Animator>();
+            animM.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Jugador/Minero.controller");
 
             // Canvas UI
             GameObject canvasObj = CrearCanvasBase("Canvas_MenuPrincipal");
@@ -124,114 +168,115 @@ namespace ElMinero.Editor
             TMP_FontAsset fontTitulo = FontAssetBuilder.ObtenerPressStart2P();
             TMP_FontAsset fontTexto = FontAssetBuilder.ObtenerPixelifySans();
 
-            // Logo
+            // Logo Grande centrado arriba
             GameObject logoObj = new GameObject("Logo_ElMinero");
             logoObj.transform.SetParent(canvasObj.transform, false);
             var rectLogo = logoObj.AddComponent<RectTransform>();
-            rectLogo.anchorMin = new Vector2(0.5f, 0.82f);
-            rectLogo.anchorMax = new Vector2(0.5f, 0.82f);
-            rectLogo.sizeDelta = new Vector2(460f, 150f);
+            rectLogo.anchorMin = new Vector2(0.5f, 1f);
+            rectLogo.anchorMax = new Vector2(0.5f, 1f);
+            rectLogo.pivot = new Vector2(0.5f, 1f);
+            rectLogo.anchoredPosition = new Vector2(0f, -40f);
+            rectLogo.sizeDelta = new Vector2(1160f, 256f);
             var imgLogo = logoObj.AddComponent<Image>();
-            imgLogo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Logo_ElMinero.png");
+            Sprite logoGrande = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Logo_ElMinero_Grande.png");
+            if (logoGrande == null) logoGrande = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Logo_ElMinero.png");
+            imgLogo.sprite = logoGrande;
             imgLogo.preserveAspect = true;
 
-            // SubtÃ­tulo
-            GameObject subObj = new GameObject("Subtitulo");
-            subObj.transform.SetParent(canvasObj.transform, false);
-            var rectSub = subObj.AddComponent<RectTransform>();
-            rectSub.anchorMin = new Vector2(0.5f, 0.72f);
-            rectSub.anchorMax = new Vector2(0.5f, 0.72f);
-            rectSub.sizeDelta = new Vector2(500f, 35f);
-            var tmpSub = subObj.AddComponent<TextMeshProUGUI>();
-            tmpSub.font = fontTexto;
-            tmpSub.text = "Minas de Guanajuato, Siglo XIX";
-            tmpSub.fontSize = 22f;
-            tmpSub.alignment = TextAlignmentOptions.Center;
-            tmpSub.color = new Color(0.9f, 0.8f, 0.6f);
-
-            // Minero en Idle al lado izquierdo
-            GameObject mineroObj = new GameObject("Minero_Menu");
-            mineroObj.transform.position = new Vector3(-4.8f, -1.8f, 0f);
-            mineroObj.transform.localScale = new Vector3(2.5f, 2.5f, 1f);
-            var srM = mineroObj.AddComponent<SpriteRenderer>();
-            srM.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Jugador/Minero_Idle.png");
-            srM.sortingLayerName = Constantes.SortingLayers.Escenario;
-            var animM = mineroObj.AddComponent<Animator>();
-            animM.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Jugador/Minero.controller");
-
-            // Panel de Entrada de Nombre y Botones
-            GameObject panelMadera = new GameObject("Panel_Central");
+            // Panel de Botones a la derecha (620x740)
+            GameObject panelMadera = new GameObject("Panel_Lateral");
             panelMadera.transform.SetParent(canvasObj.transform, false);
             var rectPanel = panelMadera.AddComponent<RectTransform>();
-            rectPanel.anchorMin = new Vector2(0.5f, 0.40f);
-            rectPanel.anchorMax = new Vector2(0.5f, 0.40f);
-            rectPanel.sizeDelta = new Vector2(460f, 410f);
+            rectPanel.anchorMin = new Vector2(1f, 0.5f);
+            rectPanel.anchorMax = new Vector2(1f, 0.5f);
+            rectPanel.pivot = new Vector2(1f, 0.5f);
+            rectPanel.anchoredPosition = new Vector2(-120f, -40f);
+            rectPanel.sizeDelta = new Vector2(620f, 740f);
             var imgPanel = panelMadera.AddComponent<Image>();
             imgPanel.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
             imgPanel.type = Image.Type.Sliced;
+            imgPanel.pixelsPerUnitMultiplier = 0.25f;
 
             // Etiqueta Nombre
             GameObject labelNombre = new GameObject("Label_Nombre");
             labelNombre.transform.SetParent(panelMadera.transform, false);
             var rectLn = labelNombre.AddComponent<RectTransform>();
-            rectLn.anchoredPosition = new Vector2(0f, 165f);
-            rectLn.sizeDelta = new Vector2(380f, 26f);
+            rectLn.anchoredPosition = new Vector2(0f, 295f);
+            rectLn.sizeDelta = new Vector2(540f, 36f);
             var tmpLn = labelNombre.AddComponent<TextMeshProUGUI>();
             tmpLn.font = fontTexto;
             tmpLn.text = "Nombre del Minero:";
-            tmpLn.fontSize = 18f;
+            tmpLn.fontSize = 30f;
             tmpLn.alignment = TextAlignmentOptions.Center;
-            tmpLn.color = new Color(0.95f, 0.9f, 0.75f);
+            tmpLn.color = new Color(0.96f, 0.91f, 0.75f);
 
-            // InputField
+            // InputField de Nombre (540x76)
             GameObject inputObj = new GameObject("InputField_Nombre");
             inputObj.transform.SetParent(panelMadera.transform, false);
             var rectInput = inputObj.AddComponent<RectTransform>();
-            rectInput.anchoredPosition = new Vector2(0f, 130f);
-            rectInput.sizeDelta = new Vector2(320f, 40f);
+            rectInput.anchoredPosition = new Vector2(0f, 225f);
+            rectInput.sizeDelta = new Vector2(540f, 76f);
             var imgInput = inputObj.AddComponent<Image>();
-            imgInput.color = new Color(0.12f, 0.08f, 0.06f, 0.95f);
+            imgInput.color = new Color(0.10f, 0.07f, 0.05f, 0.92f);
 
+            // Placeholder
+            GameObject phObj = new GameObject("Placeholder");
+            phObj.transform.SetParent(inputObj.transform, false);
+            var rectPh = phObj.AddComponent<RectTransform>();
+            rectPh.anchorMin = Vector2.zero;
+            rectPh.anchorMax = Vector2.one;
+            rectPh.offsetMin = new Vector2(16f, 0f);
+            rectPh.offsetMax = new Vector2(-16f, 0f);
+            var tmpPh = phObj.AddComponent<TextMeshProUGUI>();
+            tmpPh.font = fontTexto;
+            tmpPh.fontSize = 28f;
+            tmpPh.alignment = TextAlignmentOptions.Midline;
+            tmpPh.color = new Color(0.6f, 0.55f, 0.5f, 0.7f);
+            tmpPh.text = "Refugio";
+
+            // Texto ingresado
             GameObject textObj = new GameObject("Text");
             textObj.transform.SetParent(inputObj.transform, false);
             var rectTxt = textObj.AddComponent<RectTransform>();
             rectTxt.anchorMin = Vector2.zero;
             rectTxt.anchorMax = Vector2.one;
-            rectTxt.offsetMin = new Vector2(10f, 0f);
-            rectTxt.offsetMax = new Vector2(-10f, 0f);
+            rectTxt.offsetMin = new Vector2(16f, 0f);
+            rectTxt.offsetMax = new Vector2(-16f, 0f);
             var tmpText = textObj.AddComponent<TextMeshProUGUI>();
             tmpText.font = fontTexto;
-            tmpText.fontSize = 20f;
+            tmpText.fontSize = 34f;
             tmpText.alignment = TextAlignmentOptions.Midline;
-            tmpText.color = new Color(1f, 0.85f, 0.3f);
+            tmpText.color = new Color(1f, 0.88f, 0.35f);
 
             var inputField = inputObj.AddComponent<TMP_InputField>();
+            inputField.textViewport = rectInput;
             inputField.textComponent = tmpText;
+            inputField.placeholder = tmpPh;
             inputField.characterLimit = 12;
 
-            // 6 Botones del menÃº
-            Button btnPlay = CrearBotonMadera(panelMadera.transform, "Boton_Jugar", "Â¡A Jugar!", new Vector2(0f, 75f), new Vector2(280f, 44f));
-            Button btnContinue = CrearBotonMadera(panelMadera.transform, "Boton_Continuar", "Continuar", new Vector2(0f, 25f), new Vector2(280f, 44f));
-            Button btnLevels = CrearBotonMadera(panelMadera.transform, "Boton_Niveles", "Niveles", new Vector2(0f, -25f), new Vector2(280f, 44f));
-            Button btnOptions = CrearBotonMadera(panelMadera.transform, "Boton_Opciones", "Opciones", new Vector2(0f, -75f), new Vector2(280f, 44f));
-            Button btnCredits = CrearBotonMadera(panelMadera.transform, "Boton_Creditos", "CrÃ©ditos", new Vector2(0f, -125f), new Vector2(280f, 44f));
-            Button btnQuit = CrearBotonMadera(panelMadera.transform, "Boton_Salir", "Salir", new Vector2(0f, -170f), new Vector2(280f, 40f));
+            // 6 Botones del menÃº (Continuar, Nuevo Juego, Niveles, Opciones, CrÃ©ditos, Salir)
+            Button btnContinue = CrearBotonMadera(panelMadera.transform, "Boton_Continuar", "Continuar", new Vector2(0f, 135f), new Vector2(540f, 84f));
+            Button btnPlay = CrearBotonMadera(panelMadera.transform, "Boton_Jugar", "Nuevo Juego", new Vector2(0f, 45f), new Vector2(540f, 84f));
+            Button btnLevels = CrearBotonMadera(panelMadera.transform, "Boton_Niveles", "Niveles", new Vector2(0f, -45f), new Vector2(540f, 84f));
+            Button btnOptions = CrearBotonMadera(panelMadera.transform, "Boton_Opciones", "Opciones", new Vector2(0f, -135f), new Vector2(540f, 84f));
+            Button btnCredits = CrearBotonMadera(panelMadera.transform, "Boton_Creditos", "CrÃ©ditos", new Vector2(0f, -225f), new Vector2(540f, 84f));
+            Button btnQuit = CrearBotonMadera(panelMadera.transform, "Boton_Salir", "Salir", new Vector2(0f, -305f), new Vector2(540f, 56f));
 
-            // Texto VersiÃ³n en esquina inferior derecha
+            // Texto VersiÃ³n en esquina inferior izquierda
             GameObject verObj = new GameObject("Texto_Version");
             verObj.transform.SetParent(canvasObj.transform, false);
             var rectVer = verObj.AddComponent<RectTransform>();
-            rectVer.anchorMin = new Vector2(1f, 0f);
-            rectVer.anchorMax = new Vector2(1f, 0f);
-            rectVer.pivot = new Vector2(1f, 0f);
-            rectVer.anchoredPosition = new Vector2(-20f, 15f);
-            rectVer.sizeDelta = new Vector2(200f, 30f);
+            rectVer.anchorMin = new Vector2(0f, 0f);
+            rectVer.anchorMax = new Vector2(0f, 0f);
+            rectVer.pivot = new Vector2(0f, 0f);
+            rectVer.anchoredPosition = new Vector2(40f, 30f);
+            rectVer.sizeDelta = new Vector2(300f, 40f);
             var tmpVer = verObj.AddComponent<TextMeshProUGUI>();
             tmpVer.font = fontTexto;
             tmpVer.text = "v1.0.0";
-            tmpVer.fontSize = 16f;
-            tmpVer.alignment = TextAlignmentOptions.BottomRight;
-            tmpVer.color = new Color(0.7f, 0.7f, 0.7f, 0.7f);
+            tmpVer.fontSize = 28f;
+            tmpVer.alignment = TextAlignmentOptions.BottomLeft;
+            tmpVer.color = new Color(0.8f, 0.8f, 0.8f, 0.85f);
 
             // Instanciar Prefabs Modales (Niveles, Opciones, CrÃ©ditos)
             GameObject pLevelSelect = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/LevelSelectPanel.prefab");
@@ -281,6 +326,7 @@ namespace ElMinero.Editor
             CrearSistemasPersistentes();
 
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/MenuPrincipal.unity");
+            Debug.Log("[LevelBuilder] Escena MenuPrincipal.unity construida exitosamente.");
         }
 
         // ====================================================================
