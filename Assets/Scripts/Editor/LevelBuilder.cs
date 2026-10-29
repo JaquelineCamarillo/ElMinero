@@ -1578,6 +1578,68 @@ namespace ElMinero.Editor
             warnTemplate.SetActive(false);
         }
 
+        private static void CrearBolaFuegoSpawner(Vector3 pos, float intervalo, float delayInicial)
+        {
+            GameObject spawnerObj = new GameObject("BolaFuego_Spawner");
+            spawnerObj.transform.position = pos;
+
+            // Objeto hijo para humo de advertencia en el techo
+            GameObject smokeObj = new GameObject("Aviso_Humo");
+            smokeObj.transform.SetParent(spawnerObj.transform, false);
+            smokeObj.transform.localPosition = Vector3.zero;
+            var srSmoke = smokeObj.AddComponent<SpriteRenderer>();
+            srSmoke.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Obstaculos/Humo.png");
+            srSmoke.sortingLayerName = Constantes.SortingLayers.Objetos;
+
+            // Prefab de bola de fuego
+            GameObject prefabBola = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Obstaculos/Bola_Fuego.prefab");
+
+            var spawner = spawnerObj.AddComponent<FireballSpawner>();
+            spawner.Configurar(intervalo, delayInicial, prefabBola, smokeObj);
+        }
+
+        private static void CrearMuroIncendio(Vector3 startPos, float endX, Vector3 triggerPos)
+        {
+            GameObject wallObj = new GameObject("Muro_Incendio");
+            wallObj.transform.position = startPos;
+            wallObj.tag = Constantes.Tags.Hazard;
+            int layerPeligro = LayerMask.NameToLayer(Constantes.Layers.Peligro);
+            if (layerPeligro != -1) wallObj.layer = layerPeligro;
+
+            // Columna de 5 llamas apiladas (Llamas_Incendio.png)
+            Sprite spLlama = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Obstaculos/Llamas_Incendio.png");
+            for (int i = 0; i < 5; i++)
+            {
+                GameObject llama = new GameObject($"Llama_{i}");
+                llama.transform.SetParent(wallObj.transform, false);
+                llama.transform.localPosition = new Vector3(0f, i * 2f, 0f);
+                var sr = llama.AddComponent<SpriteRenderer>();
+                sr.sprite = spLlama;
+                sr.sortingLayerName = Constantes.SortingLayers.Objetos;
+            }
+
+            var col = wallObj.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(1.5f, 10f);
+            col.offset = new Vector2(0f, 4.5f);
+
+            var audioSrc = wallObj.AddComponent<AudioSource>();
+            audioSrc.clip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/Fuego_Loop.wav");
+            audioSrc.loop = true;
+            audioSrc.playOnAwake = false;
+
+            var fireWall = wallObj.AddComponent<FireWallChase>();
+
+            // Trigger para activar la persecuciÃ³n
+            GameObject trigObj = new GameObject("Trigger_Incendio");
+            trigObj.transform.position = triggerPos;
+            var trigCol = trigObj.AddComponent<BoxCollider2D>();
+            trigCol.isTrigger = true;
+            trigCol.size = new Vector2(2f, 8f);
+            var trigScript = trigObj.AddComponent<FireChaseTrigger>();
+            trigScript.Configurar(fireWall);
+        }
+
         private static void CrearCheckpoint(Vector3 pos)
         {
             GameObject cp = new GameObject("Checkpoint");

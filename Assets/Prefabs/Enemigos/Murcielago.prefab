@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1549341370801013932}
   - component: {fileID: 3547201501561937644}
   - component: {fileID: 5813537712471389986}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: Murcielago
   m_TagString: Hazard
   m_Icon: {fileID: 0}

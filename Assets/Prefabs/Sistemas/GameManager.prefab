@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdf1b633e8c539944b71ab9bc5148bb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Managers.GameManager
-  playerName: Refugio
+  playerName: Minero
   totalScore: 0
   currentLevelScore: 0
   highScore: 0

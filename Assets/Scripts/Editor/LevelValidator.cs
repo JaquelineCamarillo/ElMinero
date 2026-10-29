@@ -24,6 +24,7 @@ namespace ElMinero.Editor
 
         [MenuItem("Herramientas/El Minero/Validar niveles", priority = 20)]
         [MenuItem("Herramientas/El Minero/Plantar objetos flotantes al suelo", priority = 21)]
+        public static void ValidarTodosLosNiveles() => ValidarYCorregirTodosLosNiveles();
         public static void ValidarYCorregirTodosLosNiveles()
         {
             int totalCorregidos = 0;

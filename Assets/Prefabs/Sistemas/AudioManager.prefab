@@ -44,12 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d392f27ba0ca3847938e307a5a5b334, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Managers.AudioManager
-  audioMixer: {fileID: 0}
-  musicGroup: {fileID: 0}
-  sfxGroup: {fileID: 0}
+  audioLibrary: {fileID: 0}
   musicSourceA: {fileID: 0}
   musicSourceB: {fileID: 0}
-  sfxPoolSize: 12
+  sfxPoolSize: 16
   musicMenu: {fileID: 0}
   musicNivel1: {fileID: 0}
   musicNivel2: {fileID: 0}

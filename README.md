@@ -95,6 +95,35 @@ El ejecutable compilado se guardará en:
 
 ---
 
+
+---
+
+## ðŸŒ¿ Historial de Ramas y Control de Versiones
+
+El desarrollo siguiÃ³ estrictamente la metodologÃ­a de trabajo por ramas temÃ¡ticas en Git:
+
+### Ramas de CaracterÃ­sticas (feature/*):
+- eature/input-gamepad: ConfiguraciÃ³n de Input System 1.20 y soporte para mandos.
+- eature/audio-mixer: Mezcla de audio con curvas de urgencia y pitch dinÃ¡mico.
+- eature/enemigos: ImplementaciÃ³n de enemigos del paquete v2 con IA 2D.
+- eature/narrativa-minerales: IntegraciÃ³n de minerales histÃ³ricos con contexto de Guanajuato.
+- eature/ui-modales: Paneles modales estandarizados con fuentes TTF oficiales.
+- eature/escenas-flujo: Reemplazo de Victoria/Derrota por flujo continuo de 7 escenas.
+- eature/builds: AutomatizaciÃ³n de compilaciones multiplataforma e idempotencia.
+
+### Ramas de CorrecciÃ³n e IntegraciÃ³n v3 (fix/*):
+- ix/audio: AudioLibrary (ScriptableObject) con enrutamiento de mÃºsica por escena y volumen directo.
+- ix/ui-tamanos: Dimensiones canÃ³nicas de paneles, tamaÃ±o tipogrÃ¡fico >= 26 pt y selector cÃ­clico â—€ Alta â–¶.
+- ix/menu: MenÃº con Parallax en 3 capas, nuevo tÃ­tulo Logo_ElMinero_Grande.png y animaciÃ³n de Refugio.
+- ix/paneles: Ocultamiento correcto de botones de pausa al abrir opciones, UTF-8 en narrativas y tarjetas sin marco vacÃ­o.
+- ix/elevador: MÃ¡quina de estados desacoplada en el elevador, cable continuo LineRenderer y castillete anclado.
+- ix/enemigos: Capa 12 Enemigo configurada, anclaje de telaraÃ±a al techo y raycast de suelo en alacranes.
+- ix/objetos-flotantes: LevelValidator procedural para plantar checkpoints y bloques al suelo con luz cÃ¡lida 2D.
+- ix/fuego: Bolas de fuego con aviso de humo y muro de incendio perseguidor en La Valenciana.
+
+---
+
+
 ## 👥 Datos Académicos y Créditos
 
 - **Autora:** Juana Jaqueline Camarillo Olaez

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4254085998021560398}
   - component: {fileID: 163048134501219612}
   - component: {fileID: 7865455463577831488}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: Vagoneta_Desbocada
   m_TagString: Hazard
   m_Icon: {fileID: 0}

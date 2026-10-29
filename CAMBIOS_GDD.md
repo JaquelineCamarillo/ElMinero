@@ -95,3 +95,37 @@ Se diseñó e implementó un sistema jerárquico de enemigos heredados de `Enemy
   - **WebGL:** Configuración optimizada con compresión Gzip y descompresión de respaldo (`Builds/WebGL/`).
   - **Android:** Paquete APK firmado (`Builds/Android/ElMinero.apk`) con identificador `com.utng.elminero` y nivel mínimo de API 26.
 - Todo el proyecto puede regenerarse de forma limpia e idempotente con el método `ElMineroBuilder.ConstruirTodoElProyecto()`.
+
+---
+
+## 8. IntegraciÃ³n del Paquete de Recursos v3 y Perfeccionamiento TÃ©cnico
+
+Para cumplir con las especificaciones finales del juego y resolver fallos de ejecuciÃ³n detectados en el motor, se aÃ±adieron los siguientes cambios estructurales:
+
+1. **CatÃ¡logo de Recursos v3 (SpriteImportSetup.cs)**:
+   - Castillete_Malacate.png: Celda 48Ã—80, 4 cuadros de animaciÃ³n de rueda giratoria, pivote Bottom Center.
+   - Bola_Fuego.png: Celda 16Ã—16, 4 cuadros de animaciÃ³n, pivote Center.
+   - Humo.png: Celda 16Ã—16, 4 cuadros de advertencia en techo previa a la caÃ­da de fuego.
+   - Llamas_Incendio.png: Celda 16Ã—32, 4 cuadros de fuego vertical, pivote Bottom Center.
+   - Telarana_Techo.png: Celda 16Ã—16, pivote Top Center para anclaje al techo.
+   - Logo_ElMinero_Grande.png: TÃ­tulo estilizado en alta resoluciÃ³n (~291Ã—64 original / 1160Ã—256 en lienzo UI).
+   - Fondos del MenÃº en 3 capas independientes (FondoMenu_Capa0_Cielo, FondoMenu_Capa1_Ciudad, FondoMenu_Capa2_Frente).
+
+2. **Arquitectura de Audio Directo y AudioLibrary**:
+   - En lugar de depender de parÃ¡metros expuestos de AudioMixer (susceptibles a fallas de reflexiÃ³n en Unity 6), AudioManager.cs controla directamente AudioSource.volume para mÃºsica, SFX y bucles 3D.
+   - CentralizaciÃ³n de todos los clips de sonido en un ScriptableObject (AudioLibrary.asset) alojado en Assets/Resources/, garantizando disponibilidad absoluta en ejecutables autÃ³nomos.
+
+3. **FÃ­sica del Malacate y Elevador (MineElevator.cs)**:
+   - EliminaciÃ³n de la jerarquÃ­a forzada (	ransform.SetParent); ahora el jugador es transportado calculando el desplazamiento $\Delta y$ aplicado directamente al Rigidbody2D del minero.
+   - ConexiÃ³n continua mediante LineRenderer entre la rueda del castillete y la base del elevador.
+   - Estados de espera controlados: 0.5 s para iniciar ascenso y 3.0 s para descenso.
+
+4. **ClÃ­max del Nivel 3: Bolas de Fuego y Muro de Incendio**:
+   - FireballSpawner.cs proyecta humo en el techo durante 0.8 s antes de dejar caer una bola de fuego con fÃ­sica gravitatoria activa.
+   - FireWallChase.cs activa una persecuciÃ³n cinematogrÃ¡fica en los Ãºltimos 35 tiles de La Valenciana a .4\text{ u/s}$, con alerta "Â¡LA MINA SE INCENDIA!" (56 pt) y sonido envolvente de llamas.
+
+5. **Parallax Interactivo del MenÃº Principal (MenuParallax.cs)**:
+   - Movimiento diferencial en 3 planos segÃºn la posiciÃ³n del cursor con oscilaciÃ³n armÃ³nica en reposo.
+
+6. **Selector de Calidad GrÃ¡fica Sin Dropdown**:
+   - SustituciÃ³n de TMP_Dropdown por un componente selector cÃ­clico â—€  Alta  â–¶ que opera sobre QualitySettings.names.

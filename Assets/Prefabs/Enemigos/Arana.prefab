@@ -105,7 +105,7 @@ GameObject:
   - component: {fileID: 7254794162735938529}
   - component: {fileID: 8548096651233709219}
   - component: {fileID: 5143157858643180844}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: Arana
   m_TagString: Hazard
   m_Icon: {fileID: 0}
@@ -266,4 +266,5 @@ MonoBehaviour:
   waitTime: 1
   riseSpeed: 1.5
   triggerToleranceX: 1.5
-  webRenderer: {fileID: 0}
+  spriteTelaranaTecho: {fileID: 0}
+  webLine: {fileID: 0}

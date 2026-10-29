@@ -185,16 +185,20 @@ namespace ElMinero.Editor
 
             tagManager.ApplyModifiedProperties();
 
-            // --- D) MATRIZ DE COLISIÃ“N 2D ---
-                        int layerEnemigo = LayerMask.NameToLayer(Constantes.Layers.Enemigo);
+                        // --- D) MATRIZ DE COLISIÃ“N 2D ---
+            int layerSuelo = LayerMask.NameToLayer(Constantes.Layers.Suelo);
+            int layerJugador = LayerMask.NameToLayer(Constantes.Layers.Jugador);
+            int layerColeccionable = LayerMask.NameToLayer(Constantes.Layers.Coleccionable);
+            int layerEnemigo = LayerMask.NameToLayer(Constantes.Layers.Enemigo);
+
             if (layerEnemigo != -1 && layerJugador != -1 && layerSuelo != -1)
             {
                 // Enemigo colisiona con Jugador y Suelo, ignora Coleccionable
-                Physics2D.IgnoreLayerCollision(layerEnemigo, layerColeccionable, true);
+                if (layerColeccionable != -1)
+                {
+                    Physics2D.IgnoreLayerCollision(layerEnemigo, layerColeccionable, true);
+                }
             }
-
-            int layerColeccionable = LayerMask.NameToLayer(Constantes.Layers.Coleccionable);
-            int layerJugador = LayerMask.NameToLayer(Constantes.Layers.Jugador);
 
             if (layerColeccionable != -1 && layerJugador != -1)
             {

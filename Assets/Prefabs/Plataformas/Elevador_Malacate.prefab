@@ -183,9 +183,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Plataformas.MineElevator
   bottomPoint: {x: 0, y: 0, z: 0}
   topPoint: {x: 0, y: 8, z: 0}
-  speed: 2
-  waitTime: 1
+  speed: 2.4
+  delaySubida: 0.5
+  delayBajada: 3
   malacateWheel: {fileID: 6546380517950550633}
+  cableAnchorPoint: {fileID: 0}
+  cableLine: {fileID: 0}
   wheelRotationSpeed: 180
   loopAudioSource: {fileID: 0}
 --- !u!1 &4059862354466533254
