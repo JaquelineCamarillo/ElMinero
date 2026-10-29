@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd8e682ebd4cf61418d31cf10c93a351, type: 3}
   m_Name: LevelConfig_Nivel3
   m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Niveles.LevelConfig
-  levelName: "Nivel 3 \u2014 La Valenciana"
+  levelName: "Nivel 3 \xE2\u20AC\u201D La Valenciana"
   levelIndex: 3
+  miniatura: {fileID: 0}
+  datoHistorico: "Mina de Rayas, descubierta en 1558 por Juan Rayas. Tiene el tiro m\xE1s profundo de Guanajuato (425 m)."
   timeLimit: 140
   silverVeinCount: 10
   amethystGemCount: 4
@@ -22,6 +24,6 @@ MonoBehaviour:
   allSilverBonus: 50
   distinctiveMineralName: Pirargirita
   distinctiveMineralPoints: 50
-  distinctiveMineralDescription: "Pirargirita (Ag3SbS3, plata roja): mineral emblem\xE1tico que enriqueci\xF3 a Guanajuato."
+  distinctiveMineralDescription: "Pirargirita (Ag3SbS3, plata roja): mineral emblem\xC3\xA1tico que enriqueci\xC3\xB3 a Guanajuato."
   rockSpawnInterval: 2.2
   cameraBackgroundColor: {r: 0.16, g: 0.04, b: 0.04, a: 1}

@@ -4,7 +4,7 @@ namespace ElMinero.Niveles
 {
     /// <summary>
     /// Configuración de parámetros específicos de cada nivel mediante ScriptableObject.
-    /// Define tiempo límite, cantidad de coleccionables, mineral distintivo, paleta y dificultad.
+    /// Define tiempo límite, cantidad de coleccionables, mineral distintivo, miniatura, dato histórico, paleta y dificultad.
     /// </summary>
     [CreateAssetMenu(fileName = "LevelConfig", menuName = "El Minero/Level Config", order = 1)]
     public class LevelConfig : ScriptableObject
@@ -15,6 +15,13 @@ namespace ElMinero.Niveles
 
         [Tooltip("Índice numérico del nivel (1, 2 o 3).")]
         [SerializeField] private int levelIndex = 1;
+
+        [Tooltip("Miniatura representativa para la tarjeta de inicio del nivel.")]
+        [SerializeField] private Sprite miniatura;
+
+        [TextArea(2, 4)]
+        [Tooltip("Dato histórico de la mina para la tarjeta de inicio.")]
+        [SerializeField] private string datoHistorico = "Mina de Rayas, descubierta en 1558 por Juan Rayas. Tiene el tiro más profundo de Guanajuato (425 m).";
 
         [Header("Tiempos y Derrumbe")]
         [Tooltip("Tiempo límite en segundos para completar el nivel antes del derrumbe.")]
@@ -53,6 +60,8 @@ namespace ElMinero.Niveles
         // Propiedades públicas
         public string LevelName => levelName;
         public int LevelIndex => levelIndex;
+        public Sprite Miniatura => miniatura;
+        public string DatoHistorico => datoHistorico;
         public float TimeLimit => timeLimit;
         public float InitialTime => timeLimit;
         public int SilverVeinCount => silverVeinCount;
@@ -66,7 +75,7 @@ namespace ElMinero.Niveles
         public float RockSpawnInterval => rockSpawnInterval;
         public Color CameraBackgroundColor => cameraBackgroundColor;
 
-        public void Configurar(string nombre, int indice, float tiempo, int vetas, int amatistas, string minNombre, string minDesc, float intervaloRocas, Color colorFondo)
+        public void Configurar(string nombre, int indice, float tiempo, int vetas, int amatistas, string minNombre, string minDesc, float intervaloRocas, Color colorFondo, Sprite mini = null, string dato = "")
         {
             levelName = nombre;
             levelIndex = indice;
@@ -77,6 +86,8 @@ namespace ElMinero.Niveles
             distinctiveMineralDescription = minDesc;
             rockSpawnInterval = intervaloRocas;
             cameraBackgroundColor = colorFondo;
+            if (mini != null) miniatura = mini;
+            if (!string.IsNullOrEmpty(dato)) datoHistorico = dato;
         }
     }
 }

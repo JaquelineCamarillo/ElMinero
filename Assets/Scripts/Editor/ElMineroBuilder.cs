@@ -267,7 +267,7 @@ namespace ElMinero.Editor
             Debug.Log("[El Minero] Materiales fÃ­sicos y LevelConfigs creados correctamente.");
         }
 
-        private static void CrearOActualizarLevelConfig(string path, string nombre, int index, float tiempo, int vetas, int gemas, string minNombre, string minDesc, float rocasIntervalo, Color bg)
+        private static void CrearOActualizarLevelConfig(string path, string nombre, int index, float tiempo, int vetas, int gemas, string minNombre, string minDesc, float rocasIntervalo, Color bg, Sprite mini = null, string dato = "")
         {
             LevelConfig config = AssetDatabase.LoadAssetAtPath<LevelConfig>(path);
             if (config == null)
@@ -290,6 +290,8 @@ namespace ElMinero.Editor
             so.FindProperty("distinctiveMineralPoints").intValue = 50;
             so.FindProperty("rockSpawnInterval").floatValue = rocasIntervalo;
             so.FindProperty("cameraBackgroundColor").colorValue = bg;
+            if (mini != null) so.FindProperty("miniatura").objectReferenceValue = mini;
+            if (!string.IsNullOrEmpty(dato)) so.FindProperty("datoHistorico").stringValue = dato;
             so.ApplyModifiedProperties();
             EditorUtility.SetDirty(config);
         }

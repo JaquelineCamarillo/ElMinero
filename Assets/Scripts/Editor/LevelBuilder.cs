@@ -451,51 +451,53 @@ namespace ElMinero.Editor
 
             TMP_FontAsset fontTexto = FontAssetBuilder.ObtenerPixelifySans();
 
-            // Panel oscuro semitransparente
+            // Panel oscuro semitransparente (1500x520 para Canvas 1920x1080)
             GameObject panelOscuro = new GameObject("Panel_Oscuro");
             panelOscuro.transform.SetParent(canvasObj.transform, false);
             var rectPo = panelOscuro.AddComponent<RectTransform>();
-            rectPo.sizeDelta = new Vector2(850f, 320f);
+            rectPo.sizeDelta = new Vector2(1500f, 520f);
             rectPo.anchorMin = new Vector2(0.5f, 0.5f);
             rectPo.anchorMax = new Vector2(0.5f, 0.5f);
             var imgPo = panelOscuro.AddComponent<Image>();
             imgPo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
             imgPo.type = Image.Type.Sliced;
+            imgPo.pixelsPerUnitMultiplier = 0.25f;
             imgPo.color = new Color(0.12f, 0.1f, 0.12f, 0.95f);
 
-            // Texto narrativo tipo mÃ¡quina de escribir
+            // Texto narrativo tipo mÃ¡quina de escribir (46 pt)
             GameObject goTxt = new GameObject("Texto_Narrativo");
             goTxt.transform.SetParent(panelOscuro.transform, false);
             var rectTxt = goTxt.AddComponent<RectTransform>();
             rectTxt.anchorMin = Vector2.zero;
             rectTxt.anchorMax = Vector2.one;
-            rectTxt.offsetMin = new Vector2(40f, 40f);
-            rectTxt.offsetMax = new Vector2(-40f, -40f);
+            rectTxt.offsetMin = new Vector2(60f, 50f);
+            rectTxt.offsetMax = new Vector2(-60f, -50f);
             var tmpTxt = goTxt.AddComponent<TextMeshProUGUI>();
             tmpTxt.font = fontTexto;
-            tmpTxt.fontSize = 22f;
+            tmpTxt.fontSize = 46f;
             tmpTxt.alignment = TextAlignmentOptions.Center;
             tmpTxt.color = new Color(0.96f, 0.91f, 0.76f);
             tmpTxt.textWrappingMode = TextWrappingModes.Normal;
 
-            // Indicador de avance
+            // Indicador de avance (28 pt, regla >= 26 pt)
             GameObject goInd = new GameObject("Texto_Indicador");
             goInd.transform.SetParent(canvasObj.transform, false);
             var rectInd = goInd.AddComponent<RectTransform>();
-            rectInd.anchorMin = new Vector2(0.5f, 0.22f);
-            rectInd.anchorMax = new Vector2(0.5f, 0.22f);
-            rectInd.sizeDelta = new Vector2(500f, 30f);
+            rectInd.anchorMin = new Vector2(0.5f, 0.12f);
+            rectInd.anchorMax = new Vector2(0.5f, 0.12f);
+            rectInd.sizeDelta = new Vector2(900f, 44f);
             var tmpInd = goInd.AddComponent<TextMeshProUGUI>();
             tmpInd.font = fontTexto;
-            tmpInd.fontSize = 15f;
+            tmpInd.fontSize = 28f;
             tmpInd.fontStyle = FontStyles.Italic;
             tmpInd.alignment = TextAlignmentOptions.Center;
-            tmpInd.color = new Color(0.8f, 0.8f, 0.8f, 0.8f);
+            tmpInd.color = new Color(0.85f, 0.85f, 0.85f, 0.85f);
             tmpInd.text = "Presiona [Espacio] o Toca para continuar";
 
-            // BotÃ³n Saltar
-            Button btnSaltar = CrearBotonMadera(canvasObj.transform, "Boton_Saltar", "Saltar >>", new Vector2(-70f, -30f), new Vector2(130f, 36f), new Vector2(1f, 1f), new Vector2(1f, 1f));
-
+            // BotÃ³n Saltar (220x64, texto 30 pt)
+            Button btnSaltar = CrearBotonMadera(canvasObj.transform, "Boton_Saltar", "Saltar >>", new Vector2(-100f, -60f), new Vector2(220f, 64f), new Vector2(1f, 1f), new Vector2(1f, 1f));
+            var txtBtnSaltar = btnSaltar.GetComponentInChildren<TextMeshProUGUI>();
+            if (txtBtnSaltar != null) txtBtnSaltar.fontSize = 30f;
             SerializedObject so = new SerializedObject(introCtrl);
             so.FindProperty("textoNarrativo").objectReferenceValue = tmpTxt;
             so.FindProperty("textoIndicador").objectReferenceValue = tmpInd;

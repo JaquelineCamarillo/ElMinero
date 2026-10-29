@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd8e682ebd4cf61418d31cf10c93a351, type: 3}
   m_Name: LevelConfig_Nivel1
   m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Niveles.LevelConfig
-  levelName: "Nivel 1 \u2014 Mina Rayas"
+  levelName: "Nivel 1 \xE2\u20AC\u201D Mina Rayas"
   levelIndex: 1
+  miniatura: {fileID: 0}
+  datoHistorico: "Mina de Rayas, descubierta en 1558 por Juan Rayas. Tiene el tiro m\xE1s profundo de Guanajuato (425 m)."
   timeLimit: 100
   silverVeinCount: 6
   amethystGemCount: 2

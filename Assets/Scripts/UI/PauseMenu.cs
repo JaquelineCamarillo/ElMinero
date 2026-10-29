@@ -9,7 +9,8 @@ namespace ElMinero.UI
 {
     /// <summary>
     /// Gestiona el menú de pausa durante el gameplay.
-    /// Detiene el tiempo (Time.timeScale = 0) y ofrece Continuar, Reiniciar Nivel o Volver al Menú.
+    /// Detiene el tiempo (Time.timeScale = 0) y ofrece Continuar, Reiniciar Nivel, Opciones o Volver al Menú.
+    /// Transiciona limpiamente entre el panel de pausa y el panel de opciones.
     /// </summary>
     public class PauseMenu : MonoBehaviour
     {
@@ -27,13 +28,25 @@ namespace ElMinero.UI
         private void Start()
         {
             if (pausePanel != null) pausePanel.SetActive(false);
-            if (optionsPanel != null) optionsPanel.gameObject.SetActive(false);
+            if (optionsPanel != null)
+            {
+                optionsPanel.gameObject.SetActive(false);
+                optionsPanel.AlCerrar += OnOptionsClosed;
+            }
 
             if (resumeButton != null) resumeButton.onClick.AddListener(ResumeGame);
             if (restartButton != null) restartButton.onClick.AddListener(RestartLevel);
             if (optionsButton != null) optionsButton.onClick.AddListener(OpenOptions);
             if (mainMenuButton != null) mainMenuButton.onClick.AddListener(GoToMainMenu);
             if (pauseIconButton != null) pauseIconButton.onClick.AddListener(TogglePause);
+        }
+
+        private void OnDestroy()
+        {
+            if (optionsPanel != null)
+            {
+                optionsPanel.AlCerrar -= OnOptionsClosed;
+            }
         }
 
         private void Update()
@@ -59,6 +72,13 @@ namespace ElMinero.UI
 
         public void TogglePause()
         {
+            // Si el panel de opciones está abierto dentro de la pausa, cerrarlo restaura el menú de pausa
+            if (optionsPanel != null && optionsPanel.gameObject.activeSelf)
+            {
+                optionsPanel.CerrarPanel();
+                return;
+            }
+
             if (isPaused)
             {
                 ResumeGame();
@@ -87,7 +107,20 @@ namespace ElMinero.UI
         public void OpenOptions()
         {
             if (AudioManager.Instance != null) AudioManager.Instance.PlayClickUI();
-            if (optionsPanel != null) optionsPanel.gameObject.SetActive(true);
+            if (optionsPanel != null)
+            {
+                if (pausePanel != null) pausePanel.SetActive(false);
+                optionsPanel.gameObject.SetActive(true);
+                optionsPanel.transform.SetAsLastSibling();
+            }
+        }
+
+        private void OnOptionsClosed()
+        {
+            if (isPaused && pausePanel != null)
+            {
+                pausePanel.SetActive(true);
+            }
         }
 
         public void RestartLevel()

@@ -11,8 +11,8 @@ using UnityEngine.InputSystem;
 namespace ElMinero.UI
 {
     /// <summary>
-    /// Controla la pantalla Intro narrativa (SecciÃ³n 3.6).
-    /// Muestra la historia contextual de Guanajuato en el siglo XIX con efecto mÃ¡quina de escribir,
+    /// Controla la pantalla Intro narrativa (Sección 3.6).
+    /// Muestra la historia contextual de Guanajuato en el siglo XIX con efecto máquina de escribir,
     /// personalizando el nombre del minero elegido por el jugador.
     /// </summary>
     public class IntroController : MonoBehaviour
@@ -22,7 +22,7 @@ namespace ElMinero.UI
         [SerializeField] private TextMeshProUGUI textoIndicador;
         [SerializeField] private Button botonSaltar;
 
-        [Header("ConfiguraciÃ³n")]
+        [Header("Configuración")]
         [SerializeField] private float velocidadEscritura = 0.035f;
 
         private List<string> paginas = new List<string>();
@@ -42,9 +42,9 @@ namespace ElMinero.UI
             if (string.IsNullOrWhiteSpace(nombre)) nombre = "Refugio";
 
             paginas.Add("Guanajuato, siglo XIX. La plata de sus minas es famosa en todo el mundo.");
-            paginas.Add($"{nombre} trabaja en lo mÃ¡s profundo de la Mina de Rayas cuando la tierra empieza a temblarâ€¦");
-            paginas.Add("Â¡Derrumbe! La Ãºnica salida estÃ¡ arriba: subir por El Nopal hasta la bocamina de La Valenciana.");
-            paginas.Add("Recoge toda la plata que puedasâ€¦ y no mires atrÃ¡s.");
+            paginas.Add($"{nombre} trabaja en lo más profundo de la Mina de Rayas cuando la tierra empieza a temblar...");
+            paginas.Add("¡Derrumbe! La única salida está arriba: subir por El Nopal hasta la bocamina de La Valenciana.");
+            paginas.Add("Recoge toda la plata que puedas... y no mires atrás.");
 
             if (botonSaltar != null)
             {

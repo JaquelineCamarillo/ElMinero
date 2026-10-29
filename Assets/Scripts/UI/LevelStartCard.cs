@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using ElMinero.Managers;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace ElMinero.UI
 {
@@ -10,6 +13,7 @@ namespace ElMinero.UI
     /// Tarjeta modal informativa que aparece al iniciar un nivel por primera vez (Sección 3.6).
     /// Muestra el nombre de la mina, miniatura, dato histórico y objetivo,
     /// pausando el juego hasta que el jugador presiona "¡A escapar!".
+    /// Si la miniatura no está asignada, la oculta de forma transparente (sin cuadro blanco).
     /// No se muestra en reintentos tras morir.
     /// </summary>
     public class LevelStartCard : MonoBehaviour
@@ -34,6 +38,18 @@ namespace ElMinero.UI
             }
         }
 
+        private void Update()
+        {
+            if (!gameObject.activeSelf) return;
+
+#if ENABLE_INPUT_SYSTEM
+            if (Keyboard.current != null && (Keyboard.current.spaceKey.wasPressedThisFrame || Keyboard.current.enterKey.wasPressedThisFrame)) IniciarNivel();
+            if (Gamepad.current != null && (Gamepad.current.buttonSouth.wasPressedThisFrame || Gamepad.current.startButton.wasPressedThisFrame)) IniciarNivel();
+#else
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)) IniciarNivel();
+#endif
+        }
+
         public void ConfigurarYMostrar(string nombreEscena, string nombreMina, Sprite miniatura, string datoHistorico, string objetivo = "Sube a la siguiente mina antes de que el derrumbe te alcance.")
         {
             nombreEscenaActual = nombreEscena;
@@ -45,7 +61,20 @@ namespace ElMinero.UI
                 return;
             }
 
-            if (miniaturaMina != null && miniatura != null) miniaturaMina.sprite = miniatura;
+            if (miniaturaMina != null)
+            {
+                if (miniatura != null)
+                {
+                    miniaturaMina.sprite = miniatura;
+                    miniaturaMina.color = Color.white;
+                }
+                else
+                {
+                    miniaturaMina.sprite = null;
+                    miniaturaMina.color = new Color(1f, 1f, 1f, 0f);
+                }
+            }
+
             if (textoNombreMina != null) textoNombreMina.text = nombreMina;
             if (textoDatoHistorico != null) textoDatoHistorico.text = datoHistorico;
             if (textoObjetivo != null) textoObjetivo.text = objetivo;

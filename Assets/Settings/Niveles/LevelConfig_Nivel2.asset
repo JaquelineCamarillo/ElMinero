@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd8e682ebd4cf61418d31cf10c93a351, type: 3}
   m_Name: LevelConfig_Nivel2
   m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Niveles.LevelConfig
-  levelName: "Nivel 2 \u2014 El Nopal"
+  levelName: "Nivel 2 \xE2\u20AC\u201D El Nopal"
   levelIndex: 2
+  miniatura: {fileID: 0}
+  datoHistorico: "Mina de Rayas, descubierta en 1558 por Juan Rayas. Tiene el tiro m\xE1s profundo de Guanajuato (425 m)."
   timeLimit: 120
   silverVeinCount: 8
   amethystGemCount: 3
@@ -22,6 +24,6 @@ MonoBehaviour:
   allSilverBonus: 50
   distinctiveMineralName: Pepita de oro
   distinctiveMineralPoints: 50
-  distinctiveMineralDescription: "Pepita de oro nativo extra\xEDda de las profundidades de Guanajuato."
+  distinctiveMineralDescription: "Pepita de oro nativo extra\xC3\xADda de las profundidades de Guanajuato."
   rockSpawnInterval: 3
   cameraBackgroundColor: {r: 0.16, g: 0.1, b: 0.05, a: 1}
