@@ -9,6 +9,8 @@ namespace ElMinero.Editor
     public static class AudioMixerBuilder
     {
         [MenuItem("Herramientas/El Minero/Crear Mezclador Principal")]
+        public static AudioMixer CrearMixer() => ObtenerOCrearMezclador();
+
         public static AudioMixer ObtenerOCrearMezclador()
         {
             string path = "Assets/Audios/MezcladorPrincipal.mixer";

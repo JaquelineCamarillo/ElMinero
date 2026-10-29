@@ -1215,35 +1215,44 @@ namespace ElMinero.Editor
 
                 // 1. Crear carpetas
                 CrearCarpetas();
-                EditorUtility.DisplayProgressBar("El Minero", "1/8 Carpetas...", 0.12f);
+                EditorUtility.DisplayProgressBar("El Minero", "1/10 Carpetas...", 0.10f);
 
                 // 2. Configurar Tags, Layers y Matriz
                 ConfigurarTagsYLayers();
-                EditorUtility.DisplayProgressBar("El Minero", "2/8 Tags y Layers...", 0.25f);
+                EditorUtility.DisplayProgressBar("El Minero", "2/10 Tags y Layers...", 0.20f);
 
-                // 3. Configurar importación de sprites y tilesets
+                // 3. Crear AudioMixer
+                AudioMixerBuilder.CrearMixer();
+                EditorUtility.DisplayProgressBar("El Minero", "3/10 AudioMixer...", 0.30f);
+
+                // 4. Configurar importación de sprites y tilesets
                 SpriteImportSetup.ConfigurarTodosLosSprites();
-                EditorUtility.DisplayProgressBar("El Minero", "3/8 Sprites y Tilesets...", 0.38f);
+                EditorUtility.DisplayProgressBar("El Minero", "4/10 Sprites y Tilesets...", 0.40f);
 
-                // 4. Crear animaciones y Animator Controllers
+                // 5. Crear animaciones y Animator Controllers
                 AnimationGenerator.GenerarTodasLasAnimaciones();
-                EditorUtility.DisplayProgressBar("El Minero", "4/8 Animaciones...", 0.50f);
+                EditorUtility.DisplayProgressBar("El Minero", "5/10 Animaciones...", 0.50f);
 
-                // 5. Crear materiales físicos y LevelConfigs
+                // 6. Crear Fuentes y Prefabs de UI
+                FontAssetBuilder.GenerarFontAssets();
+                UIPrefabBuilder.CrearTodosLosPrefabsUI();
+                EditorUtility.DisplayProgressBar("El Minero", "6/10 UI y Fuentes...", 0.60f);
+
+                // 7. Crear materiales físicos y LevelConfigs
                 CrearMaterialesFisicosYConfigs();
-                EditorUtility.DisplayProgressBar("El Minero", "5/8 Físicas y Configs...", 0.62f);
+                EditorUtility.DisplayProgressBar("El Minero", "7/10 Físicas y Configs...", 0.70f);
 
-                // 6. Crear Prefabs
+                // 8. Crear Prefabs de juego
                 PrefabGenerator.CrearTodosLosPrefabs();
-                EditorUtility.DisplayProgressBar("El Minero", "6/8 Prefabs...", 0.75f);
+                EditorUtility.DisplayProgressBar("El Minero", "8/10 Prefabs...", 0.80f);
 
-                // 7. Construir Escenas
+                // 9. Construir las 7 Escenas
                 LevelBuilder.ConstruirTodasLasEscenas();
-                EditorUtility.DisplayProgressBar("El Minero", "7/8 Escenas...", 0.88f);
+                EditorUtility.DisplayProgressBar("El Minero", "9/10 Escenas...", 0.90f);
 
-                // 8. Configurar Build Settings y Player Settings
-                ConfigurarBuildSettingsYPlayer();
-                EditorUtility.DisplayProgressBar("El Minero", "8/8 Build Settings...", 1.0f);
+                // 10. Configurar Build Settings y Player Settings
+                BuildSettingsSetup.ConfigurarBuildSettings();
+                EditorUtility.DisplayProgressBar("El Minero", "10/10 Build Settings...", 1.0f);
 
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
@@ -1252,20 +1261,23 @@ namespace ElMinero.Editor
                 EditorUtility.DisplayDialog("El Minero — Construcción Completa",
                     "¡El videojuego 'El Minero' ha sido construido completamente!\n\n" +
                     "✓ Carpetas, Tags, Layers y Sorting Layers.\n" +
+                    "✓ AudioMixer con buses Música y Efectos.\n" +
                     "✓ Sprites importados con PPU=16 y Point Filter.\n" +
                     "✓ Animaciones y Animator Controllers generados.\n" +
-                    "✓ Físicas (SinFriccion) y LevelConfigs (N1: 90s, N2: 75s, N3: 70s).\n" +
-                    "✓ Prefabs completos de jugador, plataformas, obstáculos y sistemas.\n" +
-                    "✓ Las 6 escenas construidas:\n" +
+                    "✓ TextMeshPro Font Assets (PressStart2P y PixelifySans).\n" +
+                    "✓ Prefabs de UI modales y HUD completo.\n" +
+                    "✓ Físicas (SinFriccion) y LevelConfigs (N1: 100s, N2: 120s, N3: 140s).\n" +
+                    "✓ Prefabs completos de jugador, enemigos, obstáculos y coleccionables.\n" +
+                    "✓ Las 7 escenas construidas y enlazadas en Build Settings:\n" +
+                    "   • Splash.unity\n" +
                     "   • MenuPrincipal.unity\n" +
+                    "   • Intro.unity\n" +
                     "   • Nivel1_MinaRayas.unity\n" +
                     "   • Nivel2_ElNopal.unity\n" +
                     "   • Nivel3_LaValenciana.unity\n" +
-                    "   • Victoria.unity\n" +
-                    "   • Derrota.unity\n" +
-                    "✓ Build Settings y Player Settings (Windows, WebGL, Android).\n\n" +
+                    "   • Final.unity\n\n" +
                     "Para jugar:\n" +
-                    "1. Abre 'Assets/Scenes/MenuPrincipal.unity'\n" +
+                    "1. Abre 'Assets/Scenes/Splash.unity' o 'Assets/Scenes/MenuPrincipal.unity'\n" +
                     "2. Pulsa Play y disfruta de la aventura.",
                     "¡Entendido!");
             }
