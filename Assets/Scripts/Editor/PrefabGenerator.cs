@@ -55,6 +55,7 @@ namespace ElMinero.Editor
 
                 // 3. Obstáculos
                 CrearPrefabRoca(layerPeligro);
+                CrearPrefabBolaFuego(layerPeligro);
                 CrearPrefabRockSpawner();
                 CrearPrefabHuecoLetal();
                 CrearPrefabZonaDerrumbe();
@@ -259,6 +260,32 @@ namespace ElMinero.Editor
             GuardarYDestruir(go, path);
         }
 
+        private static void CrearPrefabBolaFuego(int layerPeligro)
+        {
+            string path = "Assets/Prefabs/Obstaculos/Bola_Fuego.prefab";
+            GameObject go = new GameObject("Bola_Fuego");
+            go.tag = Constantes.Tags.Hazard;
+            go.layer = layerPeligro;
+
+            var sr = go.AddComponent<SpriteRenderer>();
+            Sprite spBola = null;
+            var subSprites = AssetDatabase.LoadAllAssetsAtPath("Assets/Sprites/Obstaculos/Bola_Fuego.png").OfType<Sprite>().ToArray();
+            if (subSprites.Length > 0) spBola = subSprites[0];
+            if (spBola == null) spBola = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Obstaculos/Bola_Fuego.png");
+            sr.sprite = spBola;
+            sr.sortingLayerName = Constantes.SortingLayers.Objetos;
+
+            var col = go.AddComponent<CircleCollider2D>();
+            col.radius = 0.45f;
+
+            var rb = go.AddComponent<Rigidbody2D>();
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.gravityScale = 2.5f;
+
+            go.AddComponent<Fireball>();
+
+            GuardarYDestruir(go, path);
+        }
         private static void CrearPrefabRoca(int layerPeligro)
         {
             string path = "Assets/Prefabs/Obstaculos/Roca.prefab";

@@ -1137,6 +1137,14 @@ namespace ElMinero.Editor
             CrearMineTremor();
 
             // Salida a la Superficie (Final)
+            // Spawners de Bolas de Fuego cayendo del techo en Nivel 3
+            CrearBolaFuegoSpawner(new Vector3(182f, 7.5f, 0f), 3.0f, 0.5f);
+            CrearBolaFuegoSpawner(new Vector3(192f, 7.5f, 0f), 3.2f, 1.2f);
+            CrearBolaFuegoSpawner(new Vector3(200f, 7.5f, 0f), 2.8f, 0.8f);
+
+            // Muro de Fuego perseguidor en los Ãºltimos 35 tiles de La Valenciana
+            CrearMuroIncendio(new Vector3(172f, -1.5f, 0f), 205f, new Vector3(175f, 0f, 0f));
+
             CrearSalida(new Vector3(204f, -1f, 0f), true);
 
             CrearAntorchaConLuz(new Vector3(-5f, 0.8f, 0f), luzFuego);
