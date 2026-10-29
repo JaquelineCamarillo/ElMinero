@@ -41,7 +41,7 @@ namespace ElMinero.Editor
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
-                EditorUtility.DisplayDialog("El Minero", "Por favor sal del Modo Play (detén el juego) antes de construir las escenas.", "Entendido");
+                EditorUtility.DisplayDialog("El Minero", "Por favor sal del Modo Play (detÃ©n el juego) antes de construir las escenas.", "Entendido");
                 return;
             }
 
@@ -49,7 +49,7 @@ namespace ElMinero.Editor
 
             try
             {
-                // Asegurar que las dependencias previas estén configuradas
+                // Asegurar que las dependencias previas estÃ©n configuradas
                 ElMineroBuilder.ConfigurarTagsYLayers();
                 ElMineroBuilder.CrearMaterialesFisicosYConfigs();
 
@@ -69,13 +69,13 @@ namespace ElMinero.Editor
                 // 4. Limpieza de escenas obsoletas
                 EliminarEscenasObsoletas();
 
-                // 5. Registrar las 7 escenas en Build Settings automáticamente
+                // 5. Registrar las 7 escenas en Build Settings automÃ¡ticamente
                 ElMineroBuilder.ConfigurarBuildSettingsYPlayer();
 
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
 
-                Debug.Log("[El Minero] ¡Las 7 escenas construidas y guardadas exitosamente en Assets/Scenes/!");
+                Debug.Log("[El Minero] Â¡Las 7 escenas construidas y guardadas exitosamente en Assets/Scenes/!");
             }
             finally
             {
@@ -84,13 +84,13 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // 1. MENÚ PRINCIPAL
+        // 1. MENÃš PRINCIPAL
         // ====================================================================
         public static void ConstruirMenuPrincipal()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-            // Cámara
+            // CÃ¡mara
             GameObject camObj = new GameObject("Main Camera");
             camObj.tag = "MainCamera";
             camObj.transform.position = new Vector3(0f, 0f, -10f);
@@ -102,7 +102,7 @@ namespace ElMinero.Editor
             camObj.AddComponent<AudioListener>();
             camObj.AddComponent<UniversalAdditionalCameraData>();
 
-            // Fondo visual del menú
+            // Fondo visual del menÃº
             GameObject fondo = new GameObject("Fondo_Menu");
             var srFondo = fondo.AddComponent<SpriteRenderer>();
             srFondo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Fondos/Fondo_Menu.png");
@@ -135,7 +135,7 @@ namespace ElMinero.Editor
             imgLogo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Logo_ElMinero.png");
             imgLogo.preserveAspect = true;
 
-            // Subtítulo
+            // SubtÃ­tulo
             GameObject subObj = new GameObject("Subtitulo");
             subObj.transform.SetParent(canvasObj.transform, false);
             var rectSub = subObj.AddComponent<RectTransform>();
@@ -209,15 +209,15 @@ namespace ElMinero.Editor
             inputField.textComponent = tmpText;
             inputField.characterLimit = 12;
 
-            // 6 Botones del menú
-            Button btnPlay = CrearBotonMadera(panelMadera.transform, "Boton_Jugar", "¡A Jugar!", new Vector2(0f, 75f), new Vector2(280f, 44f));
+            // 6 Botones del menÃº
+            Button btnPlay = CrearBotonMadera(panelMadera.transform, "Boton_Jugar", "Â¡A Jugar!", new Vector2(0f, 75f), new Vector2(280f, 44f));
             Button btnContinue = CrearBotonMadera(panelMadera.transform, "Boton_Continuar", "Continuar", new Vector2(0f, 25f), new Vector2(280f, 44f));
             Button btnLevels = CrearBotonMadera(panelMadera.transform, "Boton_Niveles", "Niveles", new Vector2(0f, -25f), new Vector2(280f, 44f));
             Button btnOptions = CrearBotonMadera(panelMadera.transform, "Boton_Opciones", "Opciones", new Vector2(0f, -75f), new Vector2(280f, 44f));
-            Button btnCredits = CrearBotonMadera(panelMadera.transform, "Boton_Creditos", "Créditos", new Vector2(0f, -125f), new Vector2(280f, 44f));
+            Button btnCredits = CrearBotonMadera(panelMadera.transform, "Boton_Creditos", "CrÃ©ditos", new Vector2(0f, -125f), new Vector2(280f, 44f));
             Button btnQuit = CrearBotonMadera(panelMadera.transform, "Boton_Salir", "Salir", new Vector2(0f, -170f), new Vector2(280f, 40f));
 
-            // Texto Versión en esquina inferior derecha
+            // Texto VersiÃ³n en esquina inferior derecha
             GameObject verObj = new GameObject("Texto_Version");
             verObj.transform.SetParent(canvasObj.transform, false);
             var rectVer = verObj.AddComponent<RectTransform>();
@@ -233,7 +233,7 @@ namespace ElMinero.Editor
             tmpVer.alignment = TextAlignmentOptions.BottomRight;
             tmpVer.color = new Color(0.7f, 0.7f, 0.7f, 0.7f);
 
-            // Instanciar Prefabs Modales (Niveles, Opciones, Créditos)
+            // Instanciar Prefabs Modales (Niveles, Opciones, CrÃ©ditos)
             GameObject pLevelSelect = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/LevelSelectPanel.prefab");
             GameObject pOptions = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/OptionsPanel.prefab");
             GameObject pCredits = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/CreditsPanel.prefab");
@@ -284,13 +284,13 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // 2. PANTALLA SPLASH (Sección 3.1)
+        // 2. PANTALLA SPLASH (SecciÃ³n 3.1)
         // ====================================================================
         public static void ConstruirSplash()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-            // Cámara
+            // CÃ¡mara
             GameObject camObj = new GameObject("Main Camera");
             camObj.tag = "MainCamera";
             camObj.transform.position = new Vector3(0f, 0f, -10f);
@@ -336,7 +336,7 @@ namespace ElMinero.Editor
             rectUtng.sizeDelta = new Vector2(600f, 40f);
             var tmpUtng = goTxtUtng.AddComponent<TextMeshProUGUI>();
             tmpUtng.font = fontTexto;
-            tmpUtng.text = "UTNG · Creación de Videojuegos";
+            tmpUtng.text = "UTNG Â· CreaciÃ³n de Videojuegos";
             tmpUtng.fontSize = 22f;
             tmpUtng.alignment = TextAlignmentOptions.Center;
             tmpUtng.color = new Color(0.9f, 0.85f, 0.75f);
@@ -372,13 +372,13 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // 3. PANTALLA INTRO NARRATIVA (Sección 3.6)
+        // 3. PANTALLA INTRO NARRATIVA (SecciÃ³n 3.6)
         // ====================================================================
         public static void ConstruirIntro()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-            // Cámara
+            // CÃ¡mara
             GameObject camObj = new GameObject("Main Camera");
             camObj.tag = "MainCamera";
             camObj.transform.position = new Vector3(0f, 0f, -10f);
@@ -417,7 +417,7 @@ namespace ElMinero.Editor
             imgPo.type = Image.Type.Sliced;
             imgPo.color = new Color(0.12f, 0.1f, 0.12f, 0.95f);
 
-            // Texto narrativo tipo máquina de escribir
+            // Texto narrativo tipo mÃ¡quina de escribir
             GameObject goTxt = new GameObject("Texto_Narrativo");
             goTxt.transform.SetParent(panelOscuro.transform, false);
             var rectTxt = goTxt.AddComponent<RectTransform>();
@@ -447,7 +447,7 @@ namespace ElMinero.Editor
             tmpInd.color = new Color(0.8f, 0.8f, 0.8f, 0.8f);
             tmpInd.text = "Presiona [Espacio] o Toca para continuar";
 
-            // Botón Saltar
+            // BotÃ³n Saltar
             Button btnSaltar = CrearBotonMadera(canvasObj.transform, "Boton_Saltar", "Saltar >>", new Vector2(-70f, -30f), new Vector2(130f, 36f), new Vector2(1f, 1f), new Vector2(1f, 1f));
 
             SerializedObject so = new SerializedObject(introCtrl);
@@ -462,13 +462,13 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // 4. PANTALLA FINAL (Sección 3.7)
+        // 4. PANTALLA FINAL (SecciÃ³n 3.7)
         // ====================================================================
         public static void ConstruirFinal()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-            // Cámara
+            // CÃ¡mara
             GameObject camObj = new GameObject("Main Camera");
             camObj.tag = "MainCamera";
             camObj.transform.position = new Vector3(0f, 0f, -10f);
@@ -488,7 +488,7 @@ namespace ElMinero.Editor
             templo.transform.position = new Vector3(0f, -0.5f, 0f);
             templo.transform.localScale = new Vector3(2.2f, 2.2f, 1f);
 
-            // Luz cálida 2D simulando el amanecer
+            // Luz cÃ¡lida 2D simulando el amanecer
             GameObject luzAmanecer = new GameObject("Luz_Amanecer");
             var l2d = luzAmanecer.AddComponent<Light2D>();
             l2d.lightType = Light2D.LightType.Global;
@@ -496,7 +496,7 @@ namespace ElMinero.Editor
             l2d.intensity = 1.35f;
             ElMineroBuilder.AsignarCapasALuz2D(l2d);
 
-            // Minero en celebración frente al templo
+            // Minero en celebraciÃ³n frente al templo
             GameObject minero = new GameObject("Minero_Celebrando");
             var srMinero = minero.AddComponent<SpriteRenderer>();
             srMinero.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Jugador/Minero_Celebrar.png");
@@ -536,7 +536,7 @@ namespace ElMinero.Editor
             tmpTn.fontSize = 17f;
             tmpTn.alignment = TextAlignmentOptions.Center;
             tmpTn.color = new Color(1f, 0.95f, 0.85f);
-            tmpTn.text = "Refugio sale a la luz junto al Templo de San Cayetano. Detrás, la mina se cierra para siempre… pero la plata que llevas cuenta otra historia.";
+            tmpTn.text = "Refugio sale a la luz junto al Templo de San Cayetano. DetrÃ¡s, la mina se cierra para siempreâ€¦ pero la plata que llevas cuenta otra historia.";
 
             // Panel Izquierdo: Resumen Acumulado
             GameObject panelStats = new GameObject("Panel_Resumen");
@@ -550,7 +550,7 @@ namespace ElMinero.Editor
             imgPs.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
             imgPs.type = Image.Type.Sliced;
 
-            // Título Resumen
+            // TÃ­tulo Resumen
             GameObject goTitRes = new GameObject("Titulo_Resumen");
             goTitRes.transform.SetParent(panelStats.transform, false);
             var rectTr = goTitRes.AddComponent<RectTransform>();
@@ -570,11 +570,11 @@ namespace ElMinero.Editor
             tScore.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 50f);
             tScore.fontSize = 18f;
 
-            TextMeshProUGUI tEstrellas = CrearTextoStat(panelStats.transform, "Texto_EstrellasTotales", "ESTRELLAS: 0 / 9 ★", fontTexto);
+            TextMeshProUGUI tEstrellas = CrearTextoStat(panelStats.transform, "Texto_EstrellasTotales", "ESTRELLAS: 0 / 9 â˜…", fontTexto);
             tEstrellas.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 15f);
             tEstrellas.fontSize = 17f;
 
-            TextMeshProUGUI tMinerales = CrearTextoStat(panelStats.transform, "Texto_MineralesTotales", "MINERALES HISTÓRICOS: 0 / 3", fontTexto);
+            TextMeshProUGUI tMinerales = CrearTextoStat(panelStats.transform, "Texto_MineralesTotales", "MINERALES HISTÃ“RICOS: 0 / 3", fontTexto);
             tMinerales.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -20f);
             tMinerales.fontSize = 15f;
 
@@ -595,7 +595,7 @@ namespace ElMinero.Editor
             Image icPep = CrearIcono(goFilaMin.transform, "Icono_PepitaOro", AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Coleccionables/Pepita_Oro.png"), new Vector2(40f, 40f));
             Image icPir = CrearIcono(goFilaMin.transform, "Icono_Pirargirita", AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Coleccionables/Pirargirita.png"), new Vector2(40f, 40f));
 
-            // Panel Derecho: Créditos en Scroll
+            // Panel Derecho: CrÃ©ditos en Scroll
             GameObject panelCreditos = new GameObject("Panel_Creditos_Mascara");
             panelCreditos.transform.SetParent(canvasObj.transform, false);
             var rectPc = panelCreditos.AddComponent<RectTransform>();
@@ -629,16 +629,16 @@ namespace ElMinero.Editor
                            "<b>UNIVERSIDAD:</b>\n" +
                            "UTNG\n\n" +
                            "<b>DOCENTE:</b>\n" +
-                           "Gabriel Barrón Rodríguez\n" +
-                           "Creación de Videojuegos\n\n" +
-                           "<b>MÚSICA Y ARTE:</b>\n" +
+                           "Gabriel BarrÃ³n RodrÃ­guez\n" +
+                           "CreaciÃ³n de Videojuegos\n\n" +
+                           "<b>MÃšSICA Y ARTE:</b>\n" +
                            "Herramientas de IA Asistida\n\n" +
                            "<b>FUENTES:</b>\n" +
                            "Press Start 2P & Pixelify Sans\n(SIL OFL 1.1)\n\n" +
-                           "<i>¡Felicidades por escapar!</i>";
+                           "<i>Â¡Felicidades por escapar!</i>";
 
-            // Botón Volver al Menú Principal
-            Button btnMenu = CrearBotonMadera(canvasObj.transform, "Boton_MenuPrincipal", "Menú Principal", new Vector2(0f, 40f), new Vector2(220f, 45f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f));
+            // BotÃ³n Volver al MenÃº Principal
+            Button btnMenu = CrearBotonMadera(canvasObj.transform, "Boton_MenuPrincipal", "MenÃº Principal", new Vector2(0f, 40f), new Vector2(220f, 45f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f));
 
             SerializedObject so = new SerializedObject(finalCtrl);
             so.FindProperty("textoNarrativo").objectReferenceValue = tmpTn;
@@ -705,7 +705,7 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // 4. NIVEL 1 — MINA RAYAS (130u, 110s, 6 vetas, 2 gemas, 4 huecos, 7 spawners, 2 derrumbes)
+        // 4. NIVEL 1 â€” MINA RAYAS (130u, 110s, 6 vetas, 2 gemas, 4 huecos, 7 spawners, 2 derrumbes)
         // ====================================================================
         public static void ConstruirNivel1_MinaRayas()
         {
@@ -714,7 +714,7 @@ namespace ElMinero.Editor
             Color bgVioleta = new Color(0.12f, 0.09f, 0.19f); // #1E1630
             Color luzAmbar = new Color(0.96f, 0.83f, 0.54f);
 
-            // 1. Iluminación URP 2D
+            // 1. IluminaciÃ³n URP 2D
             CrearIluminacionNivel(bgVioleta, 0.75f);
 
             // 2. Parallax 3 Capas Mina Rayas (extendido a 130u)
@@ -738,8 +738,8 @@ namespace ElMinero.Editor
             CrearHuecoLetal(new Vector3(86f, -4f, 0f), new Vector2(5f, 2f));
             CrearHuecoLetal(new Vector3(108f, -4f, 0f), new Vector2(5f, 2f));
 
-            // 5. Plataformas fijas con escalones alcanzables (ΔY <= 1.3u)
-            CrearPlataformaFija(new Vector3(5f, 0.3f, 0f), layerSuelo);     // Escalón bajo
+            // 5. Plataformas fijas con escalones alcanzables (Î”Y <= 1.3u)
+            CrearPlataformaFija(new Vector3(5f, 0.3f, 0f), layerSuelo);     // EscalÃ³n bajo
             CrearPlataformaFija(new Vector3(20f, 0.2f, 0f), layerSuelo);    // Sobre Hueco 1
             CrearPlataformaFija(new Vector3(35f, 0.3f, 0f), layerSuelo);    // Escalera 1A
             CrearPlataformaFija(new Vector3(39f, 1.4f, 0f), layerSuelo);    // Escalera 1B
@@ -767,14 +767,14 @@ namespace ElMinero.Editor
             // Mineral distintivo Nivel 1: Aguilarita
             CrearMineralDistintivo("Mineral_Aguilarita", new Vector3(58f, 3.5f, 0f));
 
-            // Enemigos Nivel 1: 2 Murciélagos estándar
+            // Enemigos Nivel 1: 2 MurciÃ©lagos estÃ¡ndar
             CrearMurcielago(new Vector3(25f, 2.5f, 0f), 5f);
             CrearMurcielago(new Vector3(75f, 2.5f, 0f), 5f);
 
             // Elevador tipo malacate
             CrearElevador(new Vector3(50f, -1f, 0f), new Vector3(50f, 3f, 0f), 2f);
 
-            // 7. Obstáculos: 7 Spawners de Rocas rápidos (intervalo 2.0s - 2.2s)
+            // 7. ObstÃ¡culos: 7 Spawners de Rocas rÃ¡pidos (intervalo 2.0s - 2.2s)
             CrearRockSpawner(new Vector3(12f, 7f, 0f), 2.2f);
             CrearRockSpawner(new Vector3(28f, 7f, 0f), 2.2f);
             CrearRockSpawner(new Vector3(48f, 7f, 0f), 2.0f);
@@ -792,13 +792,13 @@ namespace ElMinero.Editor
             CrearZonaDerrumbe(new Vector3(46f, 0f, 0f), new Vector3(41f, -0.5f, 0f));
             CrearZonaDerrumbe(new Vector3(92f, 0f, 0f), new Vector3(87f, -0.5f, 0f));
 
-            // 10. Temblor periódico
+            // 10. Temblor periÃ³dico
             CrearMineTremor();
 
-            // 11. Salida del nivel (Túnel al final X = 124)
+            // 11. Salida del nivel (TÃºnel al final X = 124)
             CrearSalida(new Vector3(124f, -1f, 0f), false);
 
-            // 12. Ambientación (Antorchas)
+            // 12. AmbientaciÃ³n (Antorchas)
             CrearAntorchaConLuz(new Vector3(-5f, 0.8f, 0f), luzAmbar);
             CrearAntorchaConLuz(new Vector3(14f, 0.8f, 0f), luzAmbar);
             CrearAntorchaConLuz(new Vector3(32f, 0.8f, 0f), luzAmbar);
@@ -811,7 +811,7 @@ namespace ElMinero.Editor
             // 13. Jugador (Minero)
             GameObject jugador = CrearJugador(new Vector3(-7f, 0.5f, 0f), layerSuelo);
 
-            // 14. Cámara Cinemachine y Brain
+            // 14. CÃ¡mara Cinemachine y Brain
             ConfigurarCamaraNivel(jugador, bgVioleta, new Vector2(-15f, -6f), new Vector2(135f, 12f));
 
             // 15. Managers y HUD
@@ -822,7 +822,7 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // 5. NIVEL 2 — EL NOPAL (170u, 120s, 8 vetas, 3 gemas, 4 plat móviles, 6 huecos, 10 spawners, 3 derrumbes)
+        // 5. NIVEL 2 â€” EL NOPAL (170u, 120s, 8 vetas, 3 gemas, 4 plat mÃ³viles, 6 huecos, 10 spawners, 3 derrumbes)
         // ====================================================================
         public static void ConstruirNivel2_ElNopal()
         {
@@ -853,17 +853,17 @@ namespace ElMinero.Editor
             CrearHuecoLetal(new Vector3(126f, -4f, 0f), new Vector2(8f, 2f));
             CrearHuecoLetal(new Vector3(152f, -4f, 0f), new Vector2(8f, 2f));
 
-            // Plataformas Móviles sobre los huecos
+            // Plataformas MÃ³viles sobre los huecos
             CrearPlataformaMovil(new Vector3(11f, 0.2f, 0f), new Vector3(17f, 0.2f, 0f), 2.2f, layerSuelo);
             CrearPlataformaMovil(new Vector3(37f, 0.2f, 0f), new Vector3(43f, 0.2f, 0f), 2.0f, layerSuelo);
             CrearPlataformaMovil(new Vector3(44f, 0.5f, 0f), new Vector3(49f, 0.5f, 0f), 2.2f, layerSuelo);
             CrearPlataformaMovil(new Vector3(94f, 0.3f, 0f), new Vector3(101f, 0.3f, 0f), 2.5f, layerSuelo);
             CrearPlataformaMovil(new Vector3(122f, 0.4f, 0f), new Vector3(129f, 0.4f, 0f), 3.0f, layerSuelo);
 
-            // Plataformas fijas con escalones alcanzables (ΔY <= 1.3u)
+            // Plataformas fijas con escalones alcanzables (Î”Y <= 1.3u)
             CrearPlataformaFija(new Vector3(24f, 0.4f, 0f), layerSuelo);
             CrearPlataformaFija(new Vector3(58f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(62f, 1.4f, 0f), layerSuelo); // Escalón alto accesible
+            CrearPlataformaFija(new Vector3(62f, 1.4f, 0f), layerSuelo); // EscalÃ³n alto accesible
             CrearPlataformaFija(new Vector3(76f, 0.2f, 0f), layerSuelo); // Sobre hueco 3A
             CrearPlataformaFija(new Vector3(80f, 0.5f, 0f), layerSuelo); // Sobre hueco 3B
             CrearPlataformaFija(new Vector3(86f, 0.4f, 0f), layerSuelo);
@@ -890,18 +890,18 @@ namespace ElMinero.Editor
             // Mineral distintivo Nivel 2: Pepita de Oro
             CrearMineralDistintivo("Mineral_PepitaOro", new Vector3(97f, 2.8f, 0f));
 
-            // Enemigos Nivel 2: 3 Arañas que bajan y 2 Murciélagos
+            // Enemigos Nivel 2: 3 AraÃ±as que bajan y 2 MurciÃ©lagos
             CrearArana(new Vector3(32f, 5.5f, 0f));
             CrearArana(new Vector3(88f, 5.5f, 0f));
             CrearArana(new Vector3(142f, 5.5f, 0f));
             CrearMurcielago(new Vector3(20f, 2.5f, 0f), 6f);
             CrearMurcielago(new Vector3(110f, 2.5f, 0f), 6f);
 
-            // Obstáculos Nivel 2: 2 Vagonetas desbocadas con triggers
+            // ObstÃ¡culos Nivel 2: 2 Vagonetas desbocadas con triggers
             CrearVagoneta(new Vector3(45f, 0f, 0f), new Vector3(65f, -1.2f, 0f), Vector2.left, 22f);
             CrearVagoneta(new Vector3(120f, 0f, 0f), new Vector3(140f, -1.2f, 0f), Vector2.left, 22f);
 
-            // 10 Rock spawners rápidos (intervalo 1.8s)
+            // 10 Rock spawners rÃ¡pidos (intervalo 1.8s)
             CrearRockSpawner(new Vector3(8f, 7f, 0f), 1.8f);
             CrearRockSpawner(new Vector3(20f, 7f, 0f), 1.8f);
             CrearRockSpawner(new Vector3(32f, 7f, 0f), 1.8f);
@@ -948,7 +948,7 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // 6. NIVEL 3 — LA VALENCIANA (210u, 130s, 10 vetas, 4 gemas, 9 quebradizas, 2 móviles, 9 huecos, 14 spawners, 4 derrumbes)
+        // 6. NIVEL 3 â€” LA VALENCIANA (210u, 130s, 10 vetas, 4 gemas, 9 quebradizas, 2 mÃ³viles, 9 huecos, 14 spawners, 4 derrumbes)
         // ====================================================================
         public static void ConstruirNivel3_LaValenciana()
         {
@@ -996,16 +996,16 @@ namespace ElMinero.Editor
             CrearPlataformaQuebradiza(new Vector3(189f, 0.2f, 0f), layerSuelo);
             CrearPlataformaQuebradiza(new Vector3(193f, 0.4f, 0f), layerSuelo);
 
-            // Plataformas Móviles
+            // Plataformas MÃ³viles
             CrearPlataformaMovil(new Vector3(83f, 0.4f, 0f), new Vector3(88f, 0.4f, 0f), 2.5f, layerSuelo);
             CrearPlataformaMovil(new Vector3(166f, 0.3f, 0f), new Vector3(173f, 0.3f, 0f), 2.8f, layerSuelo);
 
-            // Plataformas fijas con escalones alcanzables (ΔY <= 1.3u)
+            // Plataformas fijas con escalones alcanzables (Î”Y <= 1.3u)
             CrearPlataformaFija(new Vector3(18f, 0.4f, 0f), layerSuelo);
             CrearPlataformaFija(new Vector3(35f, 0.4f, 0f), layerSuelo);
             CrearPlataformaFija(new Vector3(47f, 0.5f, 0f), layerSuelo);  // Sobre hueco 3
             CrearPlataformaFija(new Vector3(64f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(68f, 1.4f, 0f), layerSuelo);  // Escalón alto
+            CrearPlataformaFija(new Vector3(68f, 1.4f, 0f), layerSuelo);  // EscalÃ³n alto
             CrearPlataformaFija(new Vector3(94f, 0.4f, 0f), layerSuelo);
             CrearPlataformaFija(new Vector3(118f, 0.4f, 0f), layerSuelo);
             CrearPlataformaFija(new Vector3(122f, 1.5f, 0f), layerSuelo);
@@ -1035,7 +1035,7 @@ namespace ElMinero.Editor
             // Mineral distintivo Nivel 3: Pirargirita
             CrearMineralDistintivo("Mineral_Pirargirita", new Vector3(144f, 2.8f, 0f));
 
-            // Enemigos Nivel 3: 3 Alacranes, 3 Murciélagos Rojos en picada, 2 Arañas
+            // Enemigos Nivel 3: 3 Alacranes, 3 MurciÃ©lagos Rojos en picada, 2 AraÃ±as
             CrearAlacran(new Vector3(35f, -1.5f, 0f), 4f);
             CrearAlacran(new Vector3(94f, -1.5f, 0f), 5f);
             CrearAlacran(new Vector3(162f, -1.5f, 0f), 4f);
@@ -1047,7 +1047,7 @@ namespace ElMinero.Editor
             CrearArana(new Vector3(60f, 6.0f, 0f));
             CrearArana(new Vector3(130f, 6.0f, 0f));
 
-            // Obstáculos Nivel 3: 2 Vagonetas, 2 Llamas de gas, 1 Elevador malacate
+            // ObstÃ¡culos Nivel 3: 2 Vagonetas, 2 Llamas de gas, 1 Elevador malacate
             CrearVagoneta(new Vector3(50f, 0f, 0f), new Vector3(72f, -1.2f, 0f), Vector2.left, 22f);
             CrearVagoneta(new Vector3(154f, 0f, 0f), new Vector3(175f, -1.2f, 0f), Vector2.left, 22f);
 
@@ -1114,7 +1114,7 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // CONSTRUCCIÓN PROCEDURAL DE TERRENOS POR NIVEL
+        // CONSTRUCCIÃ“N PROCEDURAL DE TERRENOS POR NIVEL
         // ====================================================================
         private static void ConstruirTerrenoNivel1(Tilemap tmSuelo, Tilemap tmDeco)
         {
@@ -1146,7 +1146,7 @@ namespace ElMinero.Editor
                 tmSuelo.SetTile(new Vector3Int(x, 6, 0), t17);
                 tmSuelo.SetTile(new Vector3Int(x, 7, 0), t9);
 
-                // Estalactitas periódicas
+                // Estalactitas periÃ³dicas
                 if (x % 7 == 0 && t7 != null)
                 {
                     tmDeco.SetTile(new Vector3Int(x, 5, 0), t7);
@@ -1258,7 +1258,7 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // HELPERS DE INSTANCIACIÓN DE ELEMENTOS
+        // HELPERS DE INSTANCIACIÃ“N DE ELEMENTOS
         // ====================================================================
         private static void CrearIluminacionNivel(Color bgColor, float globalIntensity)
         {
@@ -1344,7 +1344,7 @@ namespace ElMinero.Editor
                 compCol.GenerateGeometry();
                 if (compCol.pathCount == 0)
                 {
-                    Debug.LogWarning($"[LevelBuilder] CompositeCollider2D en '{tm.name}' tiene 0 caminos. Usando colisión directa en TilemapCollider2D.");
+                    Debug.LogWarning($"[LevelBuilder] CompositeCollider2D en '{tm.name}' tiene 0 caminos. Usando colisiÃ³n directa en TilemapCollider2D.");
                     tmCol.compositeOperation = Collider2D.CompositeOperation.None;
                     UnityEngine.Object.DestroyImmediate(compCol);
                 }
@@ -1650,7 +1650,7 @@ namespace ElMinero.Editor
             }
             else
             {
-                Debug.LogWarning($"[LevelBuilder] No se encontró el prefab {nombrePrefab} ni {cleanName}");
+                Debug.LogWarning($"[LevelBuilder] No se encontrÃ³ el prefab {nombrePrefab} ni {cleanName}");
             }
         }
 
@@ -1918,9 +1918,9 @@ namespace ElMinero.Editor
             rectSup.anchorMin = new Vector2(0f, 1f);
             rectSup.anchorMax = new Vector2(1f, 1f);
             rectSup.pivot = new Vector2(0.5f, 1f);
-            rectSup.sizeDelta = new Vector2(0f, 90f);
+            rectSup.sizeDelta = new Vector2(0f, 120f);
 
-            // 3 Corazones
+            // 3 Corazones (64x64, separación 12 px)
             Sprite sprCorazonLleno = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Corazon_Lleno.png");
             Sprite sprCorazonVacio = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Corazon_Vacio.png");
             Image[] hearts = new Image[3];
@@ -1932,8 +1932,8 @@ namespace ElMinero.Editor
                 rectH.anchorMin = new Vector2(0f, 0.5f);
                 rectH.anchorMax = new Vector2(0f, 0.5f);
                 rectH.pivot = new Vector2(0f, 0.5f);
-                rectH.sizeDelta = new Vector2(48f, 48f);
-                rectH.anchoredPosition = new Vector2(40f + (i * 56f), 0f);
+                rectH.sizeDelta = new Vector2(64f, 64f);
+                rectH.anchoredPosition = new Vector2(40f + (i * 76f), 0f);
                 hearts[i] = hObj.AddComponent<Image>();
                 hearts[i].sprite = sprCorazonLleno;
             }
@@ -1944,7 +1944,7 @@ namespace ElMinero.Editor
             var rectReloj = relojObj.AddComponent<RectTransform>();
             rectReloj.anchorMin = new Vector2(0.5f, 0.5f);
             rectReloj.anchorMax = new Vector2(0.5f, 0.5f);
-            rectReloj.sizeDelta = new Vector2(180f, 50f);
+            rectReloj.sizeDelta = new Vector2(240f, 60f);
 
             GameObject iconoReloj = new GameObject("Icono_Reloj");
             iconoReloj.transform.SetParent(relojObj.transform, false);
@@ -1952,7 +1952,7 @@ namespace ElMinero.Editor
             rectIr.anchorMin = new Vector2(0f, 0.5f);
             rectIr.anchorMax = new Vector2(0f, 0.5f);
             rectIr.pivot = new Vector2(0f, 0.5f);
-            rectIr.sizeDelta = new Vector2(40f, 40f);
+            rectIr.sizeDelta = new Vector2(56f, 56f);
             rectIr.anchoredPosition = new Vector2(0f, 0f);
             var imgReloj = iconoReloj.AddComponent<Image>();
             imgReloj.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Icono_Reloj.png");
@@ -1962,11 +1962,11 @@ namespace ElMinero.Editor
             var rectTr = textoReloj.AddComponent<RectTransform>();
             rectTr.anchorMin = new Vector2(0f, 0f);
             rectTr.anchorMax = new Vector2(1f, 1f);
-            rectTr.offsetMin = new Vector2(48f, 0f);
+            rectTr.offsetMin = new Vector2(64f, 0f);
             rectTr.offsetMax = Vector2.zero;
             var tmpReloj = textoReloj.AddComponent<TextMeshProUGUI>();
             tmpReloj.text = "01:30";
-            tmpReloj.fontSize = 32f;
+            tmpReloj.fontSize = 42f;
             tmpReloj.alignment = TextAlignmentOptions.MidlineLeft;
             tmpReloj.fontStyle = FontStyles.Bold;
 
@@ -1977,8 +1977,8 @@ namespace ElMinero.Editor
             rectPlata.anchorMin = new Vector2(1f, 0.5f);
             rectPlata.anchorMax = new Vector2(1f, 0.5f);
             rectPlata.pivot = new Vector2(1f, 0.5f);
-            rectPlata.sizeDelta = new Vector2(300f, 50f);
-            rectPlata.anchoredPosition = new Vector2(-120f, 0f);
+            rectPlata.sizeDelta = new Vector2(440f, 60f);
+            rectPlata.anchoredPosition = new Vector2(-160f, 0f);
 
             GameObject iconoPlata = new GameObject("Icono_Plata");
             iconoPlata.transform.SetParent(plataObj.transform, false);
@@ -1986,7 +1986,7 @@ namespace ElMinero.Editor
             ipRect.anchorMin = new Vector2(0f, 0.5f);
             ipRect.anchorMax = new Vector2(0f, 0.5f);
             ipRect.pivot = new Vector2(0f, 0.5f);
-            ipRect.sizeDelta = new Vector2(40f, 40f);
+            ipRect.sizeDelta = new Vector2(56f, 56f);
             var imgPlata = iconoPlata.AddComponent<Image>();
             imgPlata.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Icono_Plata.png");
 
@@ -1995,11 +1995,11 @@ namespace ElMinero.Editor
             var tpRect = textoPlata.AddComponent<RectTransform>();
             tpRect.anchorMin = new Vector2(0f, 0f);
             tpRect.anchorMax = new Vector2(0.5f, 1f);
-            tpRect.offsetMin = new Vector2(48f, 0f);
+            tpRect.offsetMin = new Vector2(64f, 0f);
             tpRect.offsetMax = Vector2.zero;
             var tmpPlata = textoPlata.AddComponent<TextMeshProUGUI>();
             tmpPlata.text = $"0 / {totalVetas}";
-            tmpPlata.fontSize = 30f;
+            tmpPlata.fontSize = 42f;
             tmpPlata.alignment = TextAlignmentOptions.MidlineLeft;
 
             GameObject textoScore = new GameObject("Texto_Score");
@@ -2011,18 +2011,18 @@ namespace ElMinero.Editor
             tsRect.offsetMax = Vector2.zero;
             var tmpScore = textoScore.AddComponent<TextMeshProUGUI>();
             tmpScore.text = "0 pts";
-            tmpScore.fontSize = 30f;
+            tmpScore.fontSize = 42f;
             tmpScore.fontStyle = FontStyles.Bold;
             tmpScore.alignment = TextAlignmentOptions.MidlineRight;
 
-            // Botón Pausa (esquina sup derecha)
+            // Botón Pausa (104x104, esquina sup derecha a -40, 0)
             GameObject btnPausaObj = new GameObject("Boton_Pausa");
             btnPausaObj.transform.SetParent(panelSup.transform, false);
             var bpRect = btnPausaObj.AddComponent<RectTransform>();
             bpRect.anchorMin = new Vector2(1f, 0.5f);
             bpRect.anchorMax = new Vector2(1f, 0.5f);
             bpRect.pivot = new Vector2(1f, 0.5f);
-            bpRect.sizeDelta = new Vector2(48f, 48f);
+            bpRect.sizeDelta = new Vector2(104f, 104f);
             bpRect.anchoredPosition = new Vector2(-40f, 0f);
             var imgPausa = btnPausaObj.AddComponent<Image>();
             imgPausa.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Boton_Pausa.png");
@@ -2115,10 +2115,10 @@ namespace ElMinero.Editor
             soLm2.FindProperty("initialSpawnPoint").vector3Value = jugador.transform.position;
             soLm2.ApplyModifiedProperties();
 
-            // Menú de Pausa
+            // MenÃº de Pausa
             CrearMenuPausaEnCanvas(canvasObj, btnPausa, optionsComp);
 
-            // Controles Táctiles para Móvil
+            // Controles TÃ¡ctiles para MÃ³vil
             CrearControlesTactiles(canvasObj, jugador.GetComponent<PlayerInputHandler>());
 
             // Sistemas Persistentes
@@ -2132,28 +2132,29 @@ namespace ElMinero.Editor
             GameObject panelPausa = new GameObject("Panel_Pausa");
             panelPausa.transform.SetParent(canvasObj.transform, false);
             var rectP = panelPausa.AddComponent<RectTransform>();
-            rectP.sizeDelta = new Vector2(450f, 360f);
+            rectP.sizeDelta = new Vector2(800f, 650f);
             var imgP = panelPausa.AddComponent<Image>();
             imgP.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
             imgP.type = Image.Type.Sliced;
+            imgP.pixelsPerUnitMultiplier = 0.25f;
 
             // Título Pausa
             GameObject tObj = new GameObject("Texto_Pausa");
             tObj.transform.SetParent(panelPausa.transform, false);
             var rectT = tObj.AddComponent<RectTransform>();
-            rectT.anchoredPosition = new Vector2(0f, 120f);
-            rectT.sizeDelta = new Vector2(400f, 45f);
+            rectT.anchoredPosition = new Vector2(0f, 220f);
+            rectT.sizeDelta = new Vector2(700f, 65f);
             var tmpT = tObj.AddComponent<TextMeshProUGUI>();
             tmpT.text = "PAUSA";
-            tmpT.fontSize = 32f;
+            tmpT.fontSize = 56f;
             tmpT.alignment = TextAlignmentOptions.Center;
             tmpT.fontStyle = FontStyles.Bold;
             tmpT.color = new Color(1f, 0.9f, 0.4f);
 
-            Button btnResume = CrearBotonMadera(panelPausa.transform, "Boton_Continuar", "Continuar", new Vector2(0f, 50f), new Vector2(250f, 42f));
-            Button btnRestart = CrearBotonMadera(panelPausa.transform, "Boton_Reiniciar", "Reiniciar Nivel", new Vector2(0f, 0f), new Vector2(250f, 42f));
-            Button btnOptions = CrearBotonMadera(panelPausa.transform, "Boton_Opciones", "Opciones", new Vector2(0f, -50f), new Vector2(250f, 42f));
-            Button btnMenu = CrearBotonMadera(panelPausa.transform, "Boton_MenuPrincipal", "Menú Principal", new Vector2(0f, -100f), new Vector2(250f, 42f));
+            Button btnResume = CrearBotonMadera(panelPausa.transform, "Boton_Continuar", "Continuar", new Vector2(0f, 100f), new Vector2(420f, 80f));
+            Button btnRestart = CrearBotonMadera(panelPausa.transform, "Boton_Reiniciar", "Reiniciar Nivel", new Vector2(0f, 0f), new Vector2(420f, 80f));
+            Button btnOptions = CrearBotonMadera(panelPausa.transform, "Boton_Opciones", "Opciones", new Vector2(0f, -100f), new Vector2(420f, 80f));
+            Button btnMenu = CrearBotonMadera(panelPausa.transform, "Boton_MenuPrincipal", "Menú Principal", new Vector2(0f, -200f), new Vector2(420f, 80f));
 
             SerializedObject so = new SerializedObject(pauseComp);
             so.FindProperty("pausePanel").objectReferenceValue = panelPausa;
@@ -2181,15 +2182,15 @@ namespace ElMinero.Editor
             var touch = touchRoot.AddComponent<TouchControls>();
             touch.SetInputHandler(inputHandler);
 
-            // Botón Izquierda (esquina inferior izquierda)
+            // BotÃ³n Izquierda (esquina inferior izquierda)
             GameObject btnLeft = CrearBotonTactil(touchRoot.transform, "Boton_Izquierda", "Assets/Sprites/UI/Boton_Izquierda.png",
                 new Vector2(140f, 140f), new Vector2(180f, 180f), new Vector2(0f, 0f));
 
-            // Botón Derecha (al lado del botón izquierda)
+            // BotÃ³n Derecha (al lado del botÃ³n izquierda)
             GameObject btnRight = CrearBotonTactil(touchRoot.transform, "Boton_Derecha", "Assets/Sprites/UI/Boton_Derecha.png",
                 new Vector2(340f, 140f), new Vector2(180f, 180f), new Vector2(0f, 0f));
 
-            // Botón Saltar (esquina inferior derecha)
+            // BotÃ³n Saltar (esquina inferior derecha)
             GameObject btnJump = CrearBotonTactil(touchRoot.transform, "Boton_Saltar", "Assets/Sprites/UI/Boton_Saltar.png",
                 new Vector2(-160f, 160f), new Vector2(200f, 200f), new Vector2(1f, 0f));
 
@@ -2198,7 +2199,7 @@ namespace ElMinero.Editor
             AgregarEventTrigger(btnRight, () => touch.OnRightDown(), () => touch.OnRightUp());
             AgregarEventTrigger(btnJump, () => touch.OnJumpDown(), () => touch.OnJumpUp());
 
-            touchRoot.SetActive(false); // TouchControls lo activará automáticamente en móvil
+            touchRoot.SetActive(false); // TouchControls lo activarÃ¡ automÃ¡ticamente en mÃ³vil
         }
 
         private static GameObject CrearBotonTactil(Transform parent, string name, string spritePath, Vector2 pos, Vector2 size, Vector2 anchor)
@@ -2271,6 +2272,7 @@ namespace ElMinero.Editor
             var img = btnObj.AddComponent<Image>();
             img.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Boton_Madera.png");
             img.type = Image.Type.Sliced;
+            img.pixelsPerUnitMultiplier = 0.25f;
 
             var btn = btnObj.AddComponent<Button>();
 
@@ -2284,7 +2286,7 @@ namespace ElMinero.Editor
             rectT.offsetMax = Vector2.zero;
             var tmp = txtObj.AddComponent<TextMeshProUGUI>();
             tmp.text = texto;
-            tmp.fontSize = 20f;
+            tmp.fontSize = 34f;
             tmp.fontStyle = FontStyles.Bold;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = new Color(0.95f, 0.9f, 0.8f);

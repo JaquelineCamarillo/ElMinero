@@ -1,16 +1,19 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using ElMinero.Managers;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace ElMinero.UI
 {
     /// <summary>
-    /// Controlador del panel de opciones según la especificación exacta de la sección 3.4.
-    /// Gestiona sliders de volumen, toggle de música, selector de calidad gráfica,
-    /// subpanel de controles, y modal de confirmación para borrar progreso.
+    /// Controlador del panel de opciones según la especificación exacta de la sección 3.4 y correcciones D/E.
+    /// Gestiona sliders de volumen directo, toggle de música, selector de calidad con flechas (◀  Alta  ▶),
+    /// subpanel de controles, modal de borrado de progreso y evento AlCerrar.
     /// </summary>
     public class OptionsPanel : MonoBehaviour
     {
@@ -19,8 +22,10 @@ namespace ElMinero.UI
         [SerializeField] private Slider sliderEfectos;
         [SerializeField] private Toggle toggleMusica;
 
-        [Header("Calidad")]
-        [SerializeField] private TMP_Dropdown dropdownCalidad;
+        [Header("Selector de Calidad")]
+        [SerializeField] private Button botonCalidadAnterior;
+        [SerializeField] private Button botonCalidadSiguiente;
+        [SerializeField] private TextMeshProUGUI textoCalidad;
 
         [Header("Subpanel de Controles")]
         [SerializeField] private Button botonControles;
@@ -37,6 +42,10 @@ namespace ElMinero.UI
         [Header("Navegación")]
         [SerializeField] private Button botonVolver;
 
+        private int indiceCalidadActual = 2;
+
+        public event Action AlCerrar;
+
         private void Awake()
         {
             ConfigurarListeners();
@@ -48,6 +57,30 @@ namespace ElMinero.UI
             if (modalConfirmarBorrar != null) modalConfirmarBorrar.SetActive(false);
             if (panelControles != null) panelControles.SetActive(false);
             if (avisoProgresoBorrado != null) avisoProgresoBorrado.SetActive(false);
+        }
+
+        private void Update()
+        {
+            bool volver = false;
+#if ENABLE_INPUT_SYSTEM
+            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) volver = true;
+            if (Gamepad.current != null && (Gamepad.current.buttonEast.wasPressedThisFrame || Gamepad.current.startButton.wasPressedThisFrame)) volver = true;
+#endif
+            if (volver)
+            {
+                if (modalConfirmarBorrar != null && modalConfirmarBorrar.activeSelf)
+                {
+                    CancelarBorrado();
+                }
+                else if (panelControles != null && panelControles.activeSelf)
+                {
+                    CerrarControles();
+                }
+                else
+                {
+                    CerrarPanel();
+                }
+            }
         }
 
         private void ConfigurarListeners()
@@ -67,9 +100,14 @@ namespace ElMinero.UI
                 toggleMusica.onValueChanged.AddListener(OnToggleMusicaChanged);
             }
 
-            if (dropdownCalidad != null)
+            if (botonCalidadAnterior != null)
             {
-                dropdownCalidad.onValueChanged.AddListener(OnCalidadChanged);
+                botonCalidadAnterior.onClick.AddListener(() => CambiarCalidad(-1));
+            }
+
+            if (botonCalidadSiguiente != null)
+            {
+                botonCalidadSiguiente.onClick.AddListener(() => CambiarCalidad(1));
             }
 
             if (botonControles != null)
@@ -114,14 +152,7 @@ namespace ElMinero.UI
             if (sliderEfectos != null) sliderEfectos.value = volEfectos;
             if (toggleMusica != null) toggleMusica.isOn = musicaActiva;
 
-            if (dropdownCalidad != null)
-            {
-                dropdownCalidad.ClearOptions();
-                List<string> opciones = new List<string> { "Baja", "Media", "Alta" };
-                dropdownCalidad.AddOptions(opciones);
-                dropdownCalidad.value = Mathf.Clamp(calidad, 0, opciones.Count - 1);
-                dropdownCalidad.RefreshShownValue();
-            }
+            AplicarCalidad(calidad);
         }
 
         private void OnMusicaChanged(float val)
@@ -165,70 +196,88 @@ namespace ElMinero.UI
             if (AudioManager.Instance != null) AudioManager.Instance.PlayClickUI();
         }
 
-        private void OnCalidadChanged(int indice)
+        private void CambiarCalidad(int delta)
         {
-            if (SettingsManager.Instance != null)
-            {
-                SettingsManager.Instance.SetCalidad(indice);
-            }
-            else
-            {
-                QualitySettings.SetQualityLevel(indice, true);
-                PlayerPrefs.SetInt(SettingsManager.PREF_CALIDAD, indice);
-            }
+            string[] nombres = QualitySettings.names;
+            int total = nombres.Length;
+            if (total == 0) return;
 
+            indiceCalidadActual = (indiceCalidadActual + delta + total) % total;
+            AplicarCalidad(indiceCalidadActual);
             if (AudioManager.Instance != null) AudioManager.Instance.PlayClickUI();
         }
 
-        public void AbrirControles()
+        private void AplicarCalidad(int indice)
+        {
+            string[] nombres = QualitySettings.names;
+            if (nombres == null || nombres.Length == 0) return;
+
+            indiceCalidadActual = Mathf.Clamp(indice, 0, nombres.Length - 1);
+            QualitySettings.SetQualityLevel(indiceCalidadActual, true);
+            PlayerPrefs.SetInt(SettingsManager.PREF_CALIDAD, indiceCalidadActual);
+            PlayerPrefs.Save();
+
+            if (textoCalidad != null)
+            {
+                textoCalidad.text = nombres[indiceCalidadActual];
+            }
+        }
+
+        private void AbrirControles()
         {
             if (AudioManager.Instance != null) AudioManager.Instance.PlayClickUI();
             if (panelControles != null) panelControles.SetActive(true);
         }
 
-        public void CerrarControles()
+        private void CerrarControles()
         {
             if (AudioManager.Instance != null) AudioManager.Instance.PlayClickUI();
             if (panelControles != null) panelControles.SetActive(false);
         }
 
-        public void MostrarModalBorrar()
+        private void MostrarModalBorrar()
         {
             if (AudioManager.Instance != null) AudioManager.Instance.PlayClickUI();
             if (modalConfirmarBorrar != null) modalConfirmarBorrar.SetActive(true);
         }
 
-        public void CancelarBorrado()
+        private void CancelarBorrado()
         {
             if (AudioManager.Instance != null) AudioManager.Instance.PlayClickUI();
             if (modalConfirmarBorrar != null) modalConfirmarBorrar.SetActive(false);
         }
 
-        public void ConfirmarBorrado()
+        private void ConfirmarBorrado()
         {
-            if (SettingsManager.Instance != null)
+            if (modalConfirmarBorrar != null) modalConfirmarBorrar.SetActive(false);
+
+            PlayerPrefs.DeleteKey(SettingsManager.PREF_NIVEL_DESBLOQUEADO);
+            for (int i = 1; i <= 3; i++)
             {
-                SettingsManager.Instance.BorrarProgreso();
-            }
-            else
-            {
-                PlayerPrefs.DeleteAll();
-                PlayerPrefs.Save();
+                PlayerPrefs.DeleteKey($"Nivel_{i}_Estrellas");
+                PlayerPrefs.DeleteKey($"Nivel_{i}_Score");
+                PlayerPrefs.DeleteKey($"Nivel_{i}_Tiempo");
+                PlayerPrefs.DeleteKey($"Nivel_{i}_Completado");
             }
 
-            if (modalConfirmarBorrar != null) modalConfirmarBorrar.SetActive(false);
+            PlayerPrefs.DeleteKey("Mineral_Nivel1_MinaRayas");
+            PlayerPrefs.DeleteKey("Mineral_Nivel2_ElNopal");
+            PlayerPrefs.DeleteKey("Mineral_Nivel3_LaValenciana");
+
+            PlayerPrefs.Save();
+
+            if (AudioManager.Instance != null) AudioManager.Instance.PlayDanioSuave();
             if (avisoProgresoBorrado != null)
             {
                 avisoProgresoBorrado.SetActive(true);
-                StartCoroutine(OcultarAvisoDespues(2.5f));
+                StopAllCoroutines();
+                StartCoroutine(OcultarAviso());
             }
-
-            if (AudioManager.Instance != null) AudioManager.Instance.PlayDanioSuave();
         }
 
-        private IEnumerator OcultarAvisoDespues(float delay)
+        private System.Collections.IEnumerator OcultarAviso()
         {
-            yield return new WaitForSecondsRealtime(delay);
+            yield return new WaitForSecondsRealtime(2f);
             if (avisoProgresoBorrado != null) avisoProgresoBorrado.SetActive(false);
         }
 
@@ -236,6 +285,7 @@ namespace ElMinero.UI
         {
             if (AudioManager.Instance != null) AudioManager.Instance.PlayClickUI();
             gameObject.SetActive(false);
+            AlCerrar?.Invoke();
         }
     }
 }
