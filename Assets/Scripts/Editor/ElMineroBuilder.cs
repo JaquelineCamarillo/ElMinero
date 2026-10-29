@@ -258,16 +258,16 @@ namespace ElMinero.Editor
             string dirConfigs = "Assets/Settings/Niveles";
             if (!Directory.Exists(dirConfigs)) Directory.CreateDirectory(dirConfigs);
 
-            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel1.asset"), "Nivel 1 — Mina Rayas", 1, 110f, 6, 2, 2.2f, new Color(0.12f, 0.09f, 0.19f));
-            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel2.asset"), "Nivel 2 — El Nopal", 2, 120f, 8, 3, 1.8f, new Color(0.16f, 0.10f, 0.05f));
-            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel3.asset"), "Nivel 3 — La Valenciana", 3, 130f, 10, 4, 1.3f, new Color(0.16f, 0.04f, 0.04f));
+            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel1.asset"), "Nivel 1 — Mina Rayas", 1, 100f, 6, 2, "Aguilarita", "Aguilarita (Ag4SeS): mineral de plata y selenio descubierto en Guanajuato en 1891.", 4.0f, new Color(0.12f, 0.09f, 0.19f));
+            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel2.asset"), "Nivel 2 — El Nopal", 2, 120f, 8, 3, "Pepita de oro", "Pepita de oro nativo extraída de las profundidades de Guanajuato.", 3.0f, new Color(0.16f, 0.10f, 0.05f));
+            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel3.asset"), "Nivel 3 — La Valenciana", 3, 140f, 10, 4, "Pirargirita", "Pirargirita (Ag3SbS3, plata roja): mineral emblemático que enriqueció a Guanajuato.", 2.2f, new Color(0.16f, 0.04f, 0.04f));
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log("[El Minero] Materiales físicos y LevelConfigs creados correctamente.");
         }
 
-        private static void CrearOActualizarLevelConfig(string path, string nombre, int index, float tiempo, int vetas, int gemas, float rocasIntervalo, Color bg)
+        private static void CrearOActualizarLevelConfig(string path, string nombre, int index, float tiempo, int vetas, int gemas, string minNombre, string minDesc, float rocasIntervalo, Color bg)
         {
             LevelConfig config = AssetDatabase.LoadAssetAtPath<LevelConfig>(path);
             if (config == null)
@@ -285,9 +285,13 @@ namespace ElMinero.Editor
             so.FindProperty("silverVeinPoints").intValue = 10;
             so.FindProperty("amethystGemPoints").intValue = 25;
             so.FindProperty("allSilverBonus").intValue = 50;
+            so.FindProperty("distinctiveMineralName").stringValue = minNombre;
+            so.FindProperty("distinctiveMineralDescription").stringValue = minDesc;
+            so.FindProperty("distinctiveMineralPoints").intValue = 50;
             so.FindProperty("rockSpawnInterval").floatValue = rocasIntervalo;
             so.FindProperty("cameraBackgroundColor").colorValue = bg;
             so.ApplyModifiedProperties();
+            EditorUtility.SetDirty(config);
         }
 
         // ====================================================================
@@ -1155,12 +1159,13 @@ namespace ElMinero.Editor
         {
             string[] rutasEscenas = new string[]
             {
+                "Assets/Scenes/Splash.unity",
                 "Assets/Scenes/MenuPrincipal.unity",
+                "Assets/Scenes/Intro.unity",
                 "Assets/Scenes/Nivel1_MinaRayas.unity",
                 "Assets/Scenes/Nivel2_ElNopal.unity",
                 "Assets/Scenes/Nivel3_LaValenciana.unity",
-                "Assets/Scenes/Victoria.unity",
-                "Assets/Scenes/Derrota.unity"
+                "Assets/Scenes/Final.unity"
             };
 
             var buildScenes = new EditorBuildSettingsScene[rutasEscenas.Length];
@@ -1179,7 +1184,14 @@ namespace ElMinero.Editor
             PlayerSettings.allowedAutorotateToPortrait = false;
             PlayerSettings.allowedAutorotateToPortraitUpsideDown = false;
 
-            // Android (API mínima 26 requerida por Unity 6)
+            // Icono del juego
+            Texture2D icon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Sprites/Jugador/Minero_Retrato.png");
+            if (icon != null)
+            {
+                PlayerSettings.SetIcons(UnityEditor.Build.NamedBuildTarget.Unknown, new Texture2D[] { icon }, IconKind.Application);
+            }
+
+            // Android
             PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
 
             // WebGL

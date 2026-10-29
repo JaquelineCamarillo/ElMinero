@@ -20,6 +20,7 @@ using ElMinero.Obstaculos;
 using ElMinero.Plataformas;
 using ElMinero.UI;
 using ElMinero.Utilidades;
+using ElMinero.Enemigos;
 
 namespace ElMinero.Editor
 {
@@ -52,23 +53,29 @@ namespace ElMinero.Editor
                 ElMineroBuilder.ConfigurarTagsYLayers();
                 ElMineroBuilder.CrearMaterialesFisicosYConfigs();
 
-                // 1. Escenas de Interfaz
+                // 1. Escenas de Interfaz y Narrativa
+                ConstruirSplash();
                 ConstruirMenuPrincipal();
-                ConstruirVictoria();
-                ConstruirDerrota();
+                ConstruirIntro();
 
-                // 2. Tres Niveles de Ascenso
+                // 2. Tres Niveles de Ascenso (Mina de Rayas, El Nopal, La Valenciana)
                 ConstruirNivel1_MinaRayas();
                 ConstruirNivel2_ElNopal();
                 ConstruirNivel3_LaValenciana();
 
-                // 3. Registrar las 6 escenas en Build Settings automáticamente
+                // 3. Escena Final (Superficie y Templo de San Cayetano)
+                ConstruirFinal();
+
+                // 4. Limpieza de escenas obsoletas
+                EliminarEscenasObsoletas();
+
+                // 5. Registrar las 7 escenas en Build Settings automáticamente
                 ElMineroBuilder.ConfigurarBuildSettingsYPlayer();
 
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
 
-                Debug.Log("[El Minero] ¡Las 6 escenas construidas y guardadas exitosamente en Assets/Scenes/!");
+                Debug.Log("[El Minero] ¡Las 7 escenas construidas y guardadas exitosamente en Assets/Scenes/!");
             }
             finally
             {
@@ -114,13 +121,16 @@ namespace ElMinero.Editor
             GameObject canvasObj = CrearCanvasBase("Canvas_MenuPrincipal");
             var menuCtrl = canvasObj.AddComponent<MainMenuController>();
 
+            TMP_FontAsset fontTitulo = FontAssetBuilder.ObtenerPressStart2P();
+            TMP_FontAsset fontTexto = FontAssetBuilder.ObtenerPixelifySans();
+
             // Logo
             GameObject logoObj = new GameObject("Logo_ElMinero");
             logoObj.transform.SetParent(canvasObj.transform, false);
             var rectLogo = logoObj.AddComponent<RectTransform>();
-            rectLogo.anchorMin = new Vector2(0.5f, 0.75f);
-            rectLogo.anchorMax = new Vector2(0.5f, 0.75f);
-            rectLogo.sizeDelta = new Vector2(480f, 160f);
+            rectLogo.anchorMin = new Vector2(0.5f, 0.82f);
+            rectLogo.anchorMax = new Vector2(0.5f, 0.82f);
+            rectLogo.sizeDelta = new Vector2(460f, 150f);
             var imgLogo = logoObj.AddComponent<Image>();
             imgLogo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Logo_ElMinero.png");
             imgLogo.preserveAspect = true;
@@ -129,22 +139,33 @@ namespace ElMinero.Editor
             GameObject subObj = new GameObject("Subtitulo");
             subObj.transform.SetParent(canvasObj.transform, false);
             var rectSub = subObj.AddComponent<RectTransform>();
-            rectSub.anchorMin = new Vector2(0.5f, 0.62f);
-            rectSub.anchorMax = new Vector2(0.5f, 0.62f);
-            rectSub.sizeDelta = new Vector2(500f, 40f);
+            rectSub.anchorMin = new Vector2(0.5f, 0.72f);
+            rectSub.anchorMax = new Vector2(0.5f, 0.72f);
+            rectSub.sizeDelta = new Vector2(500f, 35f);
             var tmpSub = subObj.AddComponent<TextMeshProUGUI>();
+            tmpSub.font = fontTexto;
             tmpSub.text = "Minas de Guanajuato, Siglo XIX";
-            tmpSub.fontSize = 24f;
+            tmpSub.fontSize = 22f;
             tmpSub.alignment = TextAlignmentOptions.Center;
             tmpSub.color = new Color(0.9f, 0.8f, 0.6f);
+
+            // Minero en Idle al lado izquierdo
+            GameObject mineroObj = new GameObject("Minero_Menu");
+            mineroObj.transform.position = new Vector3(-4.8f, -1.8f, 0f);
+            mineroObj.transform.localScale = new Vector3(2.5f, 2.5f, 1f);
+            var srM = mineroObj.AddComponent<SpriteRenderer>();
+            srM.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Jugador/Minero_Idle.png");
+            srM.sortingLayerName = Constantes.SortingLayers.Escenario;
+            var animM = mineroObj.AddComponent<Animator>();
+            animM.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Jugador/Minero.controller");
 
             // Panel de Entrada de Nombre y Botones
             GameObject panelMadera = new GameObject("Panel_Central");
             panelMadera.transform.SetParent(canvasObj.transform, false);
             var rectPanel = panelMadera.AddComponent<RectTransform>();
-            rectPanel.anchorMin = new Vector2(0.5f, 0.35f);
-            rectPanel.anchorMax = new Vector2(0.5f, 0.35f);
-            rectPanel.sizeDelta = new Vector2(450f, 260f);
+            rectPanel.anchorMin = new Vector2(0.5f, 0.40f);
+            rectPanel.anchorMax = new Vector2(0.5f, 0.40f);
+            rectPanel.sizeDelta = new Vector2(460f, 410f);
             var imgPanel = panelMadera.AddComponent<Image>();
             imgPanel.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
             imgPanel.type = Image.Type.Sliced;
@@ -153,22 +174,23 @@ namespace ElMinero.Editor
             GameObject labelNombre = new GameObject("Label_Nombre");
             labelNombre.transform.SetParent(panelMadera.transform, false);
             var rectLn = labelNombre.AddComponent<RectTransform>();
-            rectLn.anchoredPosition = new Vector2(0f, 85f);
-            rectLn.sizeDelta = new Vector2(400f, 30f);
+            rectLn.anchoredPosition = new Vector2(0f, 165f);
+            rectLn.sizeDelta = new Vector2(380f, 26f);
             var tmpLn = labelNombre.AddComponent<TextMeshProUGUI>();
+            tmpLn.font = fontTexto;
             tmpLn.text = "Nombre del Minero:";
-            tmpLn.fontSize = 20f;
+            tmpLn.fontSize = 18f;
             tmpLn.alignment = TextAlignmentOptions.Center;
-            tmpLn.color = Color.white;
+            tmpLn.color = new Color(0.95f, 0.9f, 0.75f);
 
             // InputField
             GameObject inputObj = new GameObject("InputField_Nombre");
             inputObj.transform.SetParent(panelMadera.transform, false);
             var rectInput = inputObj.AddComponent<RectTransform>();
-            rectInput.anchoredPosition = new Vector2(0f, 45f);
-            rectInput.sizeDelta = new Vector2(320f, 45f);
+            rectInput.anchoredPosition = new Vector2(0f, 130f);
+            rectInput.sizeDelta = new Vector2(320f, 40f);
             var imgInput = inputObj.AddComponent<Image>();
-            imgInput.color = new Color(0.15f, 0.1f, 0.08f, 0.9f);
+            imgInput.color = new Color(0.12f, 0.08f, 0.06f, 0.95f);
 
             GameObject textObj = new GameObject("Text");
             textObj.transform.SetParent(inputObj.transform, false);
@@ -178,65 +200,82 @@ namespace ElMinero.Editor
             rectTxt.offsetMin = new Vector2(10f, 0f);
             rectTxt.offsetMax = new Vector2(-10f, 0f);
             var tmpText = textObj.AddComponent<TextMeshProUGUI>();
-            tmpText.fontSize = 22f;
+            tmpText.font = fontTexto;
+            tmpText.fontSize = 20f;
             tmpText.alignment = TextAlignmentOptions.Midline;
-            tmpText.color = Color.yellow;
+            tmpText.color = new Color(1f, 0.85f, 0.3f);
 
             var inputField = inputObj.AddComponent<TMP_InputField>();
             inputField.textComponent = tmpText;
             inputField.characterLimit = 12;
 
-            // Botón Jugar
-            Button btnPlay = CrearBotonMadera(panelMadera.transform, "Boton_Jugar", "¡Iniciar Escape!", new Vector2(0f, -15f), new Vector2(280f, 50f));
+            // 6 Botones del menú
+            Button btnPlay = CrearBotonMadera(panelMadera.transform, "Boton_Jugar", "¡A Jugar!", new Vector2(0f, 75f), new Vector2(280f, 44f));
+            Button btnContinue = CrearBotonMadera(panelMadera.transform, "Boton_Continuar", "Continuar", new Vector2(0f, 25f), new Vector2(280f, 44f));
+            Button btnLevels = CrearBotonMadera(panelMadera.transform, "Boton_Niveles", "Niveles", new Vector2(0f, -25f), new Vector2(280f, 44f));
+            Button btnOptions = CrearBotonMadera(panelMadera.transform, "Boton_Opciones", "Opciones", new Vector2(0f, -75f), new Vector2(280f, 44f));
+            Button btnCredits = CrearBotonMadera(panelMadera.transform, "Boton_Creditos", "Créditos", new Vector2(0f, -125f), new Vector2(280f, 44f));
+            Button btnQuit = CrearBotonMadera(panelMadera.transform, "Boton_Salir", "Salir", new Vector2(0f, -170f), new Vector2(280f, 40f));
 
-            // Botón Cómo Jugar
-            Button btnHow = CrearBotonMadera(panelMadera.transform, "Boton_ComoJugar", "Cómo Jugar", new Vector2(0f, -70f), new Vector2(280f, 45f));
+            // Texto Versión en esquina inferior derecha
+            GameObject verObj = new GameObject("Texto_Version");
+            verObj.transform.SetParent(canvasObj.transform, false);
+            var rectVer = verObj.AddComponent<RectTransform>();
+            rectVer.anchorMin = new Vector2(1f, 0f);
+            rectVer.anchorMax = new Vector2(1f, 0f);
+            rectVer.pivot = new Vector2(1f, 0f);
+            rectVer.anchoredPosition = new Vector2(-20f, 15f);
+            rectVer.sizeDelta = new Vector2(200f, 30f);
+            var tmpVer = verObj.AddComponent<TextMeshProUGUI>();
+            tmpVer.font = fontTexto;
+            tmpVer.text = "v1.0.0";
+            tmpVer.fontSize = 16f;
+            tmpVer.alignment = TextAlignmentOptions.BottomRight;
+            tmpVer.color = new Color(0.7f, 0.7f, 0.7f, 0.7f);
 
-            // Botón Salir
-            Button btnQuit = CrearBotonMadera(canvasObj.transform, "Boton_Salir", "Salir", new Vector2(0f, 40f), new Vector2(160f, 40f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f));
+            // Instanciar Prefabs Modales (Niveles, Opciones, Créditos)
+            GameObject pLevelSelect = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/LevelSelectPanel.prefab");
+            GameObject pOptions = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/OptionsPanel.prefab");
+            GameObject pCredits = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/CreditsPanel.prefab");
 
-            // Panel Modal Cómo Jugar
-            GameObject howPanel = new GameObject("Panel_ComoJugar_Modal");
-            howPanel.transform.SetParent(canvasObj.transform, false);
-            var rectHp = howPanel.AddComponent<RectTransform>();
-            rectHp.sizeDelta = new Vector2(600f, 400f);
-            var imgHp = howPanel.AddComponent<Image>();
-            imgHp.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
-            imgHp.type = Image.Type.Sliced;
+            LevelSelectPanel levelSelectComp = null;
+            if (pLevelSelect != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(pLevelSelect, canvasObj.transform);
+                levelSelectComp = inst.GetComponent<LevelSelectPanel>();
+                inst.SetActive(false);
+            }
 
-            GameObject hpTextObj = new GameObject("Texto_Instrucciones");
-            hpTextObj.transform.SetParent(howPanel.transform, false);
-            var rectHpt = hpTextObj.AddComponent<RectTransform>();
-            rectHpt.anchorMin = Vector2.zero;
-            rectHpt.anchorMax = Vector2.one;
-            rectHpt.offsetMin = new Vector2(30f, 70f);
-            rectHpt.offsetMax = new Vector2(-30f, -30f);
-            var tmpHpt = hpTextObj.AddComponent<TextMeshProUGUI>();
-            tmpHpt.fontSize = 20f;
-            tmpHpt.text = "<b>OBJETIVO:</b>\n" +
-                          "¡La mina se está derrumbando! Escapa subiendo nivel por nivel hasta la superficie.\n\n" +
-                          "<b>CONTROLES DE TECLADO:</b>\n" +
-                          "• <b>A / D</b> o <b>Flechas</b> : Moverse a los lados\n" +
-                          "• <b>Espacio</b> : Saltar (mantén para mayor altura)\n" +
-                          "• <b>Escape</b> : Menú de Pausa\n\n" +
-                          "<b>EN DISPOSITIVOS MÓVILES:</b>\n" +
-                          "Usa los botones táctiles en pantalla.\n\n" +
-                          "★ <i>¡Recolecta 3 minerales sin recibir daño para activar Racha x2!</i>";
-            tmpHpt.color = Color.white;
+            OptionsPanel optionsComp = null;
+            if (pOptions != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(pOptions, canvasObj.transform);
+                optionsComp = inst.GetComponent<OptionsPanel>();
+                inst.SetActive(false);
+            }
 
-            Button btnCloseHow = CrearBotonMadera(howPanel.transform, "Boton_Cerrar", "Entendido", new Vector2(0f, -150f), new Vector2(200f, 45f));
+            CreditsPanel creditsComp = null;
+            if (pCredits != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(pCredits, canvasObj.transform);
+                creditsComp = inst.GetComponent<CreditsPanel>();
+                inst.SetActive(false);
+            }
 
             // Asignar referencias en MainMenuController
             SerializedObject soMenu = new SerializedObject(menuCtrl);
             soMenu.FindProperty("nameInputField").objectReferenceValue = inputField;
             soMenu.FindProperty("playButton").objectReferenceValue = btnPlay;
-            soMenu.FindProperty("howToPlayButton").objectReferenceValue = btnHow;
+            soMenu.FindProperty("continueButton").objectReferenceValue = btnContinue;
+            soMenu.FindProperty("levelsButton").objectReferenceValue = btnLevels;
+            soMenu.FindProperty("optionsButton").objectReferenceValue = btnOptions;
+            soMenu.FindProperty("creditsButton").objectReferenceValue = btnCredits;
             soMenu.FindProperty("quitButton").objectReferenceValue = btnQuit;
-            soMenu.FindProperty("howToPlayPanel").objectReferenceValue = howPanel;
-            soMenu.FindProperty("closeHowToPlayButton").objectReferenceValue = btnCloseHow;
+            soMenu.FindProperty("levelSelectPanel").objectReferenceValue = levelSelectComp;
+            soMenu.FindProperty("optionsPanel").objectReferenceValue = optionsComp;
+            soMenu.FindProperty("creditsPanel").objectReferenceValue = creditsComp;
+            soMenu.FindProperty("versionText").objectReferenceValue = tmpVer;
             soMenu.ApplyModifiedProperties();
-
-            howPanel.SetActive(false);
 
             // Managers persistentes
             CrearSistemasPersistentes();
@@ -245,9 +284,9 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // 2. PANTALLA DE VICTORIA
+        // 2. PANTALLA SPLASH (Sección 3.1)
         // ====================================================================
-        public static void ConstruirVictoria()
+        public static void ConstruirSplash()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -259,116 +298,83 @@ namespace ElMinero.Editor
             cam.orthographic = true;
             cam.orthographicSize = 5f;
             cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = new Color(0.2f, 0.45f, 0.7f); // Cielo azul exterior
+            cam.backgroundColor = new Color(0.05f, 0.05f, 0.08f);
             camObj.AddComponent<AudioListener>();
             camObj.AddComponent<UniversalAdditionalCameraData>();
 
-            // Fondo exterior
-            GameObject fondo = new GameObject("Fondo_Victoria");
-            var srFondo = fondo.AddComponent<SpriteRenderer>();
-            srFondo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Fondos/LaValenciana/Fondo_LaValenciana_Capa0_Lejana.png");
-            srFondo.sortingLayerName = Constantes.SortingLayers.Fondo;
+            // Canvas
+            GameObject canvasObj = CrearCanvasBase("Canvas_Splash");
+            var splashCtrl = canvasObj.AddComponent<SplashController>();
 
-            GameObject luz = new GameObject("LuzGlobal");
-            var l2d = luz.AddComponent<Light2D>();
-            l2d.lightType = Light2D.LightType.Global;
-            l2d.intensity = 1.2f;
-            ElMineroBuilder.AsignarCapasALuz2D(l2d);
+            TMP_FontAsset fontTexto = FontAssetBuilder.ObtenerPixelifySans();
 
-            GameObject canvasObj = CrearCanvasBase("Canvas_Victoria");
-            var vicComp = canvasObj.AddComponent<VictoryScreen>();
+            // Grupo 1: Logo Autora + Texto UTNG
+            GameObject goGrupoAutora = new GameObject("Grupo_Autora");
+            goGrupoAutora.transform.SetParent(canvasObj.transform, false);
+            var rectGa = goGrupoAutora.AddComponent<RectTransform>();
+            rectGa.anchorMin = Vector2.zero;
+            rectGa.anchorMax = Vector2.one;
+            rectGa.offsetMin = Vector2.zero;
+            rectGa.offsetMax = Vector2.zero;
+            var cgAutora = goGrupoAutora.AddComponent<CanvasGroup>();
 
-            // Panel de madera
-            GameObject panel = new GameObject("Panel_Victoria");
-            panel.transform.SetParent(canvasObj.transform, false);
-            var rectP = panel.AddComponent<RectTransform>();
-            rectP.sizeDelta = new Vector2(650f, 450f);
-            var imgP = panel.AddComponent<Image>();
-            imgP.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
-            imgP.type = Image.Type.Sliced;
+            GameObject goLogoAutora = new GameObject("Logo_Autora");
+            goLogoAutora.transform.SetParent(goGrupoAutora.transform, false);
+            var rectLa = goLogoAutora.AddComponent<RectTransform>();
+            rectLa.anchorMin = new Vector2(0.5f, 0.55f);
+            rectLa.anchorMax = new Vector2(0.5f, 0.55f);
+            rectLa.sizeDelta = new Vector2(280f, 280f);
+            var imgLa = goLogoAutora.AddComponent<Image>();
+            imgLa.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Logo_Autora.png");
+            imgLa.preserveAspect = true;
 
-            // Título
-            GameObject titObj = new GameObject("Texto_Titulo");
-            titObj.transform.SetParent(panel.transform, false);
-            var rectT = titObj.AddComponent<RectTransform>();
-            rectT.anchoredPosition = new Vector2(0f, 150f);
-            rectT.sizeDelta = new Vector2(600f, 60f);
-            var tmpT = titObj.AddComponent<TextMeshProUGUI>();
-            tmpT.text = "¡Lo lograste, Refugio!";
-            tmpT.fontSize = 36f;
-            tmpT.alignment = TextAlignmentOptions.Center;
-            tmpT.fontStyle = FontStyles.Bold;
-            tmpT.color = new Color(1f, 0.9f, 0.4f);
+            GameObject goTxtUtng = new GameObject("Texto_UTNG");
+            goTxtUtng.transform.SetParent(goGrupoAutora.transform, false);
+            var rectUtng = goTxtUtng.AddComponent<RectTransform>();
+            rectUtng.anchorMin = new Vector2(0.5f, 0.35f);
+            rectUtng.anchorMax = new Vector2(0.5f, 0.35f);
+            rectUtng.sizeDelta = new Vector2(600f, 40f);
+            var tmpUtng = goTxtUtng.AddComponent<TextMeshProUGUI>();
+            tmpUtng.font = fontTexto;
+            tmpUtng.text = "UTNG · Creación de Videojuegos";
+            tmpUtng.fontSize = 22f;
+            tmpUtng.alignment = TextAlignmentOptions.Center;
+            tmpUtng.color = new Color(0.9f, 0.85f, 0.75f);
 
-            // Subtítulo
-            GameObject subObj = new GameObject("Texto_Subtitulo");
-            subObj.transform.SetParent(panel.transform, false);
-            var rectS = subObj.AddComponent<RectTransform>();
-            rectS.anchoredPosition = new Vector2(0f, 100f);
-            rectS.sizeDelta = new Vector2(600f, 40f);
-            var tmpS = subObj.AddComponent<TextMeshProUGUI>();
-            tmpS.text = "Has escapado del colapso de las minas de Guanajuato.";
-            tmpS.fontSize = 20f;
-            tmpS.alignment = TextAlignmentOptions.Center;
-            tmpS.color = Color.white;
+            // Grupo 2: Logo El Minero
+            GameObject goGrupoJuego = new GameObject("Grupo_LogoJuego");
+            goGrupoJuego.transform.SetParent(canvasObj.transform, false);
+            var rectGj = goGrupoJuego.AddComponent<RectTransform>();
+            rectGj.anchorMin = Vector2.zero;
+            rectGj.anchorMax = Vector2.one;
+            rectGj.offsetMin = Vector2.zero;
+            rectGj.offsetMax = Vector2.zero;
+            var cgJuego = goGrupoJuego.AddComponent<CanvasGroup>();
 
-            // Puntaje
-            GameObject scoreObj = new GameObject("Texto_Score");
-            scoreObj.transform.SetParent(panel.transform, false);
-            var rectSc = scoreObj.AddComponent<RectTransform>();
-            rectSc.anchoredPosition = new Vector2(0f, 40f);
-            rectSc.sizeDelta = new Vector2(500f, 45f);
-            var tmpSc = scoreObj.AddComponent<TextMeshProUGUI>();
-            tmpSc.text = "Puntaje Final: 0 pts";
-            tmpSc.fontSize = 28f;
-            tmpSc.alignment = TextAlignmentOptions.Center;
-            tmpSc.color = Color.yellow;
+            GameObject goLogoJuego = new GameObject("Logo_ElMinero");
+            goLogoJuego.transform.SetParent(goGrupoJuego.transform, false);
+            var rectLj = goLogoJuego.AddComponent<RectTransform>();
+            rectLj.anchorMin = new Vector2(0.5f, 0.5f);
+            rectLj.anchorMax = new Vector2(0.5f, 0.5f);
+            rectLj.sizeDelta = new Vector2(520f, 200f);
+            var imgLj = goLogoJuego.AddComponent<Image>();
+            imgLj.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Logo_ElMinero.png");
+            imgLj.preserveAspect = true;
 
-            // Récord
-            GameObject highObj = new GameObject("Texto_HighScore");
-            highObj.transform.SetParent(panel.transform, false);
-            var rectHi = highObj.AddComponent<RectTransform>();
-            rectHi.anchoredPosition = new Vector2(0f, -5f);
-            rectHi.sizeDelta = new Vector2(500f, 35f);
-            var tmpHi = highObj.AddComponent<TextMeshProUGUI>();
-            tmpHi.text = "Mejor Récord: 0 pts";
-            tmpHi.fontSize = 22f;
-            tmpHi.alignment = TextAlignmentOptions.Center;
-            tmpHi.color = new Color(0.8f, 0.8f, 0.8f);
-
-            // Plata
-            GameObject silverObj = new GameObject("Texto_Plata");
-            silverObj.transform.SetParent(panel.transform, false);
-            var rectSi = silverObj.AddComponent<RectTransform>();
-            rectSi.anchoredPosition = new Vector2(0f, -45f);
-            rectSi.sizeDelta = new Vector2(500f, 35f);
-            var tmpSi = silverObj.AddComponent<TextMeshProUGUI>();
-            tmpSi.text = "Plata Total Recolectada: 0";
-            tmpSi.fontSize = 22f;
-            tmpSi.alignment = TextAlignmentOptions.Center;
-            tmpSi.color = new Color(0.9f, 0.9f, 1f);
-
-            // Botones
-            Button btnAgain = CrearBotonMadera(panel.transform, "Boton_JugarDeNuevo", "Jugar de Nuevo", new Vector2(-130f, -140f), new Vector2(220f, 50f));
-            Button btnMenu = CrearBotonMadera(panel.transform, "Boton_MenuPrincipal", "Menú Principal", new Vector2(130f, -140f), new Vector2(220f, 50f));
-
-            SerializedObject soVic = new SerializedObject(vicComp);
-            soVic.FindProperty("titleText").objectReferenceValue = tmpT;
-            soVic.FindProperty("scoreText").objectReferenceValue = tmpSc;
-            soVic.FindProperty("highScoreText").objectReferenceValue = tmpHi;
-            soVic.FindProperty("silverText").objectReferenceValue = tmpSi;
-            soVic.FindProperty("playAgainButton").objectReferenceValue = btnAgain;
-            soVic.FindProperty("mainMenuButton").objectReferenceValue = btnMenu;
-            soVic.ApplyModifiedProperties();
+            SerializedObject so = new SerializedObject(splashCtrl);
+            so.FindProperty("grupoAutora").objectReferenceValue = cgAutora;
+            so.FindProperty("grupoLogoJuego").objectReferenceValue = cgJuego;
+            so.ApplyModifiedProperties();
 
             CrearSistemasPersistentes();
-            EditorSceneManager.SaveScene(scene, "Assets/Scenes/Victoria.unity");
+            EditorSceneManager.SaveScene(scene, "Assets/Scenes/Splash.unity");
+            Debug.Log("[LevelBuilder] Escena Splash.unity guardada.");
         }
 
         // ====================================================================
-        // 3. PANTALLA DE DERROTA
+        // 3. PANTALLA INTRO NARRATIVA (Sección 3.6)
         // ====================================================================
-        public static void ConstruirDerrota()
+        public static void ConstruirIntro()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -380,67 +386,322 @@ namespace ElMinero.Editor
             cam.orthographic = true;
             cam.orthographicSize = 5f;
             cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = new Color(0.1f, 0.05f, 0.05f); // Rojo oscuro tétrico
+            cam.backgroundColor = new Color(0.04f, 0.03f, 0.06f);
             camObj.AddComponent<AudioListener>();
             camObj.AddComponent<UniversalAdditionalCameraData>();
 
-            GameObject luz = new GameObject("LuzGlobal");
-            var l2d = luz.AddComponent<Light2D>();
-            l2d.lightType = Light2D.LightType.Global;
-            l2d.intensity = 0.5f;
-            ElMineroBuilder.AsignarCapasALuz2D(l2d);
+            // Fondo visual atenuado
+            GameObject fondo = new GameObject("Fondo_Intro");
+            var srFondo = fondo.AddComponent<SpriteRenderer>();
+            srFondo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Fondos/MinaRayas/Fondo_MinaRayas_Capa0_Lejana.png");
+            srFondo.sortingLayerName = Constantes.SortingLayers.Fondo;
+            srFondo.color = new Color(0.25f, 0.25f, 0.3f, 1f);
+            fondo.transform.position = new Vector3(0f, 0f, 0f);
+            fondo.transform.localScale = new Vector3(1.3f, 1.3f, 1f);
 
-            GameObject canvasObj = CrearCanvasBase("Canvas_Derrota");
-            var defComp = canvasObj.AddComponent<DefeatScreen>();
+            // Canvas UI
+            GameObject canvasObj = CrearCanvasBase("Canvas_Intro");
+            var introCtrl = canvasObj.AddComponent<IntroController>();
 
-            // Panel de madera
-            GameObject panel = new GameObject("Panel_Derrota");
-            panel.transform.SetParent(canvasObj.transform, false);
-            var rectP = panel.AddComponent<RectTransform>();
-            rectP.sizeDelta = new Vector2(650f, 400f);
-            var imgP = panel.AddComponent<Image>();
-            imgP.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
-            imgP.type = Image.Type.Sliced;
-            imgP.color = new Color(0.85f, 0.7f, 0.7f);
+            TMP_FontAsset fontTexto = FontAssetBuilder.ObtenerPixelifySans();
 
-            // Título
-            GameObject titObj = new GameObject("Texto_Titulo");
-            titObj.transform.SetParent(panel.transform, false);
-            var rectT = titObj.AddComponent<RectTransform>();
-            rectT.anchoredPosition = new Vector2(0f, 120f);
-            rectT.sizeDelta = new Vector2(600f, 60f);
-            var tmpT = titObj.AddComponent<TextMeshProUGUI>();
-            tmpT.text = "El derrumbe alcanzó a Refugio...";
-            tmpT.fontSize = 32f;
-            tmpT.alignment = TextAlignmentOptions.Center;
-            tmpT.fontStyle = FontStyles.Bold;
-            tmpT.color = new Color(1f, 0.35f, 0.35f);
+            // Panel oscuro semitransparente
+            GameObject panelOscuro = new GameObject("Panel_Oscuro");
+            panelOscuro.transform.SetParent(canvasObj.transform, false);
+            var rectPo = panelOscuro.AddComponent<RectTransform>();
+            rectPo.sizeDelta = new Vector2(850f, 320f);
+            rectPo.anchorMin = new Vector2(0.5f, 0.5f);
+            rectPo.anchorMax = new Vector2(0.5f, 0.5f);
+            var imgPo = panelOscuro.AddComponent<Image>();
+            imgPo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
+            imgPo.type = Image.Type.Sliced;
+            imgPo.color = new Color(0.12f, 0.1f, 0.12f, 0.95f);
 
-            // Motivo
-            GameObject reasonObj = new GameObject("Texto_Motivo");
-            reasonObj.transform.SetParent(panel.transform, false);
-            var rectR = reasonObj.AddComponent<RectTransform>();
-            rectR.anchoredPosition = new Vector2(0f, 40f);
-            rectR.sizeDelta = new Vector2(550f, 60f);
-            var tmpR = reasonObj.AddComponent<TextMeshProUGUI>();
-            tmpR.text = "Te has quedado sin vidas bajo la mina.";
-            tmpR.fontSize = 22f;
-            tmpR.alignment = TextAlignmentOptions.Center;
-            tmpR.color = Color.white;
+            // Texto narrativo tipo máquina de escribir
+            GameObject goTxt = new GameObject("Texto_Narrativo");
+            goTxt.transform.SetParent(panelOscuro.transform, false);
+            var rectTxt = goTxt.AddComponent<RectTransform>();
+            rectTxt.anchorMin = Vector2.zero;
+            rectTxt.anchorMax = Vector2.one;
+            rectTxt.offsetMin = new Vector2(40f, 40f);
+            rectTxt.offsetMax = new Vector2(-40f, -40f);
+            var tmpTxt = goTxt.AddComponent<TextMeshProUGUI>();
+            tmpTxt.font = fontTexto;
+            tmpTxt.fontSize = 22f;
+            tmpTxt.alignment = TextAlignmentOptions.Center;
+            tmpTxt.color = new Color(0.96f, 0.91f, 0.76f);
+            tmpTxt.textWrappingMode = TextWrappingModes.Normal;
 
-            // Botones
-            Button btnRetry = CrearBotonMadera(panel.transform, "Boton_Reintentar", "Reintentar Nivel", new Vector2(-130f, -90f), new Vector2(220f, 50f));
-            Button btnMenu = CrearBotonMadera(panel.transform, "Boton_MenuPrincipal", "Menú Principal", new Vector2(130f, -90f), new Vector2(220f, 50f));
+            // Indicador de avance
+            GameObject goInd = new GameObject("Texto_Indicador");
+            goInd.transform.SetParent(canvasObj.transform, false);
+            var rectInd = goInd.AddComponent<RectTransform>();
+            rectInd.anchorMin = new Vector2(0.5f, 0.22f);
+            rectInd.anchorMax = new Vector2(0.5f, 0.22f);
+            rectInd.sizeDelta = new Vector2(500f, 30f);
+            var tmpInd = goInd.AddComponent<TextMeshProUGUI>();
+            tmpInd.font = fontTexto;
+            tmpInd.fontSize = 15f;
+            tmpInd.fontStyle = FontStyles.Italic;
+            tmpInd.alignment = TextAlignmentOptions.Center;
+            tmpInd.color = new Color(0.8f, 0.8f, 0.8f, 0.8f);
+            tmpInd.text = "Presiona [Espacio] o Toca para continuar";
 
-            SerializedObject soDef = new SerializedObject(defComp);
-            soDef.FindProperty("titleText").objectReferenceValue = tmpT;
-            soDef.FindProperty("reasonText").objectReferenceValue = tmpR;
-            soDef.FindProperty("retryButton").objectReferenceValue = btnRetry;
-            soDef.FindProperty("mainMenuButton").objectReferenceValue = btnMenu;
-            soDef.ApplyModifiedProperties();
+            // Botón Saltar
+            Button btnSaltar = CrearBotonMadera(canvasObj.transform, "Boton_Saltar", "Saltar >>", new Vector2(-70f, -30f), new Vector2(130f, 36f), new Vector2(1f, 1f), new Vector2(1f, 1f));
+
+            SerializedObject so = new SerializedObject(introCtrl);
+            so.FindProperty("textoNarrativo").objectReferenceValue = tmpTxt;
+            so.FindProperty("textoIndicador").objectReferenceValue = tmpInd;
+            so.FindProperty("botonSaltar").objectReferenceValue = btnSaltar;
+            so.ApplyModifiedProperties();
 
             CrearSistemasPersistentes();
-            EditorSceneManager.SaveScene(scene, "Assets/Scenes/Derrota.unity");
+            EditorSceneManager.SaveScene(scene, "Assets/Scenes/Intro.unity");
+            Debug.Log("[LevelBuilder] Escena Intro.unity guardada.");
+        }
+
+        // ====================================================================
+        // 4. PANTALLA FINAL (Sección 3.7)
+        // ====================================================================
+        public static void ConstruirFinal()
+        {
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+            // Cámara
+            GameObject camObj = new GameObject("Main Camera");
+            camObj.tag = "MainCamera";
+            camObj.transform.position = new Vector3(0f, 0f, -10f);
+            var cam = camObj.AddComponent<Camera>();
+            cam.orthographic = true;
+            cam.orthographicSize = 5f;
+            cam.clearFlags = CameraClearFlags.SolidColor;
+            cam.backgroundColor = new Color(0.2f, 0.35f, 0.5f);
+            camObj.AddComponent<AudioListener>();
+            camObj.AddComponent<UniversalAdditionalCameraData>();
+
+            // Fondo: Salida_Superficie en grande (Templo San Cayetano)
+            GameObject templo = new GameObject("Templo_SanCayetano");
+            var srTemplo = templo.AddComponent<SpriteRenderer>();
+            srTemplo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Entorno/Salida_Superficie.png");
+            srTemplo.sortingLayerName = Constantes.SortingLayers.Escenario;
+            templo.transform.position = new Vector3(0f, -0.5f, 0f);
+            templo.transform.localScale = new Vector3(2.2f, 2.2f, 1f);
+
+            // Luz cálida 2D simulando el amanecer
+            GameObject luzAmanecer = new GameObject("Luz_Amanecer");
+            var l2d = luzAmanecer.AddComponent<Light2D>();
+            l2d.lightType = Light2D.LightType.Global;
+            l2d.color = new Color(1.0f, 0.88f, 0.65f);
+            l2d.intensity = 1.35f;
+            ElMineroBuilder.AsignarCapasALuz2D(l2d);
+
+            // Minero en celebración frente al templo
+            GameObject minero = new GameObject("Minero_Celebrando");
+            var srMinero = minero.AddComponent<SpriteRenderer>();
+            srMinero.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Jugador/Minero_Celebrar.png");
+            srMinero.sortingLayerName = Constantes.SortingLayers.Jugador;
+            minero.transform.position = new Vector3(0f, -2.8f, 0f);
+            minero.transform.localScale = new Vector3(2.5f, 2.5f, 1f);
+
+            // Canvas UI Final
+            GameObject canvasObj = CrearCanvasBase("Canvas_Final");
+            var finalCtrl = canvasObj.AddComponent<FinalController>();
+
+            TMP_FontAsset fontTitulo = FontAssetBuilder.ObtenerPressStart2P();
+            TMP_FontAsset fontTexto = FontAssetBuilder.ObtenerPixelifySans();
+
+            // Panel Superior Narrativo
+            GameObject panelNarrativo = new GameObject("Panel_Narrativo");
+            panelNarrativo.transform.SetParent(canvasObj.transform, false);
+            var rectPn = panelNarrativo.AddComponent<RectTransform>();
+            rectPn.anchorMin = new Vector2(0.5f, 1f);
+            rectPn.anchorMax = new Vector2(0.5f, 1f);
+            rectPn.anchoredPosition = new Vector2(0f, -80f);
+            rectPn.sizeDelta = new Vector2(850f, 110f);
+            var imgPn = panelNarrativo.AddComponent<Image>();
+            imgPn.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
+            imgPn.type = Image.Type.Sliced;
+            imgPn.color = new Color(0.1f, 0.1f, 0.15f, 0.9f);
+
+            GameObject goTxtNarrativo = new GameObject("Texto_Narrativo");
+            goTxtNarrativo.transform.SetParent(panelNarrativo.transform, false);
+            var rectTn = goTxtNarrativo.AddComponent<RectTransform>();
+            rectTn.anchorMin = Vector2.zero;
+            rectTn.anchorMax = Vector2.one;
+            rectTn.offsetMin = new Vector2(25f, 15f);
+            rectTn.offsetMax = new Vector2(-25f, -15f);
+            var tmpTn = goTxtNarrativo.AddComponent<TextMeshProUGUI>();
+            tmpTn.font = fontTexto;
+            tmpTn.fontSize = 17f;
+            tmpTn.alignment = TextAlignmentOptions.Center;
+            tmpTn.color = new Color(1f, 0.95f, 0.85f);
+            tmpTn.text = "Refugio sale a la luz junto al Templo de San Cayetano. Detrás, la mina se cierra para siempre… pero la plata que llevas cuenta otra historia.";
+
+            // Panel Izquierdo: Resumen Acumulado
+            GameObject panelStats = new GameObject("Panel_Resumen");
+            panelStats.transform.SetParent(canvasObj.transform, false);
+            var rectPs = panelStats.AddComponent<RectTransform>();
+            rectPs.anchorMin = new Vector2(0f, 0.5f);
+            rectPs.anchorMax = new Vector2(0f, 0.5f);
+            rectPs.anchoredPosition = new Vector2(230f, 0f);
+            rectPs.sizeDelta = new Vector2(360f, 320f);
+            var imgPs = panelStats.AddComponent<Image>();
+            imgPs.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
+            imgPs.type = Image.Type.Sliced;
+
+            // Título Resumen
+            GameObject goTitRes = new GameObject("Titulo_Resumen");
+            goTitRes.transform.SetParent(panelStats.transform, false);
+            var rectTr = goTitRes.AddComponent<RectTransform>();
+            rectTr.anchorMin = new Vector2(0.5f, 1f);
+            rectTr.anchorMax = new Vector2(0.5f, 1f);
+            rectTr.anchoredPosition = new Vector2(0f, -30f);
+            rectTr.sizeDelta = new Vector2(320f, 30f);
+            var tmpTr = goTitRes.AddComponent<TextMeshProUGUI>();
+            tmpTr.font = fontTitulo;
+            tmpTr.fontSize = 16f;
+            tmpTr.alignment = TextAlignmentOptions.Center;
+            tmpTr.text = "LOGROS TOTALES";
+            tmpTr.color = new Color(1f, 0.85f, 0.4f);
+
+            // Stats textos
+            TextMeshProUGUI tScore = CrearTextoStat(panelStats.transform, "Texto_PuntajeTotal", "PUNTAJE TOTAL: 0 pts", fontTexto);
+            tScore.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 50f);
+            tScore.fontSize = 18f;
+
+            TextMeshProUGUI tEstrellas = CrearTextoStat(panelStats.transform, "Texto_EstrellasTotales", "ESTRELLAS: 0 / 9 ★", fontTexto);
+            tEstrellas.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 15f);
+            tEstrellas.fontSize = 17f;
+
+            TextMeshProUGUI tMinerales = CrearTextoStat(panelStats.transform, "Texto_MineralesTotales", "MINERALES HISTÓRICOS: 0 / 3", fontTexto);
+            tMinerales.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -20f);
+            tMinerales.fontSize = 15f;
+
+            // Fila de 3 Iconos de Minerales
+            GameObject goFilaMin = new GameObject("Fila_IconosMinerales");
+            goFilaMin.transform.SetParent(panelStats.transform, false);
+            var rectFm = goFilaMin.AddComponent<RectTransform>();
+            rectFm.anchorMin = new Vector2(0.5f, 0f);
+            rectFm.anchorMax = new Vector2(0.5f, 0f);
+            rectFm.anchoredPosition = new Vector2(0f, 65f);
+            rectFm.sizeDelta = new Vector2(220f, 48f);
+
+            var hlgMin = goFilaMin.AddComponent<HorizontalLayoutGroup>();
+            hlgMin.spacing = 20f;
+            hlgMin.childAlignment = TextAnchor.MiddleCenter;
+
+            Image icAg = CrearIcono(goFilaMin.transform, "Icono_Aguilarita", AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Coleccionables/Aguilarita.png"), new Vector2(40f, 40f));
+            Image icPep = CrearIcono(goFilaMin.transform, "Icono_PepitaOro", AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Coleccionables/Pepita_Oro.png"), new Vector2(40f, 40f));
+            Image icPir = CrearIcono(goFilaMin.transform, "Icono_Pirargirita", AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Coleccionables/Pirargirita.png"), new Vector2(40f, 40f));
+
+            // Panel Derecho: Créditos en Scroll
+            GameObject panelCreditos = new GameObject("Panel_Creditos_Mascara");
+            panelCreditos.transform.SetParent(canvasObj.transform, false);
+            var rectPc = panelCreditos.AddComponent<RectTransform>();
+            rectPc.anchorMin = new Vector2(1f, 0.5f);
+            rectPc.anchorMax = new Vector2(1f, 0.5f);
+            rectPc.anchoredPosition = new Vector2(-230f, 0f);
+            rectPc.sizeDelta = new Vector2(360f, 320f);
+            var imgPc = panelCreditos.AddComponent<Image>();
+            imgPc.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
+            imgPc.type = Image.Type.Sliced;
+            panelCreditos.AddComponent<RectMask2D>();
+
+            GameObject goContCred = new GameObject("Contenedor_Creditos");
+            goContCred.transform.SetParent(panelCreditos.transform, false);
+            var rectCc = goContCred.AddComponent<RectTransform>();
+            rectCc.anchorMin = new Vector2(0.5f, 0f);
+            rectCc.anchorMax = new Vector2(0.5f, 0f);
+            rectCc.pivot = new Vector2(0.5f, 0f);
+            rectCc.anchoredPosition = new Vector2(0f, -280f);
+            rectCc.sizeDelta = new Vector2(320f, 650f);
+
+            var tmpCred = goContCred.AddComponent<TextMeshProUGUI>();
+            tmpCred.font = fontTexto;
+            tmpCred.fontSize = 15f;
+            tmpCred.alignment = TextAlignmentOptions.Center;
+            tmpCred.text = "<b><size=18>EL MINERO</size></b>\n" +
+                           "Plataformas 2D\n\n" +
+                           "<b>DESARROLLO:</b>\n" +
+                           "Juana Jaqueline Camarillo Olaez\n" +
+                           "GIDS6102-E\n\n" +
+                           "<b>UNIVERSIDAD:</b>\n" +
+                           "UTNG\n\n" +
+                           "<b>DOCENTE:</b>\n" +
+                           "Gabriel Barrón Rodríguez\n" +
+                           "Creación de Videojuegos\n\n" +
+                           "<b>MÚSICA Y ARTE:</b>\n" +
+                           "Herramientas de IA Asistida\n\n" +
+                           "<b>FUENTES:</b>\n" +
+                           "Press Start 2P & Pixelify Sans\n(SIL OFL 1.1)\n\n" +
+                           "<i>¡Felicidades por escapar!</i>";
+
+            // Botón Volver al Menú Principal
+            Button btnMenu = CrearBotonMadera(canvasObj.transform, "Boton_MenuPrincipal", "Menú Principal", new Vector2(0f, 40f), new Vector2(220f, 45f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f));
+
+            SerializedObject so = new SerializedObject(finalCtrl);
+            so.FindProperty("textoNarrativo").objectReferenceValue = tmpTn;
+            so.FindProperty("textoPuntajeTotal").objectReferenceValue = tScore;
+            so.FindProperty("textoEstrellasTotales").objectReferenceValue = tEstrellas;
+            so.FindProperty("textoMineralesTotales").objectReferenceValue = tMinerales;
+            so.FindProperty("iconoAguilarita").objectReferenceValue = icAg;
+            so.FindProperty("iconoPepitaOro").objectReferenceValue = icPep;
+            so.FindProperty("iconoPirargirita").objectReferenceValue = icPir;
+            so.FindProperty("contenedorCreditos").objectReferenceValue = rectCc;
+            so.FindProperty("botonMenuPrincipal").objectReferenceValue = btnMenu;
+            so.ApplyModifiedProperties();
+
+            CrearSistemasPersistentes();
+            EditorSceneManager.SaveScene(scene, "Assets/Scenes/Final.unity");
+            Debug.Log("[LevelBuilder] Escena Final.unity guardada.");
+        }
+
+        private static TextMeshProUGUI CrearTextoStat(Transform parent, string name, string text, TMP_FontAsset font)
+        {
+            GameObject obj = new GameObject(name);
+            obj.transform.SetParent(parent, false);
+            var rect = obj.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = new Vector2(320f, 30f);
+            var tmp = obj.AddComponent<TextMeshProUGUI>();
+            tmp.font = font;
+            tmp.text = text;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.color = Color.white;
+            return tmp;
+        }
+
+        private static Image CrearIcono(Transform parent, string name, Sprite sprite, Vector2 size)
+        {
+            GameObject obj = new GameObject(name);
+            obj.transform.SetParent(parent, false);
+            var rect = obj.AddComponent<RectTransform>();
+            rect.sizeDelta = size;
+            var img = obj.AddComponent<Image>();
+            img.sprite = sprite;
+            img.preserveAspect = true;
+            return img;
+        }
+
+        public static void EliminarEscenasObsoletas()
+        {
+            string[] obsoletas = new string[]
+            {
+                "Assets/Scenes/Victoria.unity",
+                "Assets/Scenes/Derrota.unity",
+                "Assets/Scenes/SampleScene.unity"
+            };
+
+            foreach (var path in obsoletas)
+            {
+                if (File.Exists(path))
+                {
+                    AssetDatabase.DeleteAsset(path);
+                    Debug.Log($"[LevelBuilder] Escena obsoleta eliminada: {path}");
+                }
+            }
         }
 
         // ====================================================================
@@ -503,6 +764,16 @@ namespace ElMinero.Editor
             CrearGemaAmatista(new Vector3(20f, 1.4f, 0f)); // Sobre hueco 1
             CrearGemaAmatista(new Vector3(86f, 1.5f, 0f)); // Sobre hueco 3
 
+            // Mineral distintivo Nivel 1: Aguilarita
+            CrearMineralDistintivo("Mineral_Aguilarita", new Vector3(58f, 3.5f, 0f));
+
+            // Enemigos Nivel 1: 2 Murciélagos estándar
+            CrearMurcielago(new Vector3(25f, 2.5f, 0f), 5f);
+            CrearMurcielago(new Vector3(75f, 2.5f, 0f), 5f);
+
+            // Elevador tipo malacate
+            CrearElevador(new Vector3(50f, -1f, 0f), new Vector3(50f, 3f, 0f), 2f);
+
             // 7. Obstáculos: 7 Spawners de Rocas rápidos (intervalo 2.0s - 2.2s)
             CrearRockSpawner(new Vector3(12f, 7f, 0f), 2.2f);
             CrearRockSpawner(new Vector3(28f, 7f, 0f), 2.2f);
@@ -512,9 +783,9 @@ namespace ElMinero.Editor
             CrearRockSpawner(new Vector3(95f, 7f, 0f), 2.2f);
             CrearRockSpawner(new Vector3(112f, 7f, 0f), 1.8f);
 
-            // 8. Checkpoints funcionales (3 checkpoints)
+            // 8. Checkpoints funcionales (con Capilla en el centro)
             CrearCheckpoint(new Vector3(30f, -0.5f, 0f));
-            CrearCheckpoint(new Vector3(73f, -0.5f, 0f));
+            CrearCheckpointCapilla(new Vector3(73f, -0.5f, 0f));
             CrearCheckpoint(new Vector3(102f, -0.5f, 0f));
 
             // 9. Zonas de derrumbe sorpresa (2 derrumbes que colapsan tras pasar)
@@ -616,6 +887,20 @@ namespace ElMinero.Editor
             CrearGemaAmatista(new Vector3(97f, 1.4f, 0f));
             CrearGemaAmatista(new Vector3(126f, 1.5f, 0f));
 
+            // Mineral distintivo Nivel 2: Pepita de Oro
+            CrearMineralDistintivo("Mineral_PepitaOro", new Vector3(97f, 2.8f, 0f));
+
+            // Enemigos Nivel 2: 3 Arañas que bajan y 2 Murciélagos
+            CrearArana(new Vector3(32f, 5.5f, 0f));
+            CrearArana(new Vector3(88f, 5.5f, 0f));
+            CrearArana(new Vector3(142f, 5.5f, 0f));
+            CrearMurcielago(new Vector3(20f, 2.5f, 0f), 6f);
+            CrearMurcielago(new Vector3(110f, 2.5f, 0f), 6f);
+
+            // Obstáculos Nivel 2: 2 Vagonetas desbocadas con triggers
+            CrearVagoneta(new Vector3(45f, 0f, 0f), new Vector3(65f, -1.2f, 0f), Vector2.left, 22f);
+            CrearVagoneta(new Vector3(120f, 0f, 0f), new Vector3(140f, -1.2f, 0f), Vector2.left, 22f);
+
             // 10 Rock spawners rápidos (intervalo 1.8s)
             CrearRockSpawner(new Vector3(8f, 7f, 0f), 1.8f);
             CrearRockSpawner(new Vector3(20f, 7f, 0f), 1.8f);
@@ -628,11 +913,11 @@ namespace ElMinero.Editor
             CrearRockSpawner(new Vector3(142f, 7f, 0f), 1.8f);
             CrearRockSpawner(new Vector3(156f, 7f, 0f), 1.8f);
 
-            // 4 Checkpoints
+            // 4 Checkpoints (con Capillas intermedias)
             CrearCheckpoint(new Vector3(28f, -0.5f, 0f));
-            CrearCheckpoint(new Vector3(66f, -0.5f, 0f));
+            CrearCheckpointCapilla(new Vector3(66f, -0.5f, 0f));
             CrearCheckpoint(new Vector3(108f, -0.5f, 0f));
-            CrearCheckpoint(new Vector3(142f, -0.5f, 0f));
+            CrearCheckpointCapilla(new Vector3(142f, -0.5f, 0f));
 
             // 3 Zonas de derrumbe sorpresa
             CrearZonaDerrumbe(new Vector3(54f, 0f, 0f), new Vector3(49f, -0.5f, 0f));
@@ -747,6 +1032,30 @@ namespace ElMinero.Editor
             CrearGemaAmatista(new Vector3(134f, 1.5f, 0f));
             CrearGemaAmatista(new Vector3(193f, 1.5f, 0f));
 
+            // Mineral distintivo Nivel 3: Pirargirita
+            CrearMineralDistintivo("Mineral_Pirargirita", new Vector3(144f, 2.8f, 0f));
+
+            // Enemigos Nivel 3: 3 Alacranes, 3 Murciélagos Rojos en picada, 2 Arañas
+            CrearAlacran(new Vector3(35f, -1.5f, 0f), 4f);
+            CrearAlacran(new Vector3(94f, -1.5f, 0f), 5f);
+            CrearAlacran(new Vector3(162f, -1.5f, 0f), 4f);
+
+            CrearMurcielagoRojo(new Vector3(20f, 4.0f, 0f));
+            CrearMurcielagoRojo(new Vector3(80f, 4.0f, 0f));
+            CrearMurcielagoRojo(new Vector3(150f, 4.0f, 0f));
+
+            CrearArana(new Vector3(60f, 6.0f, 0f));
+            CrearArana(new Vector3(130f, 6.0f, 0f));
+
+            // Obstáculos Nivel 3: 2 Vagonetas, 2 Llamas de gas, 1 Elevador malacate
+            CrearVagoneta(new Vector3(50f, 0f, 0f), new Vector3(72f, -1.2f, 0f), Vector2.left, 22f);
+            CrearVagoneta(new Vector3(154f, 0f, 0f), new Vector3(175f, -1.2f, 0f), Vector2.left, 22f);
+
+            CrearFuego(new Vector3(104f, -1.6f, 0f));
+            CrearFuego(new Vector3(172f, -1.6f, 0f));
+
+            CrearElevador(new Vector3(118f, -1.5f, 0f), new Vector3(118f, 2.8f, 0f), 2.2f);
+
             // 14 Spawners de Rocas implacables (intervalo urgente 1.3s)
             CrearRockSpawner(new Vector3(6f, 8f, 0f), 1.3f);
             CrearRockSpawner(new Vector3(16f, 8f, 0f), 1.3f);
@@ -763,11 +1072,11 @@ namespace ElMinero.Editor
             CrearRockSpawner(new Vector3(184f, 8f, 0f), 1.3f);
             CrearRockSpawner(new Vector3(198f, 8f, 0f), 1.3f);
 
-            // 5 Checkpoints
+            // 5 Checkpoints (con Capillas intermedias)
             CrearCheckpoint(new Vector3(32f, -0.5f, 0f));
-            CrearCheckpoint(new Vector3(72f, -0.5f, 0f));
+            CrearCheckpointCapilla(new Vector3(72f, -0.5f, 0f));
             CrearCheckpoint(new Vector3(114f, -0.5f, 0f));
-            CrearCheckpoint(new Vector3(158f, -0.5f, 0f));
+            CrearCheckpointCapilla(new Vector3(158f, -0.5f, 0f));
             CrearCheckpoint(new Vector3(180f, -0.5f, 0f));
 
             // 4 Zonas de derrumbe sorpresa
@@ -1323,6 +1632,154 @@ namespace ElMinero.Editor
             antorcha.AddComponent<FlickeringLight2D>();
         }
 
+        private static void CrearMineralDistintivo(string nombrePrefab, Vector3 pos)
+        {
+            string cleanName = nombrePrefab.Replace("Mineral_", "");
+            if (cleanName == "PepitaOro") cleanName = "Pepita_Oro";
+
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>($"Assets/Prefabs/Coleccionables/{cleanName}.prefab");
+            if (prefab == null)
+            {
+                prefab = AssetDatabase.LoadAssetAtPath<GameObject>($"Assets/Prefabs/Coleccionables/{nombrePrefab}.prefab");
+            }
+
+            if (prefab != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                inst.transform.position = pos;
+            }
+            else
+            {
+                Debug.LogWarning($"[LevelBuilder] No se encontró el prefab {nombrePrefab} ni {cleanName}");
+            }
+        }
+
+        private static void CrearMurcielago(Vector3 pos, float rangoPatrulla = 4f)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Enemigos/Murcielago.prefab");
+            if (prefab != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                inst.transform.position = pos;
+                var bat = inst.GetComponent<BatPatrol>();
+                if (bat != null)
+                {
+                    SerializedObject so = new SerializedObject(bat);
+                    var pDist = so.FindProperty("patrolDistance");
+                    if (pDist != null) pDist.floatValue = rangoPatrulla;
+                    so.ApplyModifiedProperties();
+                }
+            }
+        }
+
+        private static void CrearMurcielagoRojo(Vector3 pos)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Enemigos/Murcielago_Rojo.prefab");
+            if (prefab != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                inst.transform.position = pos;
+            }
+        }
+
+        private static void CrearArana(Vector3 pos)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Enemigos/Arana.prefab");
+            if (prefab != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                inst.transform.position = pos;
+            }
+        }
+
+        private static void CrearAlacran(Vector3 pos, float rangoPatrulla = 4f)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Enemigos/Alacran.prefab");
+            if (prefab != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                inst.transform.position = pos;
+                var scorp = inst.GetComponent<ScorpionAI>();
+                if (scorp != null)
+                {
+                    SerializedObject so = new SerializedObject(scorp);
+                    var pDist = so.FindProperty("patrolDistance");
+                    if (pDist != null) pDist.floatValue = rangoPatrulla;
+                    so.ApplyModifiedProperties();
+                }
+            }
+        }
+
+        private static void CrearVagoneta(Vector3 triggerPos, Vector3 cartPos, Vector2 direccion, float distancia = 20f)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Obstaculos/Vagoneta_Desbocada.prefab");
+            RunawayCart cartComp = null;
+            if (prefab != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                inst.transform.position = cartPos;
+                cartComp = inst.GetComponent<RunawayCart>();
+                if (cartComp != null)
+                {
+                    SerializedObject so = new SerializedObject(cartComp);
+                    so.FindProperty("startPoint").vector3Value = cartPos;
+                    so.FindProperty("endPoint").vector3Value = cartPos + (Vector3)(direccion * distancia);
+                    so.ApplyModifiedProperties();
+                }
+            }
+
+            GameObject trigObj = new GameObject("Trigger_Vagoneta");
+            trigObj.transform.position = triggerPos;
+            var col = trigObj.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(2f, 4f);
+            var triggerComp = trigObj.AddComponent<RunawayCartTrigger>();
+            if (cartComp != null)
+            {
+                triggerComp.SetTargetCart(cartComp);
+            }
+        }
+
+        private static void CrearFuego(Vector3 pos)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Obstaculos/Fuego.prefab");
+            if (prefab != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                inst.transform.position = pos;
+            }
+        }
+
+        private static void CrearElevador(Vector3 posA, Vector3 posB, float velocidad = 2.2f)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Plataformas/Elevador_Malacate.prefab");
+            if (prefab != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                inst.transform.position = posA;
+                var elev = inst.GetComponent<MineElevator>();
+                if (elev != null)
+                {
+                    Transform wheel = inst.transform.Find("RuedaMalacate");
+                    elev.ConfigurarPuntos(posA, posB, wheel);
+                }
+            }
+        }
+
+        private static void CrearCheckpointCapilla(Vector3 pos)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Niveles/Checkpoint_Capilla.prefab");
+            if (prefab != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                inst.transform.position = pos;
+            }
+            else
+            {
+                CrearCheckpoint(pos);
+            }
+        }
+
         private static GameObject CrearJugador(Vector3 spawnPos, int layerSuelo)
         {
             PhysicsMaterial2D matSinFriccion = AssetDatabase.LoadAssetAtPath<PhysicsMaterial2D>("Assets/Materiales/Fisica/SinFriccion.physicsMaterial2D");
@@ -1612,8 +2069,54 @@ namespace ElMinero.Editor
             soHud.FindProperty("streakTimerText").objectReferenceValue = tmpBadge;
             soHud.ApplyModifiedProperties();
 
+            // Instanciar Paneles Modales de UI
+            GameObject pStartCard = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/LevelStartCard.prefab");
+            GameObject pResults = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/ResultsPanel.prefab");
+            GameObject pGameOver = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/GameOverPanel.prefab");
+            GameObject pOptions = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/OptionsPanel.prefab");
+
+            LevelStartCard startCardComp = null;
+            if (pStartCard != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(pStartCard, canvasObj.transform);
+                startCardComp = inst.GetComponent<LevelStartCard>();
+                inst.SetActive(false);
+            }
+
+            ResultsPanel resultsComp = null;
+            if (pResults != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(pResults, canvasObj.transform);
+                resultsComp = inst.GetComponent<ResultsPanel>();
+                inst.SetActive(false);
+            }
+
+            GameOverPanel gameOverComp = null;
+            if (pGameOver != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(pGameOver, canvasObj.transform);
+                gameOverComp = inst.GetComponent<GameOverPanel>();
+                inst.SetActive(false);
+            }
+
+            OptionsPanel optionsComp = null;
+            if (pOptions != null)
+            {
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(pOptions, canvasObj.transform);
+                optionsComp = inst.GetComponent<OptionsPanel>();
+                inst.SetActive(false);
+            }
+
+            SerializedObject soLm2 = new SerializedObject(lm);
+            soLm2.FindProperty("hudController").objectReferenceValue = hud;
+            soLm2.FindProperty("resultsPanel").objectReferenceValue = resultsComp;
+            soLm2.FindProperty("gameOverPanel").objectReferenceValue = gameOverComp;
+            soLm2.FindProperty("levelStartCard").objectReferenceValue = startCardComp;
+            soLm2.FindProperty("initialSpawnPoint").vector3Value = jugador.transform.position;
+            soLm2.ApplyModifiedProperties();
+
             // Menú de Pausa
-            CrearMenuPausaEnCanvas(canvasObj, btnPausa);
+            CrearMenuPausaEnCanvas(canvasObj, btnPausa, optionsComp);
 
             // Controles Táctiles para Móvil
             CrearControlesTactiles(canvasObj, jugador.GetComponent<PlayerInputHandler>());
@@ -1622,14 +2125,14 @@ namespace ElMinero.Editor
             CrearSistemasPersistentes();
         }
 
-        private static void CrearMenuPausaEnCanvas(GameObject canvasObj, Button btnPausaIcono)
+        private static void CrearMenuPausaEnCanvas(GameObject canvasObj, Button btnPausaIcono, OptionsPanel optionsPanelComp)
         {
             var pauseComp = canvasObj.AddComponent<PauseMenu>();
 
             GameObject panelPausa = new GameObject("Panel_Pausa");
             panelPausa.transform.SetParent(canvasObj.transform, false);
             var rectP = panelPausa.AddComponent<RectTransform>();
-            rectP.sizeDelta = new Vector2(450f, 320f);
+            rectP.sizeDelta = new Vector2(450f, 360f);
             var imgP = panelPausa.AddComponent<Image>();
             imgP.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
             imgP.type = Image.Type.Sliced;
@@ -1638,7 +2141,7 @@ namespace ElMinero.Editor
             GameObject tObj = new GameObject("Texto_Pausa");
             tObj.transform.SetParent(panelPausa.transform, false);
             var rectT = tObj.AddComponent<RectTransform>();
-            rectT.anchoredPosition = new Vector2(0f, 100f);
+            rectT.anchoredPosition = new Vector2(0f, 120f);
             rectT.sizeDelta = new Vector2(400f, 45f);
             var tmpT = tObj.AddComponent<TextMeshProUGUI>();
             tmpT.text = "PAUSA";
@@ -1647,16 +2150,19 @@ namespace ElMinero.Editor
             tmpT.fontStyle = FontStyles.Bold;
             tmpT.color = new Color(1f, 0.9f, 0.4f);
 
-            Button btnResume = CrearBotonMadera(panelPausa.transform, "Boton_Continuar", "Continuar", new Vector2(0f, 30f), new Vector2(250f, 45f));
-            Button btnRestart = CrearBotonMadera(panelPausa.transform, "Boton_Reiniciar", "Reiniciar Nivel", new Vector2(0f, -25f), new Vector2(250f, 45f));
-            Button btnMenu = CrearBotonMadera(panelPausa.transform, "Boton_MenuPrincipal", "Menú Principal", new Vector2(0f, -80f), new Vector2(250f, 45f));
+            Button btnResume = CrearBotonMadera(panelPausa.transform, "Boton_Continuar", "Continuar", new Vector2(0f, 50f), new Vector2(250f, 42f));
+            Button btnRestart = CrearBotonMadera(panelPausa.transform, "Boton_Reiniciar", "Reiniciar Nivel", new Vector2(0f, 0f), new Vector2(250f, 42f));
+            Button btnOptions = CrearBotonMadera(panelPausa.transform, "Boton_Opciones", "Opciones", new Vector2(0f, -50f), new Vector2(250f, 42f));
+            Button btnMenu = CrearBotonMadera(panelPausa.transform, "Boton_MenuPrincipal", "Menú Principal", new Vector2(0f, -100f), new Vector2(250f, 42f));
 
             SerializedObject so = new SerializedObject(pauseComp);
             so.FindProperty("pausePanel").objectReferenceValue = panelPausa;
             so.FindProperty("resumeButton").objectReferenceValue = btnResume;
             so.FindProperty("restartButton").objectReferenceValue = btnRestart;
+            so.FindProperty("optionsButton").objectReferenceValue = btnOptions;
             so.FindProperty("mainMenuButton").objectReferenceValue = btnMenu;
             so.FindProperty("pauseIconButton").objectReferenceValue = btnPausaIcono;
+            so.FindProperty("optionsPanel").objectReferenceValue = optionsPanelComp;
             so.ApplyModifiedProperties();
 
             panelPausa.SetActive(false);
