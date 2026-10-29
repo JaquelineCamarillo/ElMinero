@@ -6,7 +6,8 @@ namespace ElMinero.Niveles
 {
     /// <summary>
     /// Bloque de piedra maciza que cae durante un derrumbe sorpresa (BloqueDerrumbe).
-    /// Cae desde el techo detrás del jugador y bloquea el paso de regreso.
+    /// Cae desde el techo detrás del jugador y se asienta firmemente en el suelo (mediante raycast)
+    /// bloqueando por completo el paso de regreso de piso a techo sin quedar flotando.
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
     public class BloqueDerrumbe : MonoBehaviour, IResettable
@@ -55,7 +56,20 @@ namespace ElMinero.Niveles
         {
             if (isTriggered) return;
 
-            targetGroundPosition = targetPos;
+            // Detectar el suelo real mediante raycast hacia abajo para evitar que quede flotando
+            int layerSueloMask = LayerMask.GetMask(Constantes.Layers.Suelo);
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 40f, layerSueloMask);
+
+            if (hit.collider != null)
+            {
+                float extY = col != null ? col.bounds.extents.y : 0.5f;
+                targetGroundPosition = new Vector3(transform.position.x, hit.point.y + extY, transform.position.z);
+            }
+            else
+            {
+                targetGroundPosition = targetPos;
+            }
+
             isTriggered = true;
             if (col != null) col.enabled = true;
             if (sr != null) sr.enabled = true;

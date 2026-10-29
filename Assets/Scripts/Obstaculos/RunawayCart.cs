@@ -9,9 +9,9 @@ namespace ElMinero.Obstaculos
     /// <summary>
     /// Vagoneta desbocada (Niveles 2 y 3).
     /// Se activa cuando el jugador entra en su trigger de aviso.
-    /// Muestra un cartel de advertencia "¡!" 1 s antes y reproduce sonido ambiental.
-    /// Cruza los rieles a 9 u/s infligiendo daño al jugador en caso de contacto.
-    /// Al llegar al final se desactiva y se reinicia mediante IResettable.
+    /// Inicia invisible y desactivada. Muestra un aviso de "¡!" durante 1 s antes de lanzarse.
+    /// Cruza los rieles a 9 u/s con sonido de traqueteo infligiendo daño al contacto.
+    /// Al salir de escena por el otro extremo, se desactiva.
     /// </summary>
     public class RunawayCart : MonoBehaviour, IResettable
     {
@@ -41,14 +41,34 @@ namespace ElMinero.Obstaculos
         private bool isRunning = false;
         private bool isTriggered = false;
         private Coroutine cartRoutine;
+        private SpriteRenderer cartRenderer;
+        private Collider2D cartCollider;
 
         private void Awake()
         {
+            cartRenderer = GetComponent<SpriteRenderer>();
+            cartCollider = GetComponent<Collider2D>();
+
             if (startPoint == Vector3.zero) startPoint = transform.position;
             if (endPoint == Vector3.zero) endPoint = transform.position + new Vector3(25f, 0f, 0f);
 
             ConfigurarAudio3D();
+
+            // Inicia invisible e inactiva hasta que el trigger la despierte
+            OcultarVagoneta();
             if (warningObject != null) warningObject.SetActive(false);
+        }
+
+        private void OcultarVagoneta()
+        {
+            if (cartRenderer != null) cartRenderer.enabled = false;
+            if (cartCollider != null) cartCollider.enabled = false;
+        }
+
+        private void MostrarVagoneta()
+        {
+            if (cartRenderer != null) cartRenderer.enabled = true;
+            if (cartCollider != null) cartCollider.enabled = true;
         }
 
         private void ConfigurarAudio3D()
@@ -66,15 +86,24 @@ namespace ElMinero.Obstaculos
             {
                 loopAudioSource.loop = true;
                 loopAudioSource.playOnAwake = false;
-                loopAudioSource.spatialBlend = 1.0f; // 3D
+                loopAudioSource.spatialBlend = 1.0f;
                 loopAudioSource.minDistance = 3f;
-                loopAudioSource.maxDistance = 12f;
+                loopAudioSource.maxDistance = 16f;
                 loopAudioSource.rolloffMode = AudioRolloffMode.Linear;
+
                 if (AudioManager.Instance != null)
                 {
                     loopAudioSource.clip = AudioManager.Instance.GetAudioClipVagonetaLoop();
-                    loopAudioSource.outputAudioMixerGroup = AudioManager.Instance.GetSFXGroup();
+                    AudioManager.Instance.RegistrarFuenteEfectos(loopAudioSource);
                 }
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (AudioManager.Instance != null && loopAudioSource != null)
+            {
+                AudioManager.Instance.DesregistrarFuenteEfectos(loopAudioSource);
             }
         }
 
@@ -87,7 +116,7 @@ namespace ElMinero.Obstaculos
 
         private IEnumerator RutinaVagoneta()
         {
-            // 1. Aviso 1 s antes con "¡!" y sonido de advertencia
+            // 1. Mostrar cartel de advertencia "¡!" 1 s antes
             if (warningObject != null)
             {
                 warningObject.SetActive(true);
@@ -106,7 +135,8 @@ namespace ElMinero.Obstaculos
                 warningObject.SetActive(false);
             }
 
-            // 2. Recorrido a 9 u/s
+            // 2. Hacer visible y recorrer rieles a 9 u/s
+            MostrarVagoneta();
             isRunning = true;
             if (loopAudioSource != null) loopAudioSource.volume = 1.0f;
 
@@ -124,6 +154,8 @@ namespace ElMinero.Obstaculos
                 loopAudioSource.Stop();
             }
 
+            // 3. Al salir por el otro extremo, se oculta y desactiva
+            OcultarVagoneta();
             gameObject.SetActive(false);
         }
 
@@ -131,7 +163,7 @@ namespace ElMinero.Obstaculos
         {
             if (!isRunning) return;
 
-            if (other.CompareTag("Player"))
+            if (other.CompareTag(Constantes.Tags.Player))
             {
                 var health = other.GetComponent<PlayerHealth>();
                 if (health != null)
@@ -153,6 +185,7 @@ namespace ElMinero.Obstaculos
             isTriggered = false;
             transform.position = startPoint;
 
+            OcultarVagoneta();
             if (warningObject != null) warningObject.SetActive(false);
             if (loopAudioSource != null) loopAudioSource.Stop();
 
