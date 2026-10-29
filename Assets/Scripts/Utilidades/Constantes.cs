@@ -54,6 +54,23 @@ namespace ElMinero.Utilidades
         }
 
         // ====================================================================
+        // ESCENAS
+        // ====================================================================
+        public static class Escenas
+        {
+            public const string MenuPrincipal = "MenuPrincipal";
+            public const string Nivel1 = "Nivel1_MinaRayas";
+            public const string Nivel2 = "Nivel2_ElNopal";
+            public const string Nivel3 = "Nivel3_LaValenciana";
+            public const string Victoria = "Victoria";
+            public const string Derrota = "Derrota";
+            public const string Splash = "Splash";
+            public const string Intro = "Intro";
+            public const string Final = "Final";
+            public const string Creditos = "Creditos";
+        }
+
+        // ====================================================================
         // PREFS Y CLAVES DE GUARDADO
         // ====================================================================
         public static class Prefs
@@ -64,7 +81,9 @@ namespace ElMinero.Utilidades
             public const string PantallaCompleta = "PantallaCompleta";
             public const string CalidadGrafica = "CalidadGrafica";
             public const string NombreJugador = "NombreJugador";
+            public const string NombrePorDefecto = "Minero";
             public const string RecordPuntaje = "RecordPuntaje";
+            public const string MejorPuntaje = "MejorPuntaje";
             public const string NivelAlcanzado = "NivelAlcanzado";
         }
     }
