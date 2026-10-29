@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -1102,7 +1103,7 @@ namespace ElMinero.Editor
             CrearFuego(new Vector3(104f, -1.6f, 0f));
             CrearFuego(new Vector3(172f, -1.6f, 0f));
 
-            CrearElevador(new Vector3(118f, -1.5f, 0f), new Vector3(118f, 2.8f, 0f), 2.2f);
+            CrearElevador(new Vector3(118f, -1.8f, 0f), new Vector3(118f, 2.8f, 0f), 2.4f);
 
             // 14 Spawners de Rocas implacables (intervalo urgente 1.3s)
             CrearRockSpawner(new Vector3(6f, 8f, 0f), 1.3f);

@@ -6,41 +6,47 @@ using ElMinero.Managers;
 namespace ElMinero.Plataformas
 {
     /// <summary>
-    /// Elevador del malacate (Niveles 1 y 3).
-    /// Plataforma kinemática vertical que se traslada suavemente entre el fondo y la cima del tiro a 2 u/s,
-    /// pausándose 1 s en cada extremo. Transporta al jugador sin deslizamiento indeseado.
-    /// La rueda del malacate arriba gira y reproduce el loop 3D (Malacate_Loop) únicamente mientras se mueve.
+    /// Elevador de tiro de mina con malacate y cable continuo (Nivel 3).
+    /// El malacate está anclado a la repisa superior.
+    /// Al subirse el minero, tras 0.5 s sube suavemente hasta quedar a ras de la repisa superior.
+    /// Al salir el minero y pasar 3.0 s, el elevador desciende de nuevo.
+    /// Transporta al jugador mediante traslación física directa sin emparentar (evita SetParent).
     /// </summary>
     public class MineElevator : MonoBehaviour, IResettable
     {
-        [Header("Cinemática Vertical")]
-        [Tooltip("Punto inferior (A).")]
+        public enum EstadoElevador
+        {
+            Abajo,
+            EsperandoParaSubir,
+            Subiendo,
+            Arriba,
+            EsperandoParaBajar,
+            Bajando
+        }
+
+        [Header("Puntos de Recorrido")]
         [SerializeField] private Vector3 bottomPoint;
-
-        [Tooltip("Punto superior (B).")]
         [SerializeField] private Vector3 topPoint;
+        [SerializeField] private float speed = 2.4f;
 
-        [Tooltip("Velocidad de elevación (según GDD: 2 u/s).")]
-        [SerializeField] private float speed = 2f;
+        [Header("Tiempos")]
+        [SerializeField] private float delaySubida = 0.5f;
+        [SerializeField] private float delayBajada = 3.0f;
 
-        [Tooltip("Tiempo de pausa en cada extremo (1 s).")]
-        [SerializeField] private float waitTime = 1f;
-
-        [Header("Malacate Superior y Sonido")]
-        [Tooltip("Transform de la rueda del malacate que gira al moverse.")]
+        [Header("Malacate Superior y Cable")]
         [SerializeField] private Transform malacateWheel;
-
-        [Tooltip("Velocidad angular de giro del malacate (grados/s).")]
+        [SerializeField] private Transform cableAnchorPoint;
+        [SerializeField] private LineRenderer cableLine;
         [SerializeField] private float wheelRotationSpeed = 180f;
 
-        [Tooltip("AudioSource 3D para el bucle del malacate.")]
+        [Header("Audio")]
         [SerializeField] private AudioSource loopAudioSource;
 
         private Rigidbody2D rb;
-        private Vector3 targetPoint;
-        private bool isMoving = false;
-        private Coroutine movementRoutine;
-        private Vector3 initialPos;
+        private EstadoElevador estado = EstadoElevador.Abajo;
+        private bool jugadorEnPlataforma = false;
+        private Rigidbody2D playerRb;
+        private Coroutine corrutinaTemporizador;
 
         private void Awake()
         {
@@ -52,137 +58,237 @@ namespace ElMinero.Plataformas
                 rb.useFullKinematicContacts = true;
             }
 
-            initialPos = transform.position;
             if (bottomPoint == Vector3.zero) bottomPoint = transform.position;
-            if (topPoint == Vector3.zero) topPoint = transform.position + new Vector3(0f, 8f, 0f);
+            if (topPoint == Vector3.zero) topPoint = transform.position + new Vector3(0f, 10f, 0f);
 
-            targetPoint = topPoint;
-            ConfigurarAudio3D();
+            ConfigurarCable();
+            ConfigurarAudio();
         }
 
-        private void ConfigurarAudio3D()
+        private void ConfigurarCable()
+        {
+            if (cableLine == null)
+            {
+                cableLine = GetComponent<LineRenderer>();
+                if (cableLine == null) cableLine = gameObject.AddComponent<LineRenderer>();
+            }
+
+            if (cableLine != null)
+            {
+                cableLine.positionCount = 2;
+                cableLine.startWidth = 0.08f;
+                cableLine.endWidth = 0.08f;
+                cableLine.useWorldSpace = true;
+                cableLine.sortingLayerName = Constantes.SortingLayers.Escenario;
+                cableLine.sortingOrder = 1;
+
+                Material lineMat = new Material(Shader.Find("Sprites/Default"));
+                lineMat.color = new Color(0.25f, 0.22f, 0.20f, 1f);
+                cableLine.material = lineMat;
+            }
+
+            if (cableAnchorPoint == null)
+            {
+                GameObject anchor = new GameObject("CableAnchor");
+                anchor.transform.SetParent(transform, false);
+                anchor.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+                cableAnchorPoint = anchor.transform;
+            }
+        }
+
+        private void ConfigurarAudio()
         {
             if (loopAudioSource == null)
             {
                 loopAudioSource = GetComponent<AudioSource>();
-                if (loopAudioSource == null)
-                {
-                    loopAudioSource = gameObject.AddComponent<AudioSource>();
-                }
+                if (loopAudioSource == null) loopAudioSource = gameObject.AddComponent<AudioSource>();
             }
 
             if (loopAudioSource != null)
             {
                 loopAudioSource.loop = true;
                 loopAudioSource.playOnAwake = false;
-                loopAudioSource.spatialBlend = 1.0f; // 3D
+                loopAudioSource.spatialBlend = 1.0f;
                 loopAudioSource.minDistance = 3f;
-                loopAudioSource.maxDistance = 14f;
+                loopAudioSource.maxDistance = 18f;
                 loopAudioSource.rolloffMode = AudioRolloffMode.Linear;
+
                 if (AudioManager.Instance != null)
                 {
                     loopAudioSource.clip = AudioManager.Instance.GetAudioClipMalacateLoop();
-                    loopAudioSource.outputAudioMixerGroup = AudioManager.Instance.GetSFXGroup();
+                    AudioManager.Instance.RegistrarFuenteEfectos(loopAudioSource);
                 }
             }
         }
 
-        private void Start()
+        private void OnDisable()
         {
-            movementRoutine = StartCoroutine(RutinaMovimiento());
+            if (AudioManager.Instance != null && loopAudioSource != null)
+            {
+                AudioManager.Instance.DesregistrarFuenteEfectos(loopAudioSource);
+            }
+        }
+
+        public void ConfigurarPuntos(Vector3 abajo, Vector3 arriba, Transform rueda, Transform castillete = null)
+        {
+            bottomPoint = abajo;
+            topPoint = arriba;
+            transform.position = abajo;
+            if (rueda != null) malacateWheel = rueda;
         }
 
         private void Update()
         {
-            // Girar rueda del malacate si la plataforma se está moviendo
-            if (isMoving && malacateWheel != null)
+            // Actualizar línea de cable continuo
+            if (cableLine != null && malacateWheel != null && cableAnchorPoint != null)
             {
-                float rotDir = (targetPoint == topPoint) ? -1f : 1f;
-                malacateWheel.Rotate(0f, 0f, rotDir * wheelRotationSpeed * Time.deltaTime);
+                cableLine.SetPosition(0, malacateWheel.position);
+                cableLine.SetPosition(1, cableAnchorPoint.position);
+            }
+
+            // Girar rueda del malacate durante el movimiento
+            if ((estado == EstadoElevador.Subiendo || estado == EstadoElevador.Bajando) && malacateWheel != null)
+            {
+                float dir = (estado == EstadoElevador.Subiendo) ? -1f : 1f;
+                malacateWheel.Rotate(0f, 0f, dir * wheelRotationSpeed * Time.deltaTime);
             }
         }
 
-        private IEnumerator RutinaMovimiento()
+        private void FixedUpdate()
         {
-            while (true)
+            if (estado == EstadoElevador.Subiendo)
             {
-                // Iniciar movimiento hacia el objetivo
-                isMoving = true;
-                if (loopAudioSource != null && !loopAudioSource.isPlaying)
+                MoverHacia(topPoint, () =>
                 {
-                    loopAudioSource.Play();
-                }
-
-                while (Vector3.Distance(transform.position, targetPoint) > 0.05f)
+                    estado = EstadoElevador.Arriba;
+                    DetenerAudio();
+                });
+            }
+            else if (estado == EstadoElevador.Bajando)
+            {
+                MoverHacia(bottomPoint, () =>
                 {
-                    Vector3 newPos = Vector3.MoveTowards(transform.position, targetPoint, speed * Time.fixedDeltaTime);
-                    rb.MovePosition(newPos);
-                    yield return new WaitForFixedUpdate();
-                }
-
-                rb.MovePosition(targetPoint);
-                isMoving = false;
-                if (loopAudioSource != null)
-                {
-                    loopAudioSource.Pause();
-                }
-
-                // Pausa en el extremo
-                yield return new WaitForSeconds(waitTime);
-
-                // Alternar dirección
-                targetPoint = (targetPoint == topPoint) ? bottomPoint : topPoint;
+                    estado = EstadoElevador.Abajo;
+                    DetenerAudio();
+                });
             }
         }
 
-        // Transporte suave del jugador para evitar que resbale
+        private void MoverHacia(Vector3 target, System.Action alLlegar)
+        {
+            Vector2 posActual = rb.position;
+            Vector2 posDestino = Vector2.MoveTowards(posActual, target, speed * Time.fixedDeltaTime);
+            Vector2 delta = posDestino - posActual;
+
+            rb.MovePosition(posDestino);
+
+            // Arrastrar físicamente al jugador sin emparentar
+            if (jugadorEnPlataforma && playerRb != null)
+            {
+                playerRb.position += new Vector2(0f, delta.y);
+            }
+
+            if (Vector2.Distance(rb.position, target) < 0.02f)
+            {
+                rb.MovePosition(target);
+                alLlegar?.Invoke();
+            }
+        }
+
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            if (collision.gameObject.CompareTag("Player") && collision.contacts[0].normal.y < -0.5f)
+            if (collision.gameObject.CompareTag("Player") && collision.contacts[0].normal.y < -0.4f)
             {
-                collision.transform.SetParent(transform);
+                jugadorEnPlataforma = true;
+                playerRb = collision.gameObject.GetComponent<Rigidbody2D>();
+
+                if (estado == EstadoElevador.Abajo)
+                {
+                    if (corrutinaTemporizador != null) StopCoroutine(corrutinaTemporizador);
+                    corrutinaTemporizador = StartCoroutine(RutinaEsperarYSubir());
+                }
+                else if (estado == EstadoElevador.EsperandoParaBajar)
+                {
+                    // Si el jugador volvió antes de que baje, cancelar descenso
+                    if (corrutinaTemporizador != null) StopCoroutine(corrutinaTemporizador);
+                    estado = EstadoElevador.Arriba;
+                }
             }
         }
 
         private void OnCollisionExit2D(Collision2D collision)
         {
-            if (collision.gameObject.CompareTag("Player") && collision.transform.parent == transform)
+            if (collision.gameObject.CompareTag("Player"))
             {
-                collision.transform.SetParent(null);
+                jugadorEnPlataforma = false;
+                playerRb = null;
+
+                if (estado == EstadoElevador.Arriba)
+                {
+                    if (corrutinaTemporizador != null) StopCoroutine(corrutinaTemporizador);
+                    corrutinaTemporizador = StartCoroutine(RutinaEsperarYDescender());
+                }
+            }
+        }
+
+        private IEnumerator RutinaEsperarYSubir()
+        {
+            estado = EstadoElevador.EsperandoParaSubir;
+            yield return new WaitForSeconds(delaySubida);
+
+            if (jugadorEnPlataforma)
+            {
+                IniciarAudio();
+                estado = EstadoElevador.Subiendo;
+            }
+            else
+            {
+                estado = EstadoElevador.Abajo;
+            }
+        }
+
+        private IEnumerator RutinaEsperarYDescender()
+        {
+            estado = EstadoElevador.EsperandoParaBajar;
+            yield return new WaitForSeconds(delayBajada);
+
+            if (!jugadorEnPlataforma)
+            {
+                IniciarAudio();
+                estado = EstadoElevador.Bajando;
+            }
+            else
+            {
+                estado = EstadoElevador.Arriba;
+            }
+        }
+
+        private void IniciarAudio()
+        {
+            if (loopAudioSource != null && !loopAudioSource.isPlaying)
+            {
+                loopAudioSource.Play();
+            }
+        }
+
+        private void DetenerAudio()
+        {
+            if (loopAudioSource != null && loopAudioSource.isPlaying)
+            {
+                loopAudioSource.Pause();
             }
         }
 
         public void ResetObject()
         {
-            if (movementRoutine != null) StopCoroutine(movementRoutine);
+            if (corrutinaTemporizador != null) StopCoroutine(corrutinaTemporizador);
+            DetenerAudio();
 
             transform.position = bottomPoint;
-            targetPoint = topPoint;
-            isMoving = false;
-
-            if (loopAudioSource != null) loopAudioSource.Stop();
-
-            movementRoutine = StartCoroutine(RutinaMovimiento());
-        }
-
-        public void ConfigurarPuntos(Vector3 abajo, Vector3 arriba, Transform ruedaMalacate = null)
-        {
-            bottomPoint = abajo;
-            topPoint = arriba;
-            transform.position = abajo;
-            targetPoint = arriba;
-            malacateWheel = ruedaMalacate;
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            Vector3 pA = bottomPoint != Vector3.zero ? bottomPoint : transform.position;
-            Vector3 pB = topPoint != Vector3.zero ? topPoint : transform.position + new Vector3(0f, 8f, 0f);
-
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(pA, pB);
-            Gizmos.DrawWireCube(pA, new Vector3(3f, 0.5f, 0.1f));
-            Gizmos.DrawWireCube(pB, new Vector3(3f, 0.5f, 0.1f));
+            if (rb != null) rb.position = bottomPoint;
+            estado = EstadoElevador.Abajo;
+            jugadorEnPlataforma = false;
+            playerRb = null;
         }
     }
 }
