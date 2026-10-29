@@ -14,11 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Niveles.LevelConfig
   levelName: "Nivel 1 \u2014 Mina Rayas"
   levelIndex: 1
-  timeLimit: 110
+  timeLimit: 100
   silverVeinCount: 6
   amethystGemCount: 2
   silverVeinPoints: 10
   amethystGemPoints: 25
   allSilverBonus: 50
-  rockSpawnInterval: 2.2
+  distinctiveMineralName: Aguilarita
+  distinctiveMineralPoints: 50
+  distinctiveMineralDescription: 'Aguilarita (Ag4SeS): mineral de plata y selenio descubierto en Guanajuato en 1891.'
+  rockSpawnInterval: 4
   cameraBackgroundColor: {r: 0.12, g: 0.09, b: 0.19, a: 1}

@@ -14,11 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Niveles.LevelConfig
   levelName: "Nivel 3 \u2014 La Valenciana"
   levelIndex: 3
-  timeLimit: 130
+  timeLimit: 140
   silverVeinCount: 10
   amethystGemCount: 4
   silverVeinPoints: 10
   amethystGemPoints: 25
   allSilverBonus: 50
-  rockSpawnInterval: 1.3
+  distinctiveMineralName: Pirargirita
+  distinctiveMineralPoints: 50
+  distinctiveMineralDescription: "Pirargirita (Ag3SbS3, plata roja): mineral emblem\xE1tico que enriqueci\xF3 a Guanajuato."
+  rockSpawnInterval: 2.2
   cameraBackgroundColor: {r: 0.16, g: 0.04, b: 0.04, a: 1}

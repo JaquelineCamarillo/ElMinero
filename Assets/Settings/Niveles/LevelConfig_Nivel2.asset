@@ -20,5 +20,8 @@ MonoBehaviour:
   silverVeinPoints: 10
   amethystGemPoints: 25
   allSilverBonus: 50
-  rockSpawnInterval: 1.8
+  distinctiveMineralName: Pepita de oro
+  distinctiveMineralPoints: 50
+  distinctiveMineralDescription: "Pepita de oro nativo extra\xEDda de las profundidades de Guanajuato."
+  rockSpawnInterval: 3
   cameraBackgroundColor: {r: 0.16, g: 0.1, b: 0.05, a: 1}
