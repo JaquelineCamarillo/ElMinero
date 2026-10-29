@@ -10,8 +10,8 @@ using UnityEngine.InputSystem;
 namespace ElMinero.UI
 {
     /// <summary>
-    /// Controla la secuencia de inicio de la pantalla Splash (Sección 3.1).
-    /// Muestra el logo de la autora y la institución (UTNG), seguido del logo del juego,
+    /// Controla la secuencia de inicio de la pantalla Splash (SecciÃ³n 3.1).
+    /// Muestra el logo de la autora y la instituciÃ³n (UTNG), seguido del logo del juego,
     /// con transiciones suaves y posibilidad de omitir en cualquier momento.
     /// </summary>
     public class SplashController : MonoBehaviour
@@ -20,7 +20,7 @@ namespace ElMinero.UI
         [SerializeField] private CanvasGroup grupoAutora;
         [SerializeField] private CanvasGroup grupoLogoJuego;
 
-        [Header("Configuración de Tiempos")]
+        [Header("ConfiguraciÃ³n de Tiempos")]
         [SerializeField] private float duracionFade = 0.6f;
         [SerializeField] private float duracionEspera = 1.0f;
 
@@ -30,6 +30,11 @@ namespace ElMinero.UI
         {
             if (grupoAutora != null) grupoAutora.alpha = 0f;
             if (grupoLogoJuego != null) grupoLogoJuego.alpha = 0f;
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayMusicMenu();
+            }
 
             StartCoroutine(SecuenciaSplash());
         }
@@ -57,7 +62,7 @@ namespace ElMinero.UI
 
         private IEnumerator SecuenciaSplash()
         {
-            // Fase 1: Logo Autora e Institución
+            // Fase 1: Logo Autora e InstituciÃ³n
             if (grupoAutora != null)
             {
                 yield return StartCoroutine(FadeCanvasGroup(grupoAutora, 0f, 1f, duracionFade));

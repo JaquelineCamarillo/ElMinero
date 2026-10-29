@@ -8,8 +8,10 @@ namespace ElMinero.Managers
     /// <summary>
     /// Administrador de audio global (Singleton, DontDestroyOnLoad).
     /// Controla la música por escena con fundido cruzado (crossfade), aceleración de intensidad
-    /// en el derrumbe final, grupos del AudioMixer (VolMusica, VolEfectos), pool de SFX y
-    /// configuración de AudioSources 3D para peligros ambientales.
+    /// en el derrumbe final, control directo y limpio de volumen (0-1) sin depender de AudioMixer exposed parameters,
+    /// pool de SFX y registro de AudioSources 3D para peligros ambientales.
+    /// Carga todos los AudioClips mediante AudioLibrary en Resources para garantizar compatibilidad
+    /// tanto en el Editor como en builds ejecutables (.exe, WebGL, Android).
     /// </summary>
     public class AudioManager : MonoBehaviour
     {
@@ -31,10 +33,8 @@ namespace ElMinero.Managers
             }
         }
 
-        [Header("Mezclador de Audio")]
-        [SerializeField] private AudioMixer audioMixer;
-        [SerializeField] private AudioMixerGroup musicGroup;
-        [SerializeField] private AudioMixerGroup sfxGroup;
+        [Header("Biblioteca de Audio")]
+        [SerializeField] private AudioLibrary audioLibrary;
 
         [Header("Fuentes de Música (Crossfade)")]
         [SerializeField] private AudioSource musicSourceA;
@@ -43,9 +43,12 @@ namespace ElMinero.Managers
         private Coroutine crossfadeCoroutine;
 
         [Header("Pool de Efectos (SFX)")]
-        [SerializeField] private int sfxPoolSize = 12;
+        [SerializeField] private int sfxPoolSize = 16;
         private List<AudioSource> sfxPool = new List<AudioSource>();
         private int currentSfxIndex = 0;
+
+        [Header("Fuentes 3D Registradas")]
+        private readonly HashSet<AudioSource> fuentesEfectos3D = new HashSet<AudioSource>();
 
         [Header("Música")]
         [SerializeField] private AudioClip musicMenu;
@@ -101,9 +104,14 @@ namespace ElMinero.Managers
 
         private bool pasoAlternado = false;
         private bool isUrgent = false;
-        private float baseMusicPitch = 1.0f;
-        private float baseMusicVolume = 0.7f;
+        private float pauseMuffleFactor = 1.0f;
+        private float volumenMusica = 0.8f;
+        private float volumenEfectos = 0.8f;
         private bool musicActive = true;
+
+        public float VolumenMusica => volumenMusica;
+        public float VolumenEfectos => volumenEfectos;
+        public bool MusicaActiva => musicActive;
 
         private void Awake()
         {
@@ -116,39 +124,26 @@ namespace ElMinero.Managers
             instance = this;
             DontDestroyOnLoad(gameObject);
 
+            CargarPreferenciasVolumen();
             InicializarAudioSources();
             CargarRecursosDeAudio();
         }
 
+        private void CargarPreferenciasVolumen()
+        {
+            volumenMusica = PlayerPrefs.GetFloat("VolMusica", 0.8f);
+            volumenEfectos = PlayerPrefs.GetFloat("VolEfectos", 0.8f);
+            musicActive = PlayerPrefs.GetInt("MusicaActiva", 1) == 1;
+        }
+
         private void InicializarAudioSources()
         {
-            if (audioMixer == null)
-            {
-                audioMixer = Resources.Load<AudioMixer>("Audios/MezcladorPrincipal");
-                if (audioMixer == null)
-                {
-#if UNITY_EDITOR
-                    audioMixer = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioMixer>("Assets/Audios/MezcladorPrincipal.mixer");
-#endif
-                }
-            }
-
-            if (audioMixer != null)
-            {
-                var mg = audioMixer.FindMatchingGroups("Musica");
-                if (mg != null && mg.Length > 0) musicGroup = mg[0];
-
-                var sg = audioMixer.FindMatchingGroups("Efectos");
-                if (sg != null && sg.Length > 0) sfxGroup = sg[0];
-            }
-
             // Dos fuentes para crossfade
             if (musicSourceA == null)
             {
                 musicSourceA = gameObject.AddComponent<AudioSource>();
                 musicSourceA.loop = true;
                 musicSourceA.playOnAwake = false;
-                musicSourceA.outputAudioMixerGroup = musicGroup;
             }
 
             if (musicSourceB == null)
@@ -156,7 +151,6 @@ namespace ElMinero.Managers
                 musicSourceB = gameObject.AddComponent<AudioSource>();
                 musicSourceB.loop = true;
                 musicSourceB.playOnAwake = false;
-                musicSourceB.outputAudioMixerGroup = musicGroup;
             }
 
             activeMusicSource = musicSourceA;
@@ -169,7 +163,6 @@ namespace ElMinero.Managers
                     AudioSource src = gameObject.AddComponent<AudioSource>();
                     src.loop = false;
                     src.playOnAwake = false;
-                    src.outputAudioMixerGroup = sfxGroup;
                     sfxPool.Add(src);
                 }
             }
@@ -177,54 +170,110 @@ namespace ElMinero.Managers
 
         public void CargarRecursosDeAudio()
         {
+            if (audioLibrary == null)
+            {
+                audioLibrary = Resources.Load<AudioLibrary>("AudioLibrary");
+            }
+
+            if (audioLibrary != null)
+            {
+                musicMenu = audioLibrary.musicMenu;
+                musicNivel1 = audioLibrary.musicNivel1;
+                musicNivel2 = audioLibrary.musicNivel2;
+                musicNivel3 = audioLibrary.musicNivel3;
+                musicVictoria = audioLibrary.musicVictoria;
+                musicGameOver = audioLibrary.musicGameOver;
+
+                sfxSalto = audioLibrary.sfxSalto;
+                sfxAterrizar = audioLibrary.sfxAterrizar;
+                sfxPaso1 = audioLibrary.sfxPaso1;
+                sfxPaso2 = audioLibrary.sfxPaso2;
+                sfxDanio = audioLibrary.sfxDanio;
+                sfxPerderVida = audioLibrary.sfxPerderVida;
+
+                sfxRecolectarPlata = audioLibrary.sfxRecolectarPlata;
+                sfxRecolectarGema = audioLibrary.sfxRecolectarGema;
+                sfxRecolectarMineral = audioLibrary.sfxRecolectarMineral;
+                sfxRachaX2 = audioLibrary.sfxRachaX2;
+
+                sfxRocaCae = audioLibrary.sfxRocaCae;
+                sfxRocaImpacto = audioLibrary.sfxRocaImpacto;
+                sfxPlataformaCruje = audioLibrary.sfxPlataformaCruje;
+                sfxPlataformaColapso = audioLibrary.sfxPlataformaColapso;
+                sfxTemblor = audioLibrary.sfxTemblor;
+                sfxDerrumbe = audioLibrary.sfxDerrumbe;
+                sfxCheckpoint = audioLibrary.sfxCheckpoint;
+                sfxNivelCompletado = audioLibrary.sfxNivelCompletado;
+                sfxTicReloj = audioLibrary.sfxTicReloj;
+
+                sfxMurcielagoChillido = audioLibrary.sfxMurcielagoChillido;
+                sfxAranaBaja = audioLibrary.sfxAranaBaja;
+                sfxAlacranAtaque = audioLibrary.sfxAlacranAtaque;
+
+                sfxVagonetaLoop = audioLibrary.sfxVagonetaLoop;
+                sfxFuegoLoop = audioLibrary.sfxFuegoLoop;
+                sfxMalacateLoop = audioLibrary.sfxMalacateLoop;
+
+                sfxClickUI = audioLibrary.sfxClickUI;
+                sfxHoverUI = audioLibrary.sfxHoverUI;
+                sfxPausa = audioLibrary.sfxPausa;
+                sfxEstrella1 = audioLibrary.sfxEstrella1;
+                sfxEstrella2 = audioLibrary.sfxEstrella2;
+                sfxEstrella3 = audioLibrary.sfxEstrella3;
+                sfxDesbloqueoNivel = audioLibrary.sfxDesbloqueoNivel;
+            }
 #if UNITY_EDITOR
-            string pMusic = "Assets/Audios/Musica/";
-            string pSfx = "Assets/Audios/SFX/";
+            else
+            {
+                // Respaldo en editor si AudioLibrary.asset aún no se ha generado
+                string pMusic = "Assets/Audios/Musica/";
+                string pSfx = "Assets/Audios/SFX/";
 
-            if (musicMenu == null) musicMenu = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pMusic + "Musica_Menu.ogg");
-            if (musicNivel1 == null) musicNivel1 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pMusic + "Musica_Nivel1_MinaRayas.ogg");
-            if (musicNivel2 == null) musicNivel2 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pMusic + "Musica_Nivel2_ElNopal.ogg");
-            if (musicNivel3 == null) musicNivel3 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pMusic + "Musica_Nivel3_LaValenciana.ogg");
-            if (musicVictoria == null) musicVictoria = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pMusic + "Musica_Victoria.ogg");
-            if (musicGameOver == null) musicGameOver = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pMusic + "Musica_GameOver.ogg");
+                if (musicMenu == null) musicMenu = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pMusic + "Musica_Menu.ogg");
+                if (musicNivel1 == null) musicNivel1 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pMusic + "Musica_Nivel1_MinaRayas.ogg");
+                if (musicNivel2 == null) musicNivel2 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pMusic + "Musica_Nivel2_ElNopal.ogg");
+                if (musicNivel3 == null) musicNivel3 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pMusic + "Musica_Nivel3_LaValenciana.ogg");
+                if (musicVictoria == null) musicVictoria = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pMusic + "Musica_Victoria.ogg");
+                if (musicGameOver == null) musicGameOver = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pMusic + "Musica_GameOver.ogg");
 
-            if (sfxSalto == null) sfxSalto = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Salto.wav");
-            if (sfxAterrizar == null) sfxAterrizar = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Aterrizar.wav");
-            if (sfxPaso1 == null) sfxPaso1 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Paso_1.wav");
-            if (sfxPaso2 == null) sfxPaso2 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Paso_2.wav");
-            if (sfxDanio == null) sfxDanio = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Danio.wav");
-            if (sfxPerderVida == null) sfxPerderVida = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Perder_Vida.wav");
+                if (sfxSalto == null) sfxSalto = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Salto.wav");
+                if (sfxAterrizar == null) sfxAterrizar = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Aterrizar.wav");
+                if (sfxPaso1 == null) sfxPaso1 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Paso_1.wav");
+                if (sfxPaso2 == null) sfxPaso2 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Paso_2.wav");
+                if (sfxDanio == null) sfxDanio = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Danio.wav");
+                if (sfxPerderVida == null) sfxPerderVida = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Perder_Vida.wav");
 
-            if (sfxRecolectarPlata == null) sfxRecolectarPlata = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Recolectar_Plata.wav");
-            if (sfxRecolectarGema == null) sfxRecolectarGema = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Recolectar_Gema.wav");
-            if (sfxRecolectarMineral == null) sfxRecolectarMineral = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Recolectar_Mineral.wav");
-            if (sfxRachaX2 == null) sfxRachaX2 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Racha_x2.wav");
+                if (sfxRecolectarPlata == null) sfxRecolectarPlata = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Recolectar_Plata.wav");
+                if (sfxRecolectarGema == null) sfxRecolectarGema = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Recolectar_Gema.wav");
+                if (sfxRecolectarMineral == null) sfxRecolectarMineral = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Recolectar_Mineral.wav");
+                if (sfxRachaX2 == null) sfxRachaX2 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Racha_x2.wav");
 
-            if (sfxRocaCae == null) sfxRocaCae = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Roca_Cae.wav");
-            if (sfxRocaImpacto == null) sfxRocaImpacto = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Roca_Impacto.wav");
-            if (sfxPlataformaCruje == null) sfxPlataformaCruje = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Plataforma_Cruje.wav");
-            if (sfxPlataformaColapso == null) sfxPlataformaColapso = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Plataforma_Colapso.wav");
-            if (sfxTemblor == null) sfxTemblor = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Temblor.wav");
-            if (sfxDerrumbe == null) sfxDerrumbe = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Derrumbe.wav");
-            if (sfxCheckpoint == null) sfxCheckpoint = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Checkpoint.wav");
-            if (sfxNivelCompletado == null) sfxNivelCompletado = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Nivel_Completado.wav");
-            if (sfxTicReloj == null) sfxTicReloj = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Tic_Reloj.wav");
+                if (sfxRocaCae == null) sfxRocaCae = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Roca_Cae.wav");
+                if (sfxRocaImpacto == null) sfxRocaImpacto = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Roca_Impacto.wav");
+                if (sfxPlataformaCruje == null) sfxPlataformaCruje = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Plataforma_Cruje.wav");
+                if (sfxPlataformaColapso == null) sfxPlataformaColapso = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Plataforma_Colapso.wav");
+                if (sfxTemblor == null) sfxTemblor = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Temblor.wav");
+                if (sfxDerrumbe == null) sfxDerrumbe = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Derrumbe.wav");
+                if (sfxCheckpoint == null) sfxCheckpoint = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Checkpoint.wav");
+                if (sfxNivelCompletado == null) sfxNivelCompletado = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Nivel_Completado.wav");
+                if (sfxTicReloj == null) sfxTicReloj = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Tic_Reloj.wav");
 
-            if (sfxMurcielagoChillido == null) sfxMurcielagoChillido = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Murcielago_Chillido.wav");
-            if (sfxAranaBaja == null) sfxAranaBaja = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Arana_Baja.wav");
-            if (sfxAlacranAtaque == null) sfxAlacranAtaque = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Alacran_Ataque.wav");
+                if (sfxMurcielagoChillido == null) sfxMurcielagoChillido = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Murcielago_Chillido.wav");
+                if (sfxAranaBaja == null) sfxAranaBaja = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Arana_Baja.wav");
+                if (sfxAlacranAtaque == null) sfxAlacranAtaque = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Alacran_Ataque.wav");
 
-            if (sfxVagonetaLoop == null) sfxVagonetaLoop = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Vagoneta_Rodando_Loop.wav");
-            if (sfxFuegoLoop == null) sfxFuegoLoop = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Fuego_Loop.wav");
-            if (sfxMalacateLoop == null) sfxMalacateLoop = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Malacate_Loop.wav");
+                if (sfxVagonetaLoop == null) sfxVagonetaLoop = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Vagoneta_Rodando_Loop.wav");
+                if (sfxFuegoLoop == null) sfxFuegoLoop = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Fuego_Loop.wav");
+                if (sfxMalacateLoop == null) sfxMalacateLoop = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Malacate_Loop.wav");
 
-            if (sfxClickUI == null) sfxClickUI = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Click_UI.wav");
-            if (sfxHoverUI == null) sfxHoverUI = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Hover_UI.wav");
-            if (sfxPausa == null) sfxPausa = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Pausa.wav");
-            if (sfxEstrella1 == null) sfxEstrella1 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Estrella_1.wav");
-            if (sfxEstrella2 == null) sfxEstrella2 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Estrella_2.wav");
-            if (sfxEstrella3 == null) sfxEstrella3 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Estrella_3.wav");
-            if (sfxDesbloqueoNivel == null) sfxDesbloqueoNivel = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Desbloqueo_Nivel.wav");
+                if (sfxClickUI == null) sfxClickUI = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Click_UI.wav");
+                if (sfxHoverUI == null) sfxHoverUI = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Hover_UI.wav");
+                if (sfxPausa == null) sfxPausa = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Pausa.wav");
+                if (sfxEstrella1 == null) sfxEstrella1 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Estrella_1.wav");
+                if (sfxEstrella2 == null) sfxEstrella2 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Estrella_2.wav");
+                if (sfxEstrella3 == null) sfxEstrella3 = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Estrella_3.wav");
+                if (sfxDesbloqueoNivel == null) sfxDesbloqueoNivel = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Desbloqueo_Nivel.wav");
+            }
 #endif
         }
 
@@ -232,7 +281,15 @@ namespace ElMinero.Managers
         // GESTIÓN DE MÚSICA CON CROSSFADE
         // ====================================================================
 
-        public void PlayMusic(AudioClip clip, bool loop = true, float fadeDuration = 1.0f)
+        private float CalcularVolumenObjetivoMusica()
+        {
+            if (!musicActive) return 0f;
+            float target = volumenMusica * pauseMuffleFactor;
+            if (isUrgent) target = Mathf.Min(1.0f, target * 1.2f);
+            return target;
+        }
+
+        public void PlayMusic(AudioClip clip, bool loop = true, float fadeDuration = 0.8f)
         {
             if (clip == null) return;
 
@@ -254,13 +311,13 @@ namespace ElMinero.Managers
 
             incomingSource.clip = newClip;
             incomingSource.loop = loop;
-            incomingSource.pitch = baseMusicPitch;
+            incomingSource.pitch = isUrgent ? 1.08f : 1.0f;
             incomingSource.volume = 0f;
             incomingSource.Play();
 
             float elapsed = 0f;
             float initialOutVol = outgoingSource != null ? outgoingSource.volume : 0f;
-            float targetInVol = musicActive ? (isUrgent ? Mathf.Min(1.0f, baseMusicVolume * 1.25f) : baseMusicVolume) : 0f;
+            float targetInVol = CalcularVolumenObjetivoMusica();
 
             while (elapsed < duration)
             {
@@ -287,22 +344,64 @@ namespace ElMinero.Managers
             crossfadeCoroutine = null;
         }
 
-        public void PlayMusicMenu() => PlayMusic(musicMenu, true);
-        public void PlayMusicIntro() => PlayMusic(musicMenu, true);
-        public void PlayMusicCreditos() => PlayMusic(musicMenu, true);
+        public void PlayMusicMenu()
+        {
+            Debug.Log("[AudioManager] Reproduciendo pista de música: Menú Principal (Vals)");
+            SetMusicUrgency(false);
+            PlayMusic(musicMenu, true);
+        }
+
+        public void PlayMusicIntro()
+        {
+            Debug.Log("[AudioManager] Reproduciendo pista de música: Intro (Vals)");
+            SetMusicUrgency(false);
+            PlayMusic(musicMenu, true);
+        }
+
+        public void PlayMusicCreditos()
+        {
+            Debug.Log("[AudioManager] Reproduciendo pista de música: Créditos (Vals)");
+            SetMusicUrgency(false);
+            PlayMusic(musicMenu, true);
+        }
+
         public void PlayMusicNivel(int nivel)
         {
             SetMusicUrgency(false);
+            Debug.Log($"[AudioManager] Reproduciendo pista de música para Nivel {nivel}");
             switch (nivel)
             {
-                case 1: PlayMusic(musicNivel1, true); break;
-                case 2: PlayMusic(musicNivel2, true); break;
-                case 3: PlayMusic(musicNivel3, true); break;
-                default: PlayMusic(musicMenu, true); break;
+                case 1:
+                    Debug.Log("[AudioManager] Pista Nivel 1: Misteriosa (Mina Rayas)");
+                    PlayMusic(musicNivel1, true);
+                    break;
+                case 2:
+                    Debug.Log("[AudioManager] Pista Nivel 2: Rítmica (El Nopal)");
+                    PlayMusic(musicNivel2, true);
+                    break;
+                case 3:
+                    Debug.Log("[AudioManager] Pista Nivel 3: Urgente (La Valenciana)");
+                    PlayMusic(musicNivel3, true);
+                    break;
+                default:
+                    PlayMusic(musicMenu, true);
+                    break;
             }
         }
-        public void PlayMusicVictoria() => PlayMusic(musicVictoria, false, 0.4f);
-        public void PlayMusicGameOver() => PlayMusic(musicGameOver, false, 0.4f);
+
+        public void PlayMusicVictoria()
+        {
+            Debug.Log("[AudioManager] Reproduciendo pista de música: Victoria Fanfarria");
+            SetMusicUrgency(false);
+            PlayMusic(musicVictoria, false, 0.4f);
+        }
+
+        public void PlayMusicGameOver()
+        {
+            Debug.Log("[AudioManager] Reproduciendo pista de música: Game Over");
+            SetMusicUrgency(false);
+            PlayMusic(musicGameOver, false, 0.4f);
+        }
 
         public void StopMusic()
         {
@@ -313,23 +412,10 @@ namespace ElMinero.Managers
 
         public void SetPauseMusicMuffle(bool paused)
         {
-            if (audioMixer != null)
-            {
-                // En pausa se atenúa la música -10 dB
-                float db = paused ? -10f : 0f;
-                // Si el volumen de música está activo
-                if (PlayerPrefs.GetInt("MusicaActiva", 1) == 1)
-                {
-                    float volNorm = PlayerPrefs.GetFloat("VolMusica", 0.8f);
-                    float baseDb = Mathf.Log10(Mathf.Clamp(volNorm, 0.0001f, 1f)) * 20f;
-                    audioMixer.SetFloat("VolMusica", baseDb + db);
-                }
-            }
+            pauseMuffleFactor = paused ? 0.35f : 1.0f;
+            ActualizarVolumenMusicaActiva();
         }
 
-        /// <summary>
-        /// Aumenta la intensidad en el último 30% del tiempo: pitch 1.08 y volumen +2 dB.
-        /// </summary>
         public void SetMusicUrgency(bool urgent)
         {
             if (isUrgent == urgent) return;
@@ -339,43 +425,78 @@ namespace ElMinero.Managers
             {
                 activeMusicSource.pitch = isUrgent ? 1.08f : 1.0f;
             }
+            ActualizarVolumenMusicaActiva();
+        }
 
-            if (audioMixer != null && musicActive)
+        private void ActualizarVolumenMusicaActiva()
+        {
+            if (activeMusicSource != null && crossfadeCoroutine == null)
             {
-                float volNorm = PlayerPrefs.GetFloat("VolMusica", 0.8f);
-                float db = Mathf.Log10(Mathf.Clamp(volNorm, 0.0001f, 1f)) * 20f;
-                if (isUrgent) db += 2f;
-                audioMixer.SetFloat("VolMusica", Mathf.Clamp(db, -80f, 6f));
+                activeMusicSource.volume = CalcularVolumenObjetivoMusica();
             }
         }
 
         // ====================================================================
-        // VOLÚMENES Y AUDIOMIXER
+        // CONTROL DIRECTO DE VOLUMEN (Sin AudioMixer SetFloat)
         // ====================================================================
 
         public void SetMusicVolume(float normalizedVolume)
         {
-            if (audioMixer != null)
-            {
-                float db = (normalizedVolume <= 0.001f || !musicActive) ? -80f : Mathf.Log10(Mathf.Clamp01(normalizedVolume)) * 20f;
-                audioMixer.SetFloat("VolMusica", db);
-            }
+            volumenMusica = Mathf.Clamp01(normalizedVolume);
+            PlayerPrefs.SetFloat("VolMusica", volumenMusica);
+            PlayerPrefs.Save();
+            ActualizarVolumenMusicaActiva();
         }
 
         public void SetSFXVolume(float normalizedVolume)
         {
-            if (audioMixer != null)
-            {
-                float db = (normalizedVolume <= 0.001f) ? -80f : Mathf.Log10(Mathf.Clamp01(normalizedVolume)) * 20f;
-                audioMixer.SetFloat("VolEfectos", db);
-            }
+            volumenEfectos = Mathf.Clamp01(normalizedVolume);
+            PlayerPrefs.SetFloat("VolEfectos", volumenEfectos);
+            PlayerPrefs.Save();
+            ActualizarFuentes3D();
         }
 
         public void SetMusicActive(bool active)
         {
             musicActive = active;
-            float vol = PlayerPrefs.GetFloat("VolMusica", 0.8f);
-            SetMusicVolume(active ? vol : 0f);
+            PlayerPrefs.SetInt("MusicaActiva", active ? 1 : 0);
+            PlayerPrefs.Save();
+            ActualizarVolumenMusicaActiva();
+        }
+
+        // ====================================================================
+        // REGISTRO DE FUENTES 3D AMBIENTALES
+        // ====================================================================
+
+        public void RegistrarFuenteEfectos(AudioSource src)
+        {
+            if (src == null) return;
+            if (!fuentesEfectos3D.Contains(src))
+            {
+                fuentesEfectos3D.Add(src);
+            }
+            src.volume = volumenEfectos;
+        }
+
+        public void DesregistrarFuenteEfectos(AudioSource src)
+        {
+            if (src == null) return;
+            if (fuentesEfectos3D.Contains(src))
+            {
+                fuentesEfectos3D.Remove(src);
+            }
+        }
+
+        private void ActualizarFuentes3D()
+        {
+            fuentesEfectos3D.RemoveWhere(s => s == null);
+            foreach (var src in fuentesEfectos3D)
+            {
+                if (src != null)
+                {
+                    src.volume = volumenEfectos;
+                }
+            }
         }
 
         // ====================================================================
@@ -390,7 +511,7 @@ namespace ElMinero.Managers
             currentSfxIndex = (currentSfxIndex + 1) % sfxPool.Count;
 
             src.pitch = 1.0f + (pitchVariation > 0f ? Random.Range(-pitchVariation, pitchVariation) : 0f);
-            src.PlayOneShot(clip, volume);
+            src.PlayOneShot(clip, Mathf.Clamp01(volume * volumenEfectos));
         }
 
         // Métodos de acceso rápido para SFX del juego
@@ -451,11 +572,12 @@ namespace ElMinero.Managers
             src.clip = clip;
             src.loop = true;
             src.playOnAwake = true;
-            src.spatialBlend = 1.0f; // Completamente 3D
+            src.spatialBlend = 1.0f; // 3D espacial
             src.minDistance = minDistance;
             src.maxDistance = maxDistance;
             src.rolloffMode = AudioRolloffMode.Linear;
-            src.outputAudioMixerGroup = sfxGroup;
+            src.volume = volumenEfectos;
+            RegistrarFuenteEfectos(src);
             src.Play();
             return src;
         }
@@ -463,6 +585,6 @@ namespace ElMinero.Managers
         public AudioClip GetAudioClipVagonetaLoop() => sfxVagonetaLoop;
         public AudioClip GetAudioClipFuegoLoop() => sfxFuegoLoop;
         public AudioClip GetAudioClipMalacateLoop() => sfxMalacateLoop;
-        public AudioMixerGroup GetSFXGroup() => sfxGroup;
+        public AudioMixerGroup GetSFXGroup() => null;
     }
 }

@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35f403058647c1a439b3f454fdc053d0, type: 3}
+  m_Name: AudioLibrary
+  m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Managers.AudioLibrary
+  musicMenu: {fileID: 8300000, guid: e319770ed7119334ea42e8896676264c, type: 3}
+  musicNivel1: {fileID: 8300000, guid: 77a143d87e33ff44fbf203ce593904ab, type: 3}
+  musicNivel2: {fileID: 8300000, guid: 6ea8c7196b08f8941884466cf1b7a86b, type: 3}
+  musicNivel3: {fileID: 8300000, guid: 31f10a1ef1e3dd748ac596aca484439b, type: 3}
+  musicVictoria: {fileID: 8300000, guid: 8b166a1bbd464d94e92320f2c6552f8f, type: 3}
+  musicGameOver: {fileID: 8300000, guid: 5622053700344b443b1f3c183960105e, type: 3}
+  sfxSalto: {fileID: 8300000, guid: c2c48e3b063d00f4daff78f25a674862, type: 3}
+  sfxAterrizar: {fileID: 8300000, guid: b9cf18c898849a94083e66c8febd6ee0, type: 3}
+  sfxPaso1: {fileID: 8300000, guid: 34b79f60bdf21fb4c9e095afa2bb8895, type: 3}
+  sfxPaso2: {fileID: 8300000, guid: 7579260d3999d84458ee578857bc142f, type: 3}
+  sfxDanio: {fileID: 8300000, guid: c8e337c9d6a12ce429e1a2d49c42ade2, type: 3}
+  sfxPerderVida: {fileID: 8300000, guid: df29768c9b18538468065e0fd123811b, type: 3}
+  sfxRecolectarPlata: {fileID: 8300000, guid: a2afd227cbdd14b4fa26436aa5a58ee0, type: 3}
+  sfxRecolectarGema: {fileID: 8300000, guid: cdf30e30e5ff74c4ba6f8327258579cf, type: 3}
+  sfxRecolectarMineral: {fileID: 8300000, guid: 8fb775854e508a147a0dfa21cf4e9392, type: 3}
+  sfxRachaX2: {fileID: 8300000, guid: 7a4a88517a381f3438d21a857e2c49fa, type: 3}
+  sfxRocaCae: {fileID: 8300000, guid: 4aa4edcb078cabd449f7f9b34bfb1d9d, type: 3}
+  sfxRocaImpacto: {fileID: 8300000, guid: b54288f47ec31a047a0bd30aa7911212, type: 3}
+  sfxPlataformaCruje: {fileID: 8300000, guid: 56a81c00fbc30094189577685cf155d2, type: 3}
+  sfxPlataformaColapso: {fileID: 8300000, guid: fb70c77ee72b9364ba54fe21c162b913, type: 3}
+  sfxTemblor: {fileID: 8300000, guid: add041ebd79c12848b1e7e167fe9a7bc, type: 3}
+  sfxDerrumbe: {fileID: 8300000, guid: 7fbdb2d30600b934fb9958664d8f2c25, type: 3}
+  sfxCheckpoint: {fileID: 8300000, guid: a72caa6a8939b7c46b15fd100a548d16, type: 3}
+  sfxNivelCompletado: {fileID: 8300000, guid: ab1a5f39d85807545be120991ec8aa61, type: 3}
+  sfxTicReloj: {fileID: 8300000, guid: 8641cf7f7b6578345a05842244f1f29d, type: 3}
+  sfxMurcielagoChillido: {fileID: 8300000, guid: cdb66ea4a0aa0e64fa6f2dd8ecadad43, type: 3}
+  sfxAranaBaja: {fileID: 8300000, guid: 3d1aab24e6cfb9d47b4e6b9a1a2af72f, type: 3}
+  sfxAlacranAtaque: {fileID: 8300000, guid: 6b02213bea9c42e42926a14059b446d2, type: 3}
+  sfxVagonetaLoop: {fileID: 8300000, guid: 859d5a7dba9313945b2344a2469c9b19, type: 3}
+  sfxFuegoLoop: {fileID: 8300000, guid: e978f2a2abefc4f4d88777e9be0bf250, type: 3}
+  sfxMalacateLoop: {fileID: 8300000, guid: 06b59a60e0a990a4886f440c828d1ea5, type: 3}
+  sfxClickUI: {fileID: 8300000, guid: 60a932eb38731f4498f9bead3cff5b08, type: 3}
+  sfxHoverUI: {fileID: 8300000, guid: 8c041b0ea24e7554587758abf2d76ba3, type: 3}
+  sfxPausa: {fileID: 8300000, guid: bff1eed66cf4ce04cb5e13e3300cb761, type: 3}
+  sfxEstrella1: {fileID: 8300000, guid: 40d244f50b18af549ac6c5a2022a91c6, type: 3}
+  sfxEstrella2: {fileID: 8300000, guid: 6a3632463ba5a924b91fe4c46bd50907, type: 3}
+  sfxEstrella3: {fileID: 8300000, guid: ccb36c2c6f7d0a344b3d6f53b13ab2ee, type: 3}
+  sfxDesbloqueoNivel: {fileID: 8300000, guid: 6d84826a278617e4083ddf56ead5ed81, type: 3}

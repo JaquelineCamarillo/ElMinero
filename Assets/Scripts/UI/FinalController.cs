@@ -7,17 +7,17 @@ using ElMinero.Managers;
 namespace ElMinero.UI
 {
     /// <summary>
-    /// Controlador de la escena Final (Sección 3.7).
+    /// Controlador de la escena Final (SecciÃ³n 3.7).
     /// Muestra al minero en la superficie frente al Templo de San Cayetano,
     /// texto narrativo con el nombre personalizado, resumen acumulado de los 3 niveles,
-    /// minerales distintivos encontrados, música de victoria y créditos desplazables.
+    /// minerales distintivos encontrados, mÃºsica de victoria y crÃ©ditos desplazables.
     /// </summary>
     public class FinalController : MonoBehaviour
     {
         [Header("Texto Narrativo")]
         [SerializeField] private TextMeshProUGUI textoNarrativo;
 
-        [Header("Estadísticas Totales")]
+        [Header("EstadÃ­sticas Totales")]
         [SerializeField] private TextMeshProUGUI textoPuntajeTotal;
         [SerializeField] private TextMeshProUGUI textoEstrellasTotales;
         [SerializeField] private TextMeshProUGUI textoMineralesTotales;
@@ -27,7 +27,7 @@ namespace ElMinero.UI
         [SerializeField] private Image iconoPepitaOro;
         [SerializeField] private Image iconoPirargirita;
 
-        [Header("Créditos y Navegación")]
+        [Header("CrÃ©ditos y NavegaciÃ³n")]
         [SerializeField] private RectTransform contenedorCreditos;
         [SerializeField] private float velocidadCreditos = 22f;
         [SerializeField] private Button botonMenuPrincipal;
@@ -39,6 +39,7 @@ namespace ElMinero.UI
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlayMusicVictoria();
+                StartCoroutine(TransicionarAMusicaMenuDespuesDeVictoria());
             }
 
             ConfigurarNarrativaYStats();
@@ -64,7 +65,7 @@ namespace ElMinero.UI
 
             if (textoNarrativo != null)
             {
-                textoNarrativo.text = $"<b>{nombre}</b> sale a la luz junto al Templo de San Cayetano. Detrás, la mina se cierra para siempre… pero la plata que llevas cuenta otra historia.";
+                textoNarrativo.text = $"<b>{nombre}</b> sale a la luz junto al Templo de San Cayetano. DetrÃ¡s, la mina se cierra para siempreâ€¦ pero la plata que llevas cuenta otra historia.";
             }
 
             int p1 = PlayerPrefs.GetInt("MejorPuntaje_Nivel1_MinaRayas", 0);
@@ -83,8 +84,8 @@ namespace ElMinero.UI
             int mineralesTotal = (mineral1 ? 1 : 0) + (mineral2 ? 1 : 0) + (mineral3 ? 1 : 0);
 
             if (textoPuntajeTotal != null) textoPuntajeTotal.text = $"PUNTAJE TOTAL: {puntajeTotal:N0} pts";
-            if (textoEstrellasTotales != null) textoEstrellasTotales.text = $"ESTRELLAS: {estrellasTotal} / 9 ★";
-            if (textoMineralesTotales != null) textoMineralesTotales.text = $"MINERALES HISTÓRICOS: {mineralesTotal} / 3";
+            if (textoEstrellasTotales != null) textoEstrellasTotales.text = $"ESTRELLAS: {estrellasTotal} / 9 â˜…";
+            if (textoMineralesTotales != null) textoMineralesTotales.text = $"MINERALES HISTÃ“RICOS: {mineralesTotal} / 3";
 
             Color colorApagado = new Color(0.25f, 0.25f, 0.25f, 0.5f);
             Color colorActivo = Color.white;
@@ -92,6 +93,15 @@ namespace ElMinero.UI
             if (iconoAguilarita != null) iconoAguilarita.color = mineral1 ? colorActivo : colorApagado;
             if (iconoPepitaOro != null) iconoPepitaOro.color = mineral2 ? colorActivo : colorApagado;
             if (iconoPirargirita != null) iconoPirargirita.color = mineral3 ? colorActivo : colorApagado;
+        }
+
+        private IEnumerator TransicionarAMusicaMenuDespuesDeVictoria()
+        {
+            yield return new WaitForSeconds(6.0f);
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayMusicMenu();
+            }
         }
 
         public void VolverAlMenu()
