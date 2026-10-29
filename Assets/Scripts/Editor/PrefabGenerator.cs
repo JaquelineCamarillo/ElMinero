@@ -38,6 +38,9 @@ namespace ElMinero.Editor
                 if (layerJugador == -1) layerJugador = 9;
                 int layerPeligro = LayerMask.NameToLayer(Constantes.Layers.Peligro);
                 if (layerPeligro == -1) layerPeligro = 10;
+                                int layerEnemigo = LayerMask.NameToLayer(Constantes.Layers.Enemigo);
+                if (layerEnemigo == -1) layerEnemigo = layerPeligro;
+
                 int layerColeccionable = LayerMask.NameToLayer(Constantes.Layers.Coleccionable);
                 if (layerColeccionable == -1) layerColeccionable = 11;
 
@@ -57,7 +60,7 @@ namespace ElMinero.Editor
                 CrearPrefabZonaDerrumbe();
                 CrearPrefabBloqueDerrumbe();
                 CrearPrefabFuego(layerPeligro);
-                CrearPrefabVagoneta(layerPeligro);
+                CrearPrefabVagoneta(layerEnemigo);
 
                 // 4. Coleccionables
                 CrearPrefabVetaPlata(layerColeccionable);
@@ -73,10 +76,10 @@ namespace ElMinero.Editor
                 CrearPrefabLetrero();
 
                 // 6. Enemigos
-                CrearPrefabMurcielago(layerPeligro);
-                CrearPrefabMurcielagoRojo(layerPeligro);
-                CrearPrefabArana(layerPeligro);
-                CrearPrefabAlacran(layerPeligro, layerSuelo);
+                CrearPrefabMurcielago(layerEnemigo);
+                CrearPrefabMurcielagoRojo(layerEnemigo);
+                CrearPrefabArana(layerEnemigo);
+                CrearPrefabAlacran(layerEnemigo, layerSuelo);
 
                 // 7. Sistemas
                 CrearPrefabSistemas();

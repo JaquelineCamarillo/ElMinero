@@ -1,13 +1,15 @@
 using UnityEngine;
 using ElMinero.Managers;
+using ElMinero.Utilidades;
 
 namespace ElMinero.Enemigos
 {
     /// <summary>
     /// Araña de techo (Niveles 2 y 3).
-    /// Cuelga de su hilo (Hilo_Arana). Cuando el jugador pasa por debajo (±1.5 u en X),
-    /// desciende rápidamente a 4 u/s hasta 4-6 tiles, espera 1 s balanceándose suavemente,
-    /// y asciende de vuelta a 1.5 u/s.
+    /// Mediante un Raycast hacia arriba encuentra el techo de la mina y ancla Telarana_Techo.png.
+    /// Conecta su hilo continuo desde el techo hasta la araña.
+    /// Cuando el jugador pasa por debajo (±1.5 u en X), desciende rápidamente a 4 u/s hasta 4-6 tiles,
+    /// espera 1 s balanceándose suavemente, y asciende de vuelta a 1.5 u/s sin desconectarse jamás de su hilo.
     /// </summary>
     public class SpiderDrop : EnemyBase
     {
@@ -29,19 +31,98 @@ namespace ElMinero.Enemigos
         [Tooltip("Tolerancia horizontal para activar el descenso (±1.5 u).")]
         [SerializeField] private float triggerToleranceX = 1.5f;
 
-        [Header("Hilo de la Araña")]
-        [Tooltip("SpriteRenderer del hilo de la araña (estirado en Y o modo Tiled).")]
-        [SerializeField] private SpriteRenderer webRenderer;
+        [Header("Anclaje al Techo y Telaraña")]
+        [SerializeField] private Sprite spriteTelaranaTecho;
+        [SerializeField] private LineRenderer webLine;
 
         private SpiderState currentState = SpiderState.Hanging;
+        private Vector3 ceilingPosition;
+        private Vector3 hangingPosition;
         private Vector3 bottomPosition;
         private float waitTimer = 0f;
+        private GameObject goTelaranaTecho;
 
         protected override void Awake()
         {
             base.Awake();
-            bottomPosition = initialPosition - new Vector3(0f, dropDistance, 0f);
-            ActualizarHilo();
+
+            // 1. Raycast hacia arriba buscando el techo en la capa Suelo
+            int layerSuelo = LayerMask.GetMask(Constantes.Layers.Suelo);
+            RaycastHit2D hitTecho = Physics2D.Raycast(transform.position, Vector2.up, 25f, layerSuelo);
+
+            if (hitTecho.collider != null)
+            {
+                ceilingPosition = new Vector3(transform.position.x, hitTecho.point.y, transform.position.z);
+            }
+            else
+            {
+                ceilingPosition = transform.position + new Vector3(0f, 4f, 0f);
+            }
+
+            // 2. Anclar telaraña en el techo
+            CrearTelaranaTecho();
+
+            // 3. Posición colgando inicial (ligeramente bajo el techo)
+            hangingPosition = ceilingPosition - new Vector3(0f, 0.6f, 0f);
+            transform.position = hangingPosition;
+            bottomPosition = hangingPosition - new Vector3(0f, dropDistance, 0f);
+
+            ConfigurarHilo();
+        }
+
+        private void CrearTelaranaTecho()
+        {
+            goTelaranaTecho = new GameObject("Telarana_Techo_Ancla");
+            goTelaranaTecho.transform.position = ceilingPosition;
+
+            var sr = goTelaranaTecho.AddComponent<SpriteRenderer>();
+            if (spriteTelaranaTecho == null)
+            {
+                spriteTelaranaTecho = Resources.Load<Sprite>("Telarana_Techo");
+#if UNITY_EDITOR
+                if (spriteTelaranaTecho == null)
+                {
+                    spriteTelaranaTecho = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Enemigos/Telarana_Techo.png");
+                }
+#endif
+            }
+
+            sr.sprite = spriteTelaranaTecho;
+            sr.sortingLayerName = Constantes.SortingLayers.Escenario;
+            sr.sortingOrder = 2;
+        }
+
+        private void ConfigurarHilo()
+        {
+            if (webLine == null)
+            {
+                webLine = GetComponent<LineRenderer>();
+                if (webLine == null) webLine = gameObject.AddComponent<LineRenderer>();
+            }
+
+            if (webLine != null)
+            {
+                webLine.positionCount = 2;
+                webLine.startWidth = 0.05f;
+                webLine.endWidth = 0.05f;
+                webLine.useWorldSpace = true;
+                webLine.sortingLayerName = Constantes.SortingLayers.Escenario;
+                webLine.sortingOrder = 1;
+
+                Material lineMat = new Material(Shader.Find("Sprites/Default"));
+                lineMat.color = new Color(0.85f, 0.85f, 0.9f, 0.85f);
+                webLine.material = lineMat;
+            }
+        }
+
+        private void LateUpdate()
+        {
+            // El hilo siempre conecta desde la telaraña en el techo hasta el lomo de la araña
+            if (webLine != null)
+            {
+                webLine.SetPosition(0, ceilingPosition);
+                webLine.SetPosition(1, transform.position + new Vector3(0f, 0.15f, 0f));
+            }
         }
 
         private void Update()
@@ -69,8 +150,6 @@ namespace ElMinero.Enemigos
                     ActualizarSubida();
                     break;
             }
-
-            ActualizarHilo();
         }
 
         private void VerificarPasoJugador()
@@ -119,31 +198,13 @@ namespace ElMinero.Enemigos
 
         private void ActualizarSubida()
         {
-            Vector3 target = new Vector3(initialPosition.x, initialPosition.y, transform.position.z);
+            Vector3 target = new Vector3(hangingPosition.x, hangingPosition.y, transform.position.z);
             transform.position = Vector3.MoveTowards(transform.position, target, riseSpeed * Time.deltaTime);
 
-            if (Vector3.Distance(transform.position, initialPosition) <= 0.05f)
+            if (Vector3.Distance(transform.position, hangingPosition) <= 0.05f)
             {
-                transform.position = initialPosition;
+                transform.position = hangingPosition;
                 currentState = SpiderState.Hanging;
-            }
-        }
-
-        private void ActualizarHilo()
-        {
-            if (webRenderer == null) return;
-
-            float currentDist = initialPosition.y - transform.position.y;
-            if (currentDist <= 0.05f)
-            {
-                webRenderer.enabled = false;
-            }
-            else
-            {
-                webRenderer.enabled = true;
-                // Posicionar el hilo a medio camino entre el techo y la araña
-                webRenderer.transform.position = new Vector3(initialPosition.x, initialPosition.y - (currentDist * 0.5f), transform.position.z);
-                webRenderer.size = new Vector2(webRenderer.size.x, currentDist);
             }
         }
 
@@ -151,13 +212,13 @@ namespace ElMinero.Enemigos
         {
             base.ResetObject();
             currentState = SpiderState.Hanging;
-            bottomPosition = initialPosition - new Vector3(0f, dropDistance, 0f);
-            ActualizarHilo();
+            transform.position = hangingPosition;
+            bottomPosition = hangingPosition - new Vector3(0f, dropDistance, 0f);
         }
 
         protected override void OnDrawGizmosSelected()
         {
-            Vector3 top = Application.isPlaying ? initialPosition : transform.position;
+            Vector3 top = Application.isPlaying ? ceilingPosition : transform.position;
             Vector3 bot = top - new Vector3(0f, dropDistance, 0f);
 
             Gizmos.color = Color.magenta;

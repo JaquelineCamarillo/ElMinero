@@ -142,6 +142,7 @@ namespace ElMinero.Editor
             AsignarLayer(layersProp, 9, Constantes.Layers.Jugador);
             AsignarLayer(layersProp, 10, Constantes.Layers.Peligro);
             AsignarLayer(layersProp, 11, Constantes.Layers.Coleccionable);
+            AsignarLayer(layersProp, 12, Constantes.Layers.Enemigo);
 
             // --- C) SORTING LAYERS ---
             SerializedProperty sortingLayersProp = tagManager.FindProperty("m_SortingLayers");
@@ -185,6 +186,13 @@ namespace ElMinero.Editor
             tagManager.ApplyModifiedProperties();
 
             // --- D) MATRIZ DE COLISIÃ“N 2D ---
+                        int layerEnemigo = LayerMask.NameToLayer(Constantes.Layers.Enemigo);
+            if (layerEnemigo != -1 && layerJugador != -1 && layerSuelo != -1)
+            {
+                // Enemigo colisiona con Jugador y Suelo, ignora Coleccionable
+                Physics2D.IgnoreLayerCollision(layerEnemigo, layerColeccionable, true);
+            }
+
             int layerColeccionable = LayerMask.NameToLayer(Constantes.Layers.Coleccionable);
             int layerJugador = LayerMask.NameToLayer(Constantes.Layers.Jugador);
 

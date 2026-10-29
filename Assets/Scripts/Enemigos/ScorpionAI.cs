@@ -1,13 +1,16 @@
 using UnityEngine;
 using ElMinero.Managers;
+using ElMinero.Utilidades;
 
 namespace ElMinero.Enemigos
 {
     /// <summary>
     /// IA del Alacrán (Nivel 3).
     /// Máquina de estados finita: Patrulla -> Persecución -> Ataque -> Enfriamiento.
-    /// Patrulla sin caerse de plataformas a 1.5 u/s. Persigue al jugador a 3.5 u/s si tiene línea de visión
-    /// (5 u horizontal, ±1 u vertical). A 1.3 u ejecuta ataque telegrafiado de 0.35 s con daño frontal.
+    /// Patrulla sin caerse de plataformas a 1.5 u/s con detección de suelo desde la base de sus patas
+    /// comprobando exclusivamente la capa Suelo.
+    /// Persigue al jugador a 3.5 u/s si tiene línea de visión (5 u horizontal, ±1 u vertical).
+    /// A 1.3 u ejecuta ataque telegrafiado de 0.35 s con daño frontal.
     /// </summary>
     public class ScorpionAI : EnemyBase
     {
@@ -48,12 +51,14 @@ namespace ElMinero.Enemigos
         private float stateTimer = 0f;
         private float loseSightTimer = 0f;
         private bool hasHitInCurrentAttack = false;
+        private Collider2D selfCollider;
 
         protected override void Awake()
         {
             base.Awake();
-            if (groundLayer.value == 0) groundLayer = LayerMask.GetMask("Suelo", "Default");
-            if (obstacleLayer.value == 0) obstacleLayer = LayerMask.GetMask("Suelo", "Default");
+            selfCollider = GetComponent<Collider2D>();
+            groundLayer = LayerMask.GetMask(Constantes.Layers.Suelo);
+            obstacleLayer = LayerMask.GetMask(Constantes.Layers.Suelo);
         }
 
         private void Update()
@@ -182,9 +187,9 @@ namespace ElMinero.Enemigos
         private void EjecutarGolpeFrontal()
         {
             Vector2 attackCenter = (Vector2)transform.position + new Vector2(facingDirection * 0.8f, 0.2f);
-            Collider2D hit = Physics2D.OverlapCircle(attackCenter, 0.6f, LayerMask.GetMask("Jugador", "Default"));
+            Collider2D hit = Physics2D.OverlapCircle(attackCenter, 0.6f, LayerMask.GetMask(Constantes.Layers.Jugador, "Default"));
 
-            if (hit != null && hit.CompareTag("Player"))
+            if (hit != null && hit.CompareTag(Constantes.Tags.Player))
             {
                 AplicarDanioAJugador(hit.gameObject);
             }
@@ -217,21 +222,26 @@ namespace ElMinero.Enemigos
             Vector2 dir = new Vector2(dx, 0f).normalized;
             RaycastHit2D hit = Physics2D.Raycast(origin, dir, Mathf.Abs(dx), obstacleLayer);
 
-            return (hit.collider == null || hit.collider.CompareTag("Player"));
+            return (hit.collider == null || hit.collider.CompareTag(Constantes.Tags.Player));
         }
 
         private bool HaySueloEnFrente()
         {
-            Vector2 checkPos = (Vector2)transform.position + new Vector2(facingDirection * 0.5f, 0.1f);
-            RaycastHit2D hit = Physics2D.Raycast(checkPos, Vector2.down, 0.6f, groundLayer);
-            return hit.collider != null;
+            // Disparar desde las patas (bounds.min.y + 0.05) hacia abajo exclusivamente a Suelo
+            float pieY = selfCollider != null ? selfCollider.bounds.min.y + 0.05f : transform.position.y - 0.2f;
+            Vector2 checkPos = new Vector2(transform.position.x + facingDirection * 0.45f, pieY);
+
+            RaycastHit2D hit = Physics2D.Raycast(checkPos, Vector2.down, 0.45f, groundLayer);
+            return hit.collider != null && hit.collider != selfCollider;
         }
 
         private bool HayParedEnFrente()
         {
-            Vector2 checkPos = (Vector2)transform.position + new Vector2(0f, 0.3f);
-            RaycastHit2D hit = Physics2D.Raycast(checkPos, new Vector2(facingDirection, 0f), 0.5f, obstacleLayer);
-            return hit.collider != null && !hit.collider.CompareTag("Player");
+            float centroY = selfCollider != null ? selfCollider.bounds.center.y : transform.position.y;
+            Vector2 checkPos = new Vector2(transform.position.x + (facingDirection * 0.15f), centroY);
+
+            RaycastHit2D hit = Physics2D.Raycast(checkPos, new Vector2(facingDirection, 0f), 0.45f, obstacleLayer);
+            return hit.collider != null && hit.collider != selfCollider && !hit.collider.CompareTag(Constantes.Tags.Player);
         }
 
         private void ActualizarOrientacionSprite()

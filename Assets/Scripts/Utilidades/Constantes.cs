@@ -30,11 +30,13 @@ namespace ElMinero.Utilidades
             public const string Jugador = "Jugador";
             public const string Peligro = "Peligro";
             public const string Coleccionable = "Coleccionable";
+            public const string Enemigo = "Enemigo";
 
             public static int MaskSuelo => LayerMask.GetMask(Suelo);
             public static int MaskJugador => LayerMask.GetMask(Jugador);
             public static int MaskPeligro => LayerMask.GetMask(Peligro);
             public static int MaskColeccionable => LayerMask.GetMask(Coleccionable);
+            public static int MaskEnemigo => LayerMask.GetMask(Enemigo);
         }
 
         // ====================================================================
@@ -56,22 +58,14 @@ namespace ElMinero.Utilidades
         // ====================================================================
         public static class Prefs
         {
-            public const string NombreJugador = "ElMinero_PlayerName";
-            public const string MejorPuntaje = "ElMinero_HighScore";
-            public const string NombrePorDefecto = "Refugio";
-        }
-
-        // ====================================================================
-        // NOMBRES DE ESCENAS
-        // ====================================================================
-        public static class Escenas
-        {
-            public const string MenuPrincipal = "MenuPrincipal";
-            public const string Nivel1 = "Nivel1_MinaRayas";
-            public const string Nivel2 = "Nivel2_ElNopal";
-            public const string Nivel3 = "Nivel3_LaValenciana";
-            public const string Victoria = "Victoria";
-            public const string Derrota = "Derrota";
+            public const string VolumenMaster = "VolumenMaster";
+            public const string VolumenMusica = "VolumenMusica";
+            public const string VolumenSFX = "VolumenSFX";
+            public const string PantallaCompleta = "PantallaCompleta";
+            public const string CalidadGrafica = "CalidadGrafica";
+            public const string NombreJugador = "NombreJugador";
+            public const string RecordPuntaje = "RecordPuntaje";
+            public const string NivelAlcanzado = "NivelAlcanzado";
         }
     }
 }
