@@ -8,7 +8,7 @@ using UnityEngine.Tilemaps;
 namespace ElMinero.Editor
 {
     /// <summary>
-    /// Configura automÃ¡ticamente la importaciÃ³n de todos los sprites del proyecto:
+    /// Configura automáticamente la importación de todos los sprites del proyecto:
     /// PPU = 16, Filter = Point, Compression = None, rebanado por celda con pivots exactos,
     /// 9-slice en UI, y genera los assets Tile para los Tilemaps.
     /// </summary>
@@ -16,10 +16,10 @@ namespace ElMinero.Editor
     {
         private const int StandardPPU = 16;
 
-        [MenuItem("Herramientas/El Minero/3. Configurar importaciÃ³n de sprites y crear Tile Palettes", priority = 30)]
+        [MenuItem("Herramientas/El Minero/3. Configurar importación de sprites y crear Tile Palettes", priority = 30)]
         public static void ConfigurarTodosLosSprites()
         {
-            EditorUtility.DisplayProgressBar("El Minero", "Configurando importaciÃ³n de sprites...", 0.1f);
+            EditorUtility.DisplayProgressBar("El Minero", "Configurando importación de sprites...", 0.1f);
 
             try
             {
@@ -32,7 +32,7 @@ namespace ElMinero.Editor
                 // 3. Sprites de Plataformas
                 ConfigurarSpritesPlataformas();
 
-                // 4. Sprites de ObstÃ¡culos
+                // 4. Sprites de Obstáculos
                 ConfigurarSpritesObstaculos();
 
                 // 5. Sprites de Enemigos
@@ -47,12 +47,12 @@ namespace ElMinero.Editor
                 // 8. Fondos Parallax (FullRect, Repeat)
                 ConfigurarFondos();
 
-                // 9. Tilesets y generaciÃ³n de Tile Assets
+                // 9. Tilesets y generación de Tile Assets
                 ConfigurarTilesetsYCrearTiles();
 
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
-                Debug.Log("[El Minero] Â¡Todos los sprites y tilesets configurados correctamente con PPU = 16 y filtros Point!");
+                Debug.Log("[El Minero] ¡Todos los sprites y tilesets configurados correctamente con PPU = 16 y filtros Point!");
             }
             finally
             {
@@ -125,7 +125,7 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // 4. OBSTÃCULOS
+        // 4. OBSTÁCULOS
         // ====================================================================
         private static void ConfigurarSpritesObstaculos()
         {
@@ -152,22 +152,22 @@ namespace ElMinero.Editor
             Vector2 pivotCenter = new Vector2(0.5f, 0.5f);
             Vector2 pivotBottomCenter = new Vector2(0.5f, 0.0f);
 
-            // MurciÃ©lago (16x16, 4 cuadros)
+            // Murciélago (16x16, 4 cuadros)
             SliceGrid("Assets/Sprites/Enemigos/Murcielago.png", 16, 16, pivotCenter, SpriteAlignment.Center);
 
-            // MurciÃ©lago Rojo (16x16, 4 cuadros)
+            // Murciélago Rojo (16x16, 4 cuadros)
             SliceGrid("Assets/Sprites/Enemigos/Murcielago_Rojo.png", 16, 16, pivotCenter, SpriteAlignment.Center);
 
-            // AraÃ±a (16x16, 3 cuadros)
+            // Araña (16x16, 3 cuadros)
             SliceGrid("Assets/Sprites/Enemigos/Arana.png", 16, 16, pivotCenter, SpriteAlignment.Center);
 
-            // Hilo de la AraÃ±a (2x16, Tiled FullRect)
+            // Hilo de la Araña (2x16, Tiled FullRect)
             ConfigurarTiledSprite("Assets/Sprites/Enemigos/Hilo_Arana.png", new Vector2(0.5f, 1.0f));
 
-            // AlacrÃ¡n Caminar (32x16, 4 cuadros)
+            // Alacrán Caminar (32x16, 4 cuadros)
             SliceGrid("Assets/Sprites/Enemigos/Alacran_Caminar.png", 32, 16, pivotBottomCenter, SpriteAlignment.BottomCenter);
 
-            // AlacrÃ¡n Ataque (32x16, 2 cuadros)
+            // Alacrán Ataque (32x16, 2 cuadros)
             SliceGrid("Assets/Sprites/Enemigos/Alacran_Ataque.png", 32, 16, pivotBottomCenter, SpriteAlignment.BottomCenter);
 
             // Vagoneta Desbocada (32x24, 2 cuadros)
@@ -188,7 +188,7 @@ namespace ElMinero.Editor
             SliceGrid("Assets/Sprites/Coleccionables/Veta_Plata.png", 16, 16, pivotCenter, SpriteAlignment.Center);
             SliceGrid("Assets/Sprites/Coleccionables/Gema_Amatista.png", 16, 16, pivotCenter, SpriteAlignment.Center);
 
-            // Checkpoint estÃ¡ndar: 2 cuadros de 16x32 (apagado y encendido)
+            // Checkpoint estándar: 2 cuadros de 16x32 (apagado y encendido)
             SliceGrid("Assets/Sprites/Coleccionables/Checkpoint.png", 16, 32, pivotBottomCenter, SpriteAlignment.BottomCenter);
 
             // Minerales distintivos (v2: 3 cuadros de 16x16 cada uno)
@@ -269,7 +269,7 @@ namespace ElMinero.Editor
             Configurar9Slice("Assets/Sprites/UI/Boton_Madera_Presionado.png", new Vector4(4, 4, 4, 4));
             Configurar9Slice("Assets/Sprites/UI/Boton_Madera_Resaltado.png", new Vector4(4, 4, 4, 4));
 
-            // BotÃ³n Nivel con borde 6
+            // Botón Nivel con borde 6
             Configurar9Slice("Assets/Sprites/UI/Boton_Nivel.png", new Vector4(6, 6, 6, 6));
             Configurar9Slice("Assets/Sprites/UI/Boton_Nivel_Resaltado.png", new Vector4(6, 6, 6, 6));
             Configurar9Slice("Assets/Sprites/UI/Boton_Nivel_Presionado.png", new Vector4(6, 6, 6, 6));
@@ -325,7 +325,7 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // 9. TILESETS (128x48 -> 24 tiles de 16x16) Y CREACIÃ“N DE TILES
+        // 9. TILESETS (128x48 -> 24 tiles de 16x16) Y CREACIÓN DE TILES
         // ====================================================================
         private static void ConfigurarTilesetsYCrearTiles()
         {
@@ -368,7 +368,7 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // HELPERS GENÃ‰RICOS DE IMPORTACIÃ“N Y SLICING
+        // HELPERS GENÉRICOS DE IMPORTACIÓN Y SLICING
         // ====================================================================
 
         public static void ConfigurarSingleSprite(string assetPath, Vector2 pivot)

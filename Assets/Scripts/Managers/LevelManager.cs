@@ -12,15 +12,15 @@ namespace ElMinero.Managers
 {
     /// <summary>
     /// Administrador central de la escena del nivel actual.
-    /// Coordina tiempo, coleccionables, vidas, reapariciÃ³n en checkpoints,
-    /// reinicio integral del nivel y finalizaciÃ³n exitosa.
+    /// Coordina tiempo, coleccionables, vidas, reaparición en checkpoints,
+    /// reinicio integral del nivel y finalización exitosa.
     /// </summary>
     public class LevelManager : MonoBehaviour
     {
         public static LevelManager Instance { get; private set; }
 
-        [Header("ConfiguraciÃ³n del Nivel")]
-        [Tooltip("Asset de configuraciÃ³n ScriptableObject para este nivel.")]
+        [Header("Configuración del Nivel")]
+        [Tooltip("Asset de configuración ScriptableObject para este nivel.")]
         [SerializeField] private LevelConfig levelConfig;
 
         [Header("Subsistemas y Componentes")]
@@ -36,8 +36,8 @@ namespace ElMinero.Managers
         [SerializeField] private GameOverPanel gameOverPanel;
         [SerializeField] private LevelStartCard levelStartCard;
 
-        [Header("Puntos de ApariciÃ³n")]
-        [Tooltip("PosiciÃ³n inicial del jugador.")]
+        [Header("Puntos de Aparición")]
+        [Tooltip("Posición inicial del jugador.")]
         [SerializeField] private Vector3 initialSpawnPoint;
 
         private Vector3 currentCheckpoint;
@@ -45,7 +45,7 @@ namespace ElMinero.Managers
 
         // Eventos C#
         public event Action<int> OnScoreUpdated;       // Notifica puntaje total combinado
-        public event Action<string> OnBonusEarned;      // Notifica bono obtenido ("Â¡Bono todas las vetas: +50!")
+        public event Action<string> OnBonusEarned;      // Notifica bono obtenido ("¡Bono todas las vetas: +50!")
 
         public LevelConfig Config => levelConfig;
         public LevelTimer Timer => timer;
@@ -164,7 +164,7 @@ namespace ElMinero.Managers
                 timer.OnTimeExpired += ManejarTiempoAgotado;
             }
 
-            // NotificaciÃ³n inicial de puntaje
+            // Notificación inicial de puntaje
             NotificarPuntaje();
         }
 
@@ -183,31 +183,36 @@ namespace ElMinero.Managers
 
             NotificarPuntaje();
 
-            // Mostrar tarjeta de inicio con datos histÃ³ricos si estÃ¡ configurada
+            // Mostrar tarjeta de inicio con datos históricos si está configurada
             if (levelStartCard != null)
             {
                 string scName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-                string minaNombre = "1 Â· Mina de Rayas";
-                string dato = "Mina de Rayas, descubierta en 1558 por Juan Rayas. Tiene el tiro mÃ¡s profundo de Guanajuato (425 m).";
-                Sprite miniatura = null;
+                string minaNombre = "1 · Mina de Rayas";
+                string dato = "Mina de Rayas. Descubierta hacia 1550 por el arriero Juan Rayas. Con unos 400 m de profundidad, llegó a considerarse de las más profundas de su tiempo. Los mineros bajaban y subían por su tiro con un malacate, cables y poleas.";
+                string archivoMiniatura = "Miniatura_MinaRayas";
 
                 if (scName.Contains("ElNopal"))
                 {
-                    minaNombre = "2 Â· El Nopal";
-                    dato = "El Nopal, mina de exploraciÃ³n iniciada en 1868. Hoy es la mina didÃ¡ctica de la Universidad de Guanajuato.";
+                    minaNombre = "2 · El Nopal";
+                    dato = "Mina El Nopal. Se trabaja desde 1868 y de ella se ha sacado plata, oro, zinc y cobre. En sus galerías hay una antigua capilla, y hoy la Universidad de Guanajuato la usa como mina-escuela.";
+                    archivoMiniatura = "Miniatura_ElNopal";
                 }
                 else if (scName.Contains("LaValenciana"))
                 {
-                    minaNombre = "3 Â· La Valenciana";
-                    dato = "La Valenciana, descubierta en 1760. LlegÃ³ a producir la quinta parte de la plata de todo el mundo.";
+                    minaNombre = "3 · La Valenciana";
+                    dato = "La Valenciana. En el siglo XVIII fue de las minas de plata más productivas del mundo. Su dueño, Antonio de Obregón, fue nombrado Conde de la Valenciana en 1780 y mandó construir el Templo de San Cayetano junto a la mina. En 1810 sus mineros se unieron a la toma de la Alhóndiga de Granaditas, y en 1817, durante la guerra, la maquinaria fue incendiada.";
+                    archivoMiniatura = "Miniatura_LaValenciana";
                 }
+
+                // La miniatura se carga desde Assets/Resources/Miniaturas/ para que funcione también en el build
+                Sprite miniatura = Resources.Load<Sprite>("Miniaturas/" + archivoMiniatura);
 
                 levelStartCard.ConfigurarYMostrar(scName, minaNombre, miniatura, dato);
             }
         }
 
         // ====================================================================
-        // GESTIÃ“N DE DAÃ‘O Y CHECKPOINTS
+        // GESTIÓN DE DAÑO Y CHECKPOINTS
         // ====================================================================
 
         public void EstablecerCheckpoint(Vector3 posicion)
@@ -218,13 +223,13 @@ namespace ElMinero.Managers
 
         private void ManejarVidaPerdida(int vidasRestantes)
         {
-            // Cortar racha de recolecciÃ³n
+            // Cortar racha de recolección
             if (streakSystem != null)
             {
                 streakSystem.CortarRachaPorDanio();
             }
 
-            // Si aÃºn le quedan vidas, reaparece en el Ãºltimo checkpoint
+            // Si aún le quedan vidas, reaparece en el último checkpoint
             if (vidasRestantes > 0)
             {
                 ReaparecerJugadorEnCheckpoint();
@@ -247,7 +252,7 @@ namespace ElMinero.Managers
 
         private void ManejarMuerte()
         {
-            Debug.Log("[El Minero] Â¡Sin vidas! Derrota.");
+            Debug.Log("[El Minero] ¡Sin vidas! Derrota.");
             if (timer != null) timer.Detener();
 
             if (gameOverPanel != null)
@@ -259,13 +264,13 @@ namespace ElMinero.Managers
             }
             else
             {
-                ReiniciarNivelCompleto("El derrumbe te venciÃ³. Sin vidas.");
+                ReiniciarNivelCompleto("El derrumbe te venció. Sin vidas.");
             }
         }
 
         private void ManejarTiempoAgotado()
         {
-            Debug.Log("[El Minero] Â¡Tiempo agotado! Derrota inmediata.");
+            Debug.Log("[El Minero] ¡Tiempo agotado! Derrota inmediata.");
             if (timer != null) timer.Detener();
 
             if (gameOverPanel != null)
@@ -273,16 +278,16 @@ namespace ElMinero.Managers
                 int gemas = collectibleManager != null ? collectibleManager.CollectedGems : 0;
                 int plata = collectibleManager != null ? collectibleManager.CollectedSilver : 0;
                 int score = GameManager.Instance != null ? GameManager.Instance.CurrentLevelScore : 0;
-                gameOverPanel.MostrarGameOver("Â¡El derrumbe te alcanzÃ³! Se acabÃ³ el tiempo.", gemas, plata, score);
+                gameOverPanel.MostrarGameOver("¡El derrumbe te alcanzó! Se acabó el tiempo.", gemas, plata, score);
             }
             else
             {
-                ReiniciarNivelCompleto("El tiempo se agotÃ³.");
+                ReiniciarNivelCompleto("El tiempo se agotó.");
             }
         }
 
         // ====================================================================
-        // COLECCIÃ“N Y PUNTAJE
+        // COLECCIÓN Y PUNTAJE
         // ====================================================================
 
         public void RecolectarVeta(SilverVein veta)
@@ -369,7 +374,7 @@ namespace ElMinero.Managers
 
 
         // ====================================================================
-        // SALIDA Y FINALIZACIÃ“N
+        // SALIDA Y FINALIZACIÓN
         // ====================================================================
 
         public void CompletarNivel()
@@ -384,13 +389,13 @@ namespace ElMinero.Managers
                 {
                     GameManager.Instance.AddScore(bono);
                 }
-                OnBonusEarned?.Invoke($"Â¡Bono todas las vetas: +{bono} pts!");
+                OnBonusEarned?.Invoke($"¡Bono todas las vetas: +{bono} pts!");
                 NotificarPuntaje();
             }
 
-            Debug.Log("[El Minero] Â¡Nivel completado exitosamente!");
+            Debug.Log("[El Minero] ¡Nivel completado exitosamente!");
 
-            // AnimaciÃ³n de celebraciÃ³n en el jugador
+            // Animación de celebración en el jugador
             if (playerController != null)
             {
                 var anim = playerController.GetComponent<PlayerAnimator>();

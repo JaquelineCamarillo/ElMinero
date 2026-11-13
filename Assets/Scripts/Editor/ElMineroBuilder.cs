@@ -24,8 +24,8 @@ using ElMinero.UI;
 namespace ElMinero.Editor
 {
     /// <summary>
-    /// Herramienta de automatizaciÃ³n y configuraciÃ³n completa para el proyecto "El Minero".
-    /// Accesible desde el menÃº superior: Herramientas > El Minero.
+    /// Herramienta de automatización y configuración completa para el proyecto "El Minero".
+    /// Accesible desde el menú superior: Herramientas > El Minero.
     /// </summary>
     public static class ElMineroBuilder
     {
@@ -89,7 +89,7 @@ namespace ElMinero.Editor
             }
 
             AssetDatabase.Refresh();
-            Debug.Log($"[El Minero] Carpetas verificadas/creadas con Ã©xito ({creadas} nuevas).");
+            Debug.Log($"[El Minero] Carpetas verificadas/creadas con éxito ({creadas} nuevas).");
         }
 
         // ====================================================================
@@ -185,7 +185,7 @@ namespace ElMinero.Editor
 
             tagManager.ApplyModifiedProperties();
 
-                        // --- D) MATRIZ DE COLISIÃ“N 2D ---
+                        // --- D) MATRIZ DE COLISIÓN 2D ---
             int layerSuelo = LayerMask.NameToLayer(Constantes.Layers.Suelo);
             int layerJugador = LayerMask.NameToLayer(Constantes.Layers.Jugador);
             int layerColeccionable = LayerMask.NameToLayer(Constantes.Layers.Coleccionable);
@@ -232,9 +232,9 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // 5. CREAR MATERIALES FÃSICOS Y LEVELCONFIGS
+        // 5. CREAR MATERIALES FÍSICOS Y LEVELCONFIGS
         // ====================================================================
-        [MenuItem(MenuRoot + "5. Crear materiales fÃ­sicos y LevelConfigs", priority = 50)]
+        [MenuItem(MenuRoot + "5. Crear materiales físicos y LevelConfigs", priority = 50)]
         public static void CrearMaterialesFisicosYConfigs()
         {
             string dirFisica = "Assets/Materiales/Fisica";
@@ -270,13 +270,13 @@ namespace ElMinero.Editor
             string dirConfigs = "Assets/Settings/Niveles";
             if (!Directory.Exists(dirConfigs)) Directory.CreateDirectory(dirConfigs);
 
-            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel1.asset"), "Nivel 1 â€” Mina Rayas", 1, 100f, 6, 2, "Aguilarita", "Aguilarita (Ag4SeS): mineral de plata y selenio descubierto en Guanajuato en 1891.", 4.0f, new Color(0.12f, 0.09f, 0.19f));
-            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel2.asset"), "Nivel 2 â€” El Nopal", 2, 120f, 8, 3, "Pepita de oro", "Pepita de oro nativo extraÃ­da de las profundidades de Guanajuato.", 3.0f, new Color(0.16f, 0.10f, 0.05f));
-            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel3.asset"), "Nivel 3 â€” La Valenciana", 3, 140f, 10, 4, "Pirargirita", "Pirargirita (Ag3SbS3, plata roja): mineral emblemÃ¡tico que enriqueciÃ³ a Guanajuato.", 2.2f, new Color(0.16f, 0.04f, 0.04f));
+            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel1.asset"), "Nivel 1 — Mina Rayas", 1, 100f, 6, 2, "Aguilarita", "Aguilarita (Ag4SeS): mineral de plata y selenio descubierto en Guanajuato en 1891.", 4.0f, new Color(0.12f, 0.09f, 0.19f));
+            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel2.asset"), "Nivel 2 — El Nopal", 2, 120f, 8, 3, "Pepita de oro", "Pepita de oro nativo extraída de las profundidades de Guanajuato.", 3.0f, new Color(0.16f, 0.10f, 0.05f));
+            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel3.asset"), "Nivel 3 — La Valenciana", 3, 140f, 10, 4, "Pirargirita", "Pirargirita (Ag3SbS3, plata roja): mineral emblemático que enriqueció a Guanajuato.", 2.2f, new Color(0.16f, 0.04f, 0.04f));
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("[El Minero] Materiales fÃ­sicos y LevelConfigs creados correctamente.");
+            Debug.Log("[El Minero] Materiales físicos y LevelConfigs creados correctamente.");
         }
 
         private static void CrearOActualizarLevelConfig(string path, string nombre, int index, float tiempo, int vetas, int gemas, string minNombre, string minDesc, float rocasIntervalo, Color bg, Sprite mini = null, string dato = "")
@@ -328,7 +328,7 @@ namespace ElMinero.Editor
             light2D.color = new Color(0.85f, 0.8f, 0.95f);
             AsignarCapasALuz2D(light2D);
 
-            // 2. Crear Grid y los 3 Tilemaps (Fondo, Suelo con Collider, DecoraciÃ³n)
+            // 2. Crear Grid y los 3 Tilemaps (Fondo, Suelo con Collider, Decoración)
             GameObject gridObj = new GameObject("Grid");
             var grid = gridObj.AddComponent<Grid>();
             grid.cellSize = new Vector3(1f, 1f, 0f);
@@ -340,7 +340,7 @@ namespace ElMinero.Editor
             var tmFondoRend = tmFondoObj.AddComponent<TilemapRenderer>();
             tmFondoRend.sortingLayerName = Constantes.SortingLayers.Fondo;
 
-            // Tilemap Suelo (con fÃ­sica)
+            // Tilemap Suelo (con física)
             int layerSuelo = LayerMask.NameToLayer(Constantes.Layers.Suelo);
             if (layerSuelo == -1) layerSuelo = 0;
 
@@ -360,7 +360,7 @@ namespace ElMinero.Editor
             var compCol = tmSueloObj.AddComponent<CompositeCollider2D>();
             compCol.geometryType = CompositeCollider2D.GeometryType.Polygons;
 
-            // Tilemap DecoraciÃ³n
+            // Tilemap Decoración
             GameObject tmDecoObj = new GameObject("Tilemap_Decoracion");
             tmDecoObj.transform.SetParent(gridObj.transform);
             var tmDeco = tmDecoObj.AddComponent<Tilemap>();
@@ -377,7 +377,7 @@ namespace ElMinero.Editor
             // 5. Plataforma flotante sobre el hueco (Plataforma_Fija)
             CrearPlataformaFlotante(new Vector3(0.5f, 0.5f, 0f), layerSuelo);
 
-            // 6. Elementos de ambientaciÃ³n (Marco con antorcha, vagoneta, poste con farol)
+            // 6. Elementos de ambientación (Marco con antorcha, vagoneta, poste con farol)
             CrearElementosEntorno();
 
             // 7. Checkpoint funcional (a la mitad del recorrido)
@@ -389,7 +389,7 @@ namespace ElMinero.Editor
             // 9. Coleccionables del nivel (4 vetas de plata y 1 gema de amatista)
             CrearColeccionablesCompletos();
 
-            // 10. ObstÃ¡culos y Eventos de Fase 3 (Rocas, Plataforma mÃ³vil, quebradiza, derrumbe y temblor)
+            // 10. Obstáculos y Eventos de Fase 3 (Rocas, Plataforma móvil, quebradiza, derrumbe y temblor)
             CrearObstaculosYEventosFase3(layerSuelo);
 
             // 11. Jugador (Minero a escala real 32x32 PPU=16, 2 unidades de alto, con vidas y etiqueta)
@@ -401,7 +401,7 @@ namespace ElMinero.Editor
             // 13. HUD Completo en Canvas
             ConfigurarHUDCanvas();
 
-            // 14. CÃ¡mara Cinemachine 3 y CÃ¡mara Principal
+            // 14. Cámara Cinemachine 3 y Cámara Principal
             ConfigurarCamara(jugadorObj);
 
             // Guardar la escena
@@ -410,18 +410,18 @@ namespace ElMinero.Editor
             AssetDatabase.Refresh();
 
             Debug.Log($"[El Minero] Escena completa generada en: {pathEscena}");
-            EditorUtility.DisplayDialog("El Minero â€” Sistemas y Terreno Listos",
-                "Â¡Escena construida con Ã©xito!\n\n" +
-                "âœ“ Terreno construido con Tilemap oficial de Mina Rayas.\n" +
-                "âœ“ Minero a escala correcta (PPU=16, 2 unidades de alto).\n" +
-                "âœ“ FÃ­sicas exactas (5 u/s, salto 2.5 u).\n" +
-                "âœ“ 3 Corazones de vida y reapariciÃ³n en Checkpoint.\n" +
-                "âœ“ Reloj con cuenta regresiva y parpadeo rojo en Ãºltimos 10s.\n" +
-                "âœ“ 4 Vetas de plata (+10) y 1 Gema (+25).\n" +
-                "âœ“ Racha de recolecciÃ³n: 3 coleccionables activan x2 por 10s.\n" +
-                "âœ“ Salida del nivel con bono de +50 si juntas toda la plata.\n" +
-                "âœ“ Reinicio automÃ¡tico al perder vidas o tiempo.\n\n" +
-                "Presiona Play para probarla.", "Â¡A jugar!");
+            EditorUtility.DisplayDialog("El Minero — Sistemas y Terreno Listos",
+                "¡Escena construida con éxito!\n\n" +
+                "✓ Terreno construido con Tilemap oficial de Mina Rayas.\n" +
+                "✓ Minero a escala correcta (PPU=16, 2 unidades de alto).\n" +
+                "✓ Físicas exactas (5 u/s, salto 2.5 u).\n" +
+                "✓ 3 Corazones de vida y reaparición en Checkpoint.\n" +
+                "✓ Reloj con cuenta regresiva y parpadeo rojo en últimos 10s.\n" +
+                "✓ 4 Vetas de plata (+10) y 1 Gema (+25).\n" +
+                "✓ Racha de recolección: 3 coleccionables activan x2 por 10s.\n" +
+                "✓ Salida del nivel con bono de +50 si juntas toda la plata.\n" +
+                "✓ Reinicio automático al perder vidas o tiempo.\n\n" +
+                "Presiona Play para probarla.", "¡A jugar!");
         }
 
         private static void ConstruirTerrenoMinaRayas(Tilemap tmSuelo, Tilemap tmDeco)
@@ -452,7 +452,7 @@ namespace ElMinero.Editor
                 tmSuelo.SetTile(new Vector3Int(x, -4, 0), t9);
             }
 
-            // B) Hueco letal: X entre -1 y +2 queda vacÃ­o
+            // B) Hueco letal: X entre -1 y +2 queda vacío
 
             // C) Suelo derecho (X de +3 a +18, Y de -2 a -4)
             for (int x = 3; x <= 18; x++)
@@ -514,7 +514,7 @@ namespace ElMinero.Editor
                 compCol.GenerateGeometry();
                 if (compCol.pathCount == 0)
                 {
-                    Debug.LogWarning($"[ElMineroBuilder] CompositeCollider2D en '{tm.name}' tiene 0 caminos. Usando colisiÃ³n directa en TilemapCollider2D.");
+                    Debug.LogWarning($"[ElMineroBuilder] CompositeCollider2D en '{tm.name}' tiene 0 caminos. Usando colisión directa en TilemapCollider2D.");
                     tmCol.compositeOperation = Collider2D.CompositeOperation.None;
                     UnityEngine.Object.DestroyImmediate(compCol);
                 }
@@ -622,7 +622,7 @@ namespace ElMinero.Editor
             luzCp.pointLightInnerRadius = 0.5f;
             luzCp.pointLightOuterRadius = 3f;
             luzCp.intensity = 1.2f;
-            luzCp.color = new Color(0.4f, 0.9f, 1f); // Azul mÃ­stico al encender
+            luzCp.color = new Color(0.4f, 0.9f, 1f); // Azul místico al encender
             luzCp.enabled = false;
             AsignarCapasALuz2D(luzCp);
 
@@ -972,7 +972,7 @@ namespace ElMinero.Editor
         {
             GameObject camObj = new GameObject("Main Camera");
             camObj.tag = "MainCamera";
-            camObj.transform.position = new Vector3(-7f, 1.5f, -10f); // PosiciÃ³n Z = -10 fundamental para 2D
+            camObj.transform.position = new Vector3(-7f, 1.5f, -10f); // Posición Z = -10 fundamental para 2D
             var cam = camObj.AddComponent<Camera>();
             cam.orthographic = true;
             cam.orthographicSize = 5.5f;
@@ -998,7 +998,7 @@ namespace ElMinero.Editor
             vcam.Lens.NearClipPlane = 0.1f;
             vcam.Lens.FarClipPlane = 100f;
 
-            // CinemachineFollow mantiene la cÃ¡mara exactamente en Z = -10 para vista 2D sin recortar sprites
+            // CinemachineFollow mantiene la cámara exactamente en Z = -10 para vista 2D sin recortar sprites
             var follow = vcamObj.AddComponent<CinemachineFollow>();
             follow.FollowOffset = new Vector3(0f, 1f, -10f);
             follow.TrackerSettings.PositionDamping = new Vector3(0.3f, 0.3f, 0f);
@@ -1049,7 +1049,7 @@ namespace ElMinero.Editor
             rockTemplate.SetActive(false);
             warnTemplate.SetActive(false);
 
-            // 2. Plataforma MÃ³vil horizontal (MovingPlatform)
+            // 2. Plataforma Móvil horizontal (MovingPlatform)
             GameObject platMovil = new GameObject("Plataforma_Movil");
             platMovil.layer = layerSuelo;
             platMovil.transform.position = new Vector3(0.5f, -0.5f, 0f);
@@ -1120,11 +1120,11 @@ namespace ElMinero.Editor
 
             SerializedObject soCi = new SerializedObject(caveIn);
             soCi.FindProperty("blockObject").objectReferenceValue = bloqueComp;
-            soCi.FindProperty("blockDropPosition").vector3Value = new Vector3(7f, -0.5f, 0f); // Bloquea el camino detrÃ¡s
+            soCi.FindProperty("blockDropPosition").vector3Value = new Vector3(7f, -0.5f, 0f); // Bloquea el camino detrás
             soCi.FindProperty("impulseSource").objectReferenceValue = impulseSource;
             soCi.ApplyModifiedProperties();
 
-            // 5. Temblor periÃ³dico de mina (MineTremor) cada 20-25s
+            // 5. Temblor periódico de mina (MineTremor) cada 20-25s
             GameObject tremorObj = new GameObject("[MineTremor]");
             tremorObj.AddComponent<CinemachineImpulseSource>();
             tremorObj.AddComponent<MineTremor>();
@@ -1216,16 +1216,16 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
-        // â˜… CONSTRUIR TODO (OPCIÃ“N DEFINITIVA)
+        // ★ CONSTRUIR TODO (OPCIÓN DEFINITIVA)
         // ====================================================================
-        [MenuItem(MenuRoot + "â˜… Construir TODO", priority = 0)]
+        [MenuItem(MenuRoot + "★ Construir TODO", priority = 0)]
         public static void ConstruirTodoElProyecto()
         {
             EditorUtility.DisplayProgressBar("El Minero", "Construyendo todo el proyecto...", 0.05f);
 
             try
             {
-                Debug.Log("[El Minero] === INICIANDO CONSTRUCCIÃ“N COMPLETA ===");
+                Debug.Log("[El Minero] === INICIANDO CONSTRUCCIÓN COMPLETA ===");
 
                 // 1. Crear carpetas
                 CrearCarpetas();
@@ -1240,7 +1240,7 @@ namespace ElMinero.Editor
                 AudioLibraryBuilder.GenerarAudioLibrary();
                 EditorUtility.DisplayProgressBar("El Minero", "3/10 AudioMixer y AudioLibrary...", 0.30f);
 
-                // 4. Configurar importaciÃ³n de sprites y tilesets
+                // 4. Configurar importación de sprites y tilesets
                 SpriteImportSetup.ConfigurarTodosLosSprites();
                 EditorUtility.DisplayProgressBar("El Minero", "4/10 Sprites y Tilesets...", 0.40f);
 
@@ -1253,9 +1253,9 @@ namespace ElMinero.Editor
                 UIPrefabBuilder.CrearTodosLosPrefabsUI();
                 EditorUtility.DisplayProgressBar("El Minero", "6/10 UI y Fuentes...", 0.60f);
 
-                // 7. Crear materiales fÃ­sicos y LevelConfigs
+                // 7. Crear materiales físicos y LevelConfigs
                 CrearMaterialesFisicosYConfigs();
-                EditorUtility.DisplayProgressBar("El Minero", "7/10 FÃ­sicas y Configs...", 0.70f);
+                EditorUtility.DisplayProgressBar("El Minero", "7/10 Físicas y Configs...", 0.70f);
 
                 // 8. Crear Prefabs de juego
                 PrefabGenerator.CrearTodosLosPrefabs();

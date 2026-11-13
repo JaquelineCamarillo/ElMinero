@@ -144,7 +144,7 @@ namespace ElMinero.UI
                 textoPlata.text = bono ? $"Plata: {plataRecolectada} / {totalPlata} <color=#FFD700>¡+50 BONO!</color>" : $"Plata: {plataRecolectada} / {totalPlata}";
             }
             if (textoTiempo != null) textoTiempo.text = $"Tiempo restante: {tiempoRestante:F1}s";
-            if (textoVidas != null) textoVidas.text = $"Vidas restantes: {vidasRestantes} ♥";
+            if (textoVidas != null) textoVidas.text = $"Vidas restantes: {vidasRestantes}";
             if (textoPuntajeNivel != null) textoPuntajeNivel.text = $"Puntos del nivel: {puntajeNivel:N0}";
 
             int p1 = PlayerPrefs.GetInt("MejorPuntaje_Nivel1_MinaRayas", 0);
