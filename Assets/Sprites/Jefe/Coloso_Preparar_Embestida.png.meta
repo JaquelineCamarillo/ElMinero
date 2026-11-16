@@ -108,19 +108,19 @@ TextureImporter:
       name: Coloso_Preparar_Embestida_0
       rect:
         serializedVersion: 2
-        x: 8
+        x: 0
         y: 0
-        width: 54
-        height: 54
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 9b514de9157bf29a0800000000000000
+      spriteID: 17af6f18a2f041248827caa57dfad78a
       internalID: -6255579796209396295
       vertices: []
       indices: 
@@ -130,19 +130,19 @@ TextureImporter:
       name: Coloso_Preparar_Embestida_1
       rect:
         serializedVersion: 2
-        x: 73
+        x: 64
         y: 0
-        width: 54
-        height: 53
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 4f395a72019489330800000000000000
+      spriteID: ef5940cebee0c3144b682edd0d413afc
       internalID: 3717801826127811572
       vertices: []
       indices: 
@@ -152,7 +152,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: d70ce4ab2e34ef5499000f7a4accbcaa
     internalID: 0
     vertices: []
     indices: 

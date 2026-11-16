@@ -1,0 +1,29 @@
+EL MINERO
+Juego de plataformas 2D en pixel art ambientado en las minas de Guanajuato.
+
+HISTORIA
+Eres un minero atrapado en las minas de Guanajuato. La mina se está derrumbando:
+recorre la Mina de Rayas, El Nopal y La Valenciana, junta la plata y las gemas,
+vence al Coloso de Plata Roja y sal a la superficie junto al Templo de San Cayetano
+para repartir el tesoro entre la gente del pueblo.
+
+CONTROLES
+- Flechas o A / D: moverse
+- Espacio o W: saltar
+- Esc: pausa
+- En celular: botones en pantalla
+
+CARACTERÍSTICAS
+- 3 niveles inspirados en minas reales de Guanajuato, con datos históricos de cada una.
+- Plataformas, derrumbes, rocas que caen, murciélagos, arañas y alacranes.
+- Racha x2 al juntar coleccionables seguidos, estrellas y récords por nivel.
+- Jefe final: el Coloso de Plata Roja.
+- Escena final en el Templo de San Cayetano.
+
+CRÉDITOS
+Diseño y desarrollo: Juana Jaqueline Camarillo Oláez
+Universidad Tecnológica del Norte de Guanajuato (UTNG)
+GIDS6102-E - Creación de Videojuegos
+Hecho con Unity 6.
+
+Código fuente: https://github.com/JaquelineCamarillo/ElMinero

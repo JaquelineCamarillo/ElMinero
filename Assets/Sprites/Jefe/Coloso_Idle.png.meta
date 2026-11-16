@@ -114,19 +114,19 @@ TextureImporter:
       name: Coloso_Idle_0
       rect:
         serializedVersion: 2
-        x: 4
+        x: 0
         y: 0
-        width: 54
-        height: 57
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 518fe03d95f2fe020800000000000000
+      spriteID: aadff405d741ff042aa7e61624855f54
       internalID: 2373167591487109141
       vertices: []
       indices: 
@@ -136,19 +136,19 @@ TextureImporter:
       name: Coloso_Idle_1
       rect:
         serializedVersion: 2
-        x: 68
+        x: 64
         y: 0
-        width: 54
-        height: 57
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 863ee96b0f23c27a0800000000000000
+      spriteID: 3ab441aba55f84b45ba643f6afd5cbe9
       internalID: -6400684960962911384
       vertices: []
       indices: 
@@ -158,19 +158,19 @@ TextureImporter:
       name: Coloso_Idle_2
       rect:
         serializedVersion: 2
-        x: 132
+        x: 128
         y: 0
-        width: 54
-        height: 56
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 18b10f5afbd6e05f0800000000000000
+      spriteID: c40a9bc7970e5a8469be7ad37007973c
       internalID: -788572214853100671
       vertices: []
       indices: 
@@ -180,19 +180,19 @@ TextureImporter:
       name: Coloso_Idle_3
       rect:
         serializedVersion: 2
-        x: 196
+        x: 192
         y: 0
-        width: 54
-        height: 56
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 850566bf28751bc40800000000000000
+      spriteID: a0dab0d6dab97514baf132e0b6db0fac
       internalID: 5526294437835460696
       vertices: []
       indices: 
@@ -202,7 +202,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 1bf640c782018574c91bbc5a95f06ebd
     internalID: 0
     vertices: []
     indices: 

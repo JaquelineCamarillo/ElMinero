@@ -107,18 +107,40 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 32
+        width: 16
         height: 48
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: f41c6c3750ecf3340800000000000000
+      spriteID: aa552dc968928db4c824168560322472
       internalID: 4845818246886506831
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Farol_Plaza_1
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 0
+        width: 16
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1f0132ed81f38b640b65a6e60d55ffff
+      internalID: 1307526934
       vertices: []
       indices: 
       edges: []
@@ -127,7 +149,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: d877910b04f9acf44b2f5a6dcd246abb
     internalID: 0
     vertices: []
     indices: 
@@ -138,6 +160,7 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       Farol_Plaza_0: 4845818246886506831
+      Farol_Plaza_1: 1307526934
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -114,19 +114,19 @@ TextureImporter:
       name: Castillete_Tiro_0
       rect:
         serializedVersion: 2
-        x: 2
+        x: 0
         y: 0
-        width: 78
+        width: 80
         height: 96
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: bacb5330daffb1e30800000000000000
+      spriteID: e0c59d8c5f008df4eb3314d17b6e9dbd
       internalID: 4475451773270998187
       vertices: []
       indices: 
@@ -136,19 +136,19 @@ TextureImporter:
       name: Castillete_Tiro_1
       rect:
         serializedVersion: 2
-        x: 82
+        x: 80
         y: 0
-        width: 78
+        width: 80
         height: 96
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 1f4180ae0567f0b20800000000000000
+      spriteID: f73d7fb0957d2084ca2ade29aa866fb3
       internalID: 3102828758177420529
       vertices: []
       indices: 
@@ -158,19 +158,19 @@ TextureImporter:
       name: Castillete_Tiro_2
       rect:
         serializedVersion: 2
-        x: 162
+        x: 160
         y: 0
-        width: 78
+        width: 80
         height: 96
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 432aa8d554cb81610800000000000000
+      spriteID: 716efa7737dab0148965a54864a6fe57
       internalID: 1592229474383602228
       vertices: []
       indices: 
@@ -180,19 +180,19 @@ TextureImporter:
       name: Castillete_Tiro_3
       rect:
         serializedVersion: 2
-        x: 242
+        x: 240
         y: 0
-        width: 78
+        width: 80
         height: 96
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: b1702158dd28591f0800000000000000
+      spriteID: 8e24ad5a978026342991a932ba42a97e
       internalID: -1038780251107096805
       vertices: []
       indices: 
@@ -202,7 +202,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 615e3c99431f93a44bf20c441d00c4a6
     internalID: 0
     vertices: []
     indices: 

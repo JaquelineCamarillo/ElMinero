@@ -100,7 +100,7 @@ namespace ElMinero.UI
                 {
                     if (estaDesbloqueado && (mejorPuntaje > 0 || mejorTiempo > 0f))
                     {
-                        tarjeta.textoRecord.text = $"Récord: {mejorPuntaje:N0} pts | {mejorTiempo:F1}s";
+                        tarjeta.textoRecord.text = $"Récord: {mejorPuntaje:N0} pts\nMejor tiempo: {mejorTiempo:F1}s";
                     }
                     else if (estaDesbloqueado)
                     {

@@ -24,7 +24,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Nivel3_LaValenciana.unity
     guid: 99754bb28952bfb499faa9bafaffa8da
   - enabled: 1
-    path: Assets/Scenes/Final.unity
-    guid: 768f4a7c5f335f043957ef8bd8dbdb97
+    path: Assets/Scenes/Final_Templo.unity
+    guid: a11ca8c425c66c743918a7b793a72a55
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

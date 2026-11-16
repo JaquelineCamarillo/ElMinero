@@ -133,7 +133,7 @@ BoxCollider2D:
   m_Offset: {x: 0, y: -0.4}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
+    pivot: {x: 0.5, y: 0}
     oldSize: {x: 3, y: 1.5}
     newSize: {x: 3, y: 1.5}
     adaptiveTilingThreshold: 0.5
@@ -183,14 +183,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Plataformas.MineElevator
   bottomPoint: {x: 0, y: 0, z: 0}
   topPoint: {x: 0, y: 8, z: 0}
-  speed: 2.4
+  speed: 3
   delaySubida: 0.5
   delayBajada: 3
-  malacateWheel: {fileID: 6546380517950550633}
-  cableAnchorPoint: {fileID: 0}
-  cableLine: {fileID: 0}
-  wheelRotationSpeed: 180
+  anchoJaula: 3
+  ruedaCastillete: {fileID: 0}
+  centroRueda: {fileID: 0}
+  cable: {fileID: 0}
+  altoJaula: 1.25
+  rocasDelTiro: {fileID: 0}
   loopAudioSource: {fileID: 0}
+  malacateWheel: {fileID: 6546380517950550633}
 --- !u!1 &4059862354466533254
 GameObject:
   m_ObjectHideFlags: 0

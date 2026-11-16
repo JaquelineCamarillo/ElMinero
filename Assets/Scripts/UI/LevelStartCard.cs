@@ -50,7 +50,7 @@ namespace ElMinero.UI
 #endif
         }
 
-        public void ConfigurarYMostrar(string nombreEscena, string nombreMina, Sprite miniatura, string datoHistorico, string objetivo = "Sube a la siguiente mina antes de que el derrumbe te alcance.")
+        public void ConfigurarYMostrar(string nombreEscena, string nombreMina, Sprite miniatura, string datoHistorico, string objetivo = "Objetivo: sube a la siguiente mina antes de que el derrumbe te alcance.")
         {
             nombreEscenaActual = nombreEscena;
 

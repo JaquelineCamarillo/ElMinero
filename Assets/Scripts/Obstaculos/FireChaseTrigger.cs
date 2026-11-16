@@ -4,35 +4,49 @@ using ElMinero.Utilidades;
 namespace ElMinero.Obstaculos
 {
     /// <summary>
-    /// Trigger que activa el muro de fuego perseguidor cuando el minero entra en los últimos 35 tiles de La Valenciana.
+    /// Trigger "X" del mapa del nivel 3 (x = 187, después del jefe).
+    /// Cuando el jugador lo cruza, el muro de fuego aparece detrás de él.
+    /// Si el muro alcanza al jugador, el muro se apaga y este trigger se rearma.
     /// </summary>
+    [RequireComponent(typeof(Collider2D))]
     public class FireChaseTrigger : MonoBehaviour, IResettable
     {
         [SerializeField] private FireWallChase targetFireWall;
-        private bool isTriggered = false;
+        private bool armado = true;
+
+        public bool Armado => armado;
 
         public void Configurar(FireWallChase fireWall)
         {
             targetFireWall = fireWall;
         }
 
+        private void Awake()
+        {
+            var col = GetComponent<Collider2D>();
+            if (col != null) col.isTrigger = true;
+        }
+
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (isTriggered) return;
+            if (!armado) return;
+            if (!other.CompareTag(Constantes.Tags.Player)) return;
 
-            if (other.CompareTag(Constantes.Tags.Player))
+            armado = false;
+            if (targetFireWall != null)
             {
-                isTriggered = true;
-                if (targetFireWall != null)
-                {
-                    targetFireWall.IniciarPersecucion();
-                }
+                targetFireWall.Activar(other.transform);
             }
+        }
+
+        public void Rearmar()
+        {
+            armado = true;
         }
 
         public void ResetObject()
         {
-            isTriggered = false;
+            armado = true;
         }
     }
 }

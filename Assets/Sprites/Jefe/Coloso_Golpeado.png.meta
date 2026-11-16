@@ -105,19 +105,19 @@ TextureImporter:
       name: Coloso_Golpeado_0
       rect:
         serializedVersion: 2
-        x: 6
+        x: 0
         y: 0
-        width: 50
-        height: 53
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 43ac86a8260ccb8d0800000000000000
+      spriteID: 61229ef158f283b4bb8a17c9bd3db130
       internalID: -2829174936434062796
       vertices: []
       indices: 
@@ -127,7 +127,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 665963e5366770d4b87303f247f616bd
     internalID: 0
     vertices: []
     indices: 

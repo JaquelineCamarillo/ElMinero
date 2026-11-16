@@ -114,19 +114,19 @@ TextureImporter:
       name: Coloso_Caminar_0
       rect:
         serializedVersion: 2
-        x: 4
+        x: 0
         y: 0
-        width: 54
-        height: 57
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: f5ee55073a5b31910800000000000000
+      spriteID: 8591962b882d8d443ad0ac7f75547454
       internalID: 1806987589074677343
       vertices: []
       indices: 
@@ -136,19 +136,19 @@ TextureImporter:
       name: Coloso_Caminar_1
       rect:
         serializedVersion: 2
-        x: 68
+        x: 64
         y: 0
-        width: 54
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 371fb0529b8b53a30800000000000000
+      spriteID: 136bd66e38550234a962c6b396a875ed
       internalID: 4194461733295485299
       vertices: []
       indices: 
@@ -158,19 +158,19 @@ TextureImporter:
       name: Coloso_Caminar_2
       rect:
         serializedVersion: 2
-        x: 132
+        x: 128
         y: 0
-        width: 54
-        height: 57
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 2ac4a67598d9afce0800000000000000
+      spriteID: bc681a03e37a8dc4b9ed2f13392622e9
       internalID: -1370609923378230110
       vertices: []
       indices: 
@@ -180,19 +180,19 @@ TextureImporter:
       name: Coloso_Caminar_3
       rect:
         serializedVersion: 2
-        x: 196
+        x: 192
         y: 0
-        width: 54
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: c845deddddc301110800000000000000
+      spriteID: ff8f96dfda530d64eb2c45e793be3f0a
       internalID: 1229549621880902796
       vertices: []
       indices: 
@@ -202,7 +202,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 1e0c88e78f94c63469afddb59a284c80
     internalID: 0
     vertices: []
     indices: 

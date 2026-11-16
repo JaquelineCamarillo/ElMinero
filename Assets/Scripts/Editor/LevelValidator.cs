@@ -90,6 +90,11 @@ namespace ElMinero.Editor
                     }
                 }
 
+                if (escenaPath.Contains("Nivel3"))
+                {
+                    ValidarNivel3ContraMapa();
+                }
+
                 if (corregidosEnEscena > 0)
                 {
                     EditorSceneManager.SaveScene(scene);
@@ -99,6 +104,42 @@ namespace ElMinero.Editor
             }
 
             Debug.Log($"[LevelValidator] ¡Validación completada! Total de correcciones realizadas: {totalCorregidos}.");
+        }
+
+        /// <summary>
+        /// Comprueba que la escena del nivel 3 tenga exactamente lo que dice Mapa_Nivel3.txt.
+        /// </summary>
+        private static void ValidarNivel3ContraMapa()
+        {
+            TextAsset txt = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/Settings/Niveles/Mapa_Nivel3.txt");
+            if (txt == null)
+            {
+                Debug.LogWarning("[LevelValidator] Nivel 3: no se encontró Mapa_Nivel3.txt.");
+                return;
+            }
+            var mapa = LevelBuilder.LeerMapa(txt);
+            int vetasMapa = mapa.Buscar('v').Count;
+            int gemasMapa = mapa.Buscar('g').Count;
+            int cpMapa = mapa.Buscar('C').Count;
+
+            int vetas = Object.FindObjectsByType<SilverVein>(FindObjectsSortMode.None).Length;
+            int gemas = Object.FindObjectsByType<AmethystGem>(FindObjectsSortMode.None).Length;
+            int cps = Object.FindObjectsByType<Checkpoint>(FindObjectsSortMode.None).Length;
+            int jefes = Object.FindObjectsByType<ElMinero.Jefe.BossColoso>(FindObjectsSortMode.None).Length;
+            int elevadores = Object.FindObjectsByType<ElMinero.Plataformas.MineElevator>(FindObjectsSortMode.None).Length;
+            int muros = Object.FindObjectsByType<ElMinero.Obstaculos.FireWallChase>(FindObjectsSortMode.None).Length;
+            int fuegosEstaticos = Object.FindObjectsByType<ElMinero.Obstaculos.FireHazard>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length;
+
+            bool ok = true;
+            if (vetas != vetasMapa) { ok = false; Debug.LogWarning($"[LevelValidator] Nivel 3: {vetas} vetas en escena, {vetasMapa} en el mapa."); }
+            if (gemas != gemasMapa) { ok = false; Debug.LogWarning($"[LevelValidator] Nivel 3: {gemas} gemas en escena, {gemasMapa} en el mapa."); }
+            if (cps != cpMapa) { ok = false; Debug.LogWarning($"[LevelValidator] Nivel 3: {cps} checkpoints en escena, {cpMapa} en el mapa."); }
+            if (jefes != 1) { ok = false; Debug.LogWarning($"[LevelValidator] Nivel 3: se esperaba 1 jefe y hay {jefes}."); }
+            if (elevadores != 1) { ok = false; Debug.LogWarning($"[LevelValidator] Nivel 3: se esperaba 1 elevador y hay {elevadores}."); }
+            if (muros != 1) { ok = false; Debug.LogWarning($"[LevelValidator] Nivel 3: se esperaba 1 muro de fuego y hay {muros}."); }
+            if (fuegosEstaticos != 0) { ok = false; Debug.LogWarning($"[LevelValidator] Nivel 3: quedan {fuegosEstaticos} FireHazard estáticos."); }
+
+            if (ok) Debug.Log($"[LevelValidator] Nivel 3 coincide con el mapa: {vetas} vetas, {gemas} gemas, {cps} checkpoints, jefe, elevador y muro de fuego.");
         }
     }
 }

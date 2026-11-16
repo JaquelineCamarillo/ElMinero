@@ -107,18 +107,40 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 128
+        width: 64
         height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 2
+      pivot: {x: 0.5, y: 1}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 798a6e217c614d440800000000000000
+      spriteID: 9650b77f4e7792f44a0281a2df42e738
       internalID: 4959614133913168023
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Papel_Picado_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 64
+        height: 16
+      alignment: 2
+      pivot: {x: 0.5, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d2550cca4b083a74ca4f7d40c10496b9
+      internalID: -883211924
       vertices: []
       indices: 
       edges: []
@@ -127,7 +149,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 3d8bbd5a624dd0b4bb6777a8cb0fa402
     internalID: 0
     vertices: []
     indices: 
@@ -138,6 +160,7 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       Papel_Picado_0: 4959614133913168023
+      Papel_Picado_1: -883211924
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

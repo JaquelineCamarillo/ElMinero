@@ -117,19 +117,19 @@ TextureImporter:
       name: Coloso_Derrota_0
       rect:
         serializedVersion: 2
-        x: 6
+        x: 0
         y: 0
-        width: 50
-        height: 53
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 1ee0cca0a89c0cd60800000000000000
+      spriteID: 68c3ad54ef544da48a8732a1599a2728
       internalID: 7908542540386406113
       vertices: []
       indices: 
@@ -139,19 +139,19 @@ TextureImporter:
       name: Coloso_Derrota_1
       rect:
         serializedVersion: 2
-        x: 70
+        x: 64
         y: 0
-        width: 50
-        height: 46
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 33e2a0128d3cf11b0800000000000000
+      spriteID: 1efcb8410d04fd448bfe547e40a819ae
       internalID: -5683608871683609037
       vertices: []
       indices: 
@@ -161,19 +161,19 @@ TextureImporter:
       name: Coloso_Derrota_2
       rect:
         serializedVersion: 2
-        x: 133
+        x: 128
         y: 0
-        width: 54
-        height: 33
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 7ed0b4f8c0534ded0800000000000000
+      spriteID: 271b8e08f226aad4582d45782a591ccd
       internalID: -2390227174166950425
       vertices: []
       indices: 
@@ -183,19 +183,19 @@ TextureImporter:
       name: Coloso_Derrota_3
       rect:
         serializedVersion: 2
-        x: 197
+        x: 192
         y: 0
-        width: 54
-        height: 24
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: ae2338ecb9300bef0800000000000000
+      spriteID: 7bd7a27cf9bafbb44bc74b909ea76d7e
       internalID: -94571624455261462
       vertices: []
       indices: 
@@ -205,19 +205,19 @@ TextureImporter:
       name: Coloso_Derrota_4
       rect:
         serializedVersion: 2
-        x: 261
+        x: 256
         y: 0
-        width: 54
-        height: 20
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 76aa0ae9c47615eb0800000000000000
+      spriteID: c471d1c9405da6843a40e1d6b7437dae
       internalID: -4732888154613175705
       vertices: []
       indices: 
@@ -227,7 +227,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 4e47cbaa01b3dcf40be29b7ce09c3925
     internalID: 0
     vertices: []
     indices: 

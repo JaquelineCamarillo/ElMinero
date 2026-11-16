@@ -271,8 +271,8 @@ namespace ElMinero.Editor
             if (!Directory.Exists(dirConfigs)) Directory.CreateDirectory(dirConfigs);
 
             CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel1.asset"), "Nivel 1 — Mina Rayas", 1, 100f, 6, 2, "Aguilarita", "Aguilarita (Ag4SeS): mineral de plata y selenio descubierto en Guanajuato en 1891.", 4.0f, new Color(0.12f, 0.09f, 0.19f));
-            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel2.asset"), "Nivel 2 — El Nopal", 2, 120f, 8, 3, "Pepita de oro", "Pepita de oro nativo extraída de las profundidades de Guanajuato.", 3.0f, new Color(0.16f, 0.10f, 0.05f));
-            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel3.asset"), "Nivel 3 — La Valenciana", 3, 140f, 10, 4, "Pirargirita", "Pirargirita (Ag3SbS3, plata roja): mineral emblemático que enriqueció a Guanajuato.", 2.2f, new Color(0.16f, 0.04f, 0.04f));
+            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel2.asset"), "Nivel 2 — El Nopal", 2, 140f, 14, 3, "Pepita de oro", "Pepita de oro nativo extraída de las profundidades de Guanajuato.", 3.0f, new Color(0.16f, 0.10f, 0.05f));
+            CrearOActualizarLevelConfig(Path.Combine(dirConfigs, "LevelConfig_Nivel3.asset"), "Nivel 3 — La Valenciana", 3, 220f, 16, 4, "Pirargirita", "Pirargirita (Ag3SbS3, plata roja): mineral emblemático que enriqueció a Guanajuato.", 2.2f, new Color(0.16f, 0.04f, 0.04f));
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -789,6 +789,66 @@ namespace ElMinero.Editor
             soLm.ApplyModifiedProperties();
         }
 
+        /// <summary>
+        /// Agrega a un Canvas el decorador que da el mismo acabado (esquinas de hierro,
+        /// emblema dorado y textura) a todos sus paneles de madera.
+        /// </summary>
+        public static void AgregarDecoradorPaneles(GameObject canvasObj)
+        {
+            if (canvasObj == null || canvasObj.GetComponent<DecoradorPaneles>() != null) return;
+            var deco = canvasObj.AddComponent<DecoradorPaneles>();
+            var p = PiezasDecoracion();
+            var so = new SerializedObject(deco);
+            var prop = so.FindProperty("piezas");
+            prop.FindPropertyRelative("esquina").objectReferenceValue = p.esquina;
+            prop.FindPropertyRelative("emblema").objectReferenceValue = p.emblema;
+            prop.FindPropertyRelative("textura").objectReferenceValue = p.textura;
+            prop.FindPropertyRelative("marcoInterior").objectReferenceValue = p.marcoInterior;
+            prop.FindPropertyRelative("placaLateral").objectReferenceValue = p.placaLateral;
+            prop.FindPropertyRelative("remateInferior").objectReferenceValue = p.remateInferior;
+            prop.FindPropertyRelative("resplandor").objectReferenceValue = p.resplandor;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static DecoradorPaneles.Piezas piezasCache;
+
+        /// <summary>Sprites de la decoración de paneles (se importan si hace falta).</summary>
+        public static DecoradorPaneles.Piezas PiezasDecoracion()
+        {
+            const string ruta = "Assets/Sprites/UI/Decoracion/";
+            if (piezasCache == null || piezasCache.esquina == null)
+            {
+                if (AssetDatabase.LoadAssetAtPath<Sprite>(ruta + "Marco_Interior.png") == null || AssetDatabase.LoadAssetAtPath<Sprite>(ruta + "Medalla.png") == null)
+                {
+                    SpriteImportSetup.ConfigurarSpritesDecoracionPaneles();
+                }
+                piezasCache = new DecoradorPaneles.Piezas
+                {
+                    esquina = AssetDatabase.LoadAssetAtPath<Sprite>(ruta + "Esquina_Panel.png"),
+                    emblema = AssetDatabase.LoadAssetAtPath<Sprite>(ruta + "Emblema_Panel.png"),
+                    textura = AssetDatabase.LoadAssetAtPath<Sprite>(ruta + "Textura_Panel.png"),
+                    marcoInterior = AssetDatabase.LoadAssetAtPath<Sprite>(ruta + "Marco_Interior.png"),
+                    placaLateral = AssetDatabase.LoadAssetAtPath<Sprite>(ruta + "Placa_Lateral.png"),
+                    remateInferior = AssetDatabase.LoadAssetAtPath<Sprite>(ruta + "Remate_Inferior.png"),
+                    resplandor = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Menu/Menu_Resplandor.png")
+                };
+            }
+            return piezasCache;
+        }
+
+        /// <summary>Decora (en el editor) todos los paneles de madera dentro de "raiz".</summary>
+        public static void DecorarPanelesEn(GameObject raiz)
+        {
+            if (raiz == null) return;
+            var p = PiezasDecoracion();
+            foreach (Image img in raiz.GetComponentsInChildren<Image>(true))
+            {
+                if (img == null || img.sprite == null || img.sprite.name != "Panel_Madera") continue;
+                if (img.gameObject.name == "Panel_Lateral") continue;
+                DecoradorPaneles.Decorar(img, p);
+            }
+        }
+
         private static void ConfigurarHUDCanvas()
         {
             // Canvas UI
@@ -798,8 +858,9 @@ namespace ElMinero.Editor
             var scaler = canvasObj.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920, 1080);
-            scaler.matchWidthOrHeight = 0.5f;
+            scaler.matchWidthOrHeight = 1f;
             canvasObj.AddComponent<GraphicRaycaster>();
+            AgregarDecoradorPaneles(canvasObj);
 
             // EventSystem si no existe
             if (UnityEngine.Object.FindAnyObjectByType<EventSystem>() == null)
@@ -1179,7 +1240,7 @@ namespace ElMinero.Editor
                 "Assets/Scenes/Nivel1_MinaRayas.unity",
                 "Assets/Scenes/Nivel2_ElNopal.unity",
                 "Assets/Scenes/Nivel3_LaValenciana.unity",
-                "Assets/Scenes/Final.unity"
+                "Assets/Scenes/Final_Templo.unity"
             };
 
             var buildScenes = new EditorBuildSettingsScene[rutasEscenas.Length];
@@ -1269,6 +1330,19 @@ namespace ElMinero.Editor
                 BuildSettingsSetup.ConfigurarBuildSettings();
                 EditorUtility.DisplayProgressBar("El Minero", "10/10 Build Settings...", 1.0f);
 
+                // 11. Validadores de niveles e interfaz y capturas (Docs/Capturas)
+                try
+                {
+                    LevelValidator.ValidarYCorregirTodosLosNiveles();
+                    bool uiOk = UIValidator.ValidarInterfaz();
+                    Debug.Log(uiOk ? "[El Minero] Validador de interfaz: sin advertencias." : "[El Minero] Validador de interfaz: revisa las advertencias de arriba.");
+                    UIValidator.CapturarPantallasUI();
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogWarning("[El Minero] Validación/capturas no completadas: " + ex.Message);
+                }
+
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
 
@@ -1283,7 +1357,7 @@ namespace ElMinero.Editor
                         "✓ Animaciones y Animator Controllers generados.\n" +
                         "✓ TextMeshPro Font Assets (PressStart2P y PixelifySans).\n" +
                         "✓ Prefabs de UI modales y HUD completo.\n" +
-                        "✓ Físicas (SinFriccion) y LevelConfigs (N1: 100s, N2: 120s, N3: 140s).\n" +
+                        "✓ Físicas (SinFriccion) y LevelConfigs (N1: 100s, N2: 120s, N3: 220s).\n" +
                         "✓ Prefabs completos de jugador, enemigos, obstáculos y coleccionables.\n" +
                         "✓ Las 7 escenas construidas y enlazadas en Build Settings:\n" +
                         "   • Splash.unity\n" +
@@ -1292,7 +1366,7 @@ namespace ElMinero.Editor
                         "   • Nivel1_MinaRayas.unity\n" +
                         "   • Nivel2_ElNopal.unity\n" +
                         "   • Nivel3_LaValenciana.unity\n" +
-                        "   • Final.unity\n\n" +
+                        "   • Final_Templo.unity\n\n" +
                         "Para jugar:\n" +
                         "1. Abre 'Assets/Scenes/Splash.unity' o 'Assets/Scenes/MenuPrincipal.unity'\n" +
                         "2. Pulsa Play y disfruta de la aventura.",

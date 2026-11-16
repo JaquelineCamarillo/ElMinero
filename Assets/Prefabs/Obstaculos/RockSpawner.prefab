@@ -49,3 +49,5 @@ MonoBehaviour:
   spawnInterval: 4
   warningDuration: 0.35
   warningOffset: {x: 0, y: -0.5, z: 0}
+  requiereActivacion: 0
+  sombraSobre: {fileID: 0}

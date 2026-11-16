@@ -1,180 +1,291 @@
 using System.Collections;
 using UnityEngine;
-using TMPro;
+using UnityEngine.Rendering.Universal;
 using ElMinero.Utilidades;
 using ElMinero.Managers;
 using ElMinero.Jugador;
+using ElMinero.UI;
 
 namespace ElMinero.Obstaculos
 {
     /// <summary>
-    /// Muro de fuego perseguidor para los últimos 35 tiles del Nivel 3 (La Valenciana).
-    /// Al activarse por trigger, muestra en pantalla "¡LA MINA SE INCENDIA!" (56 pt, 2 s).
-    /// Avanza de izquierda a derecha a 2.4 u/s persiguiendo al jugador con sonido de fuego rugiente.
-    /// Si alcanza a Refugio, le quita 1 vida y lo devuelve al último checkpoint.
-    /// Se detiene al completar el nivel y se reinicia mediante IResettable.
+    /// Muro de fuego que persigue al minero en la huida final del nivel 3 (La Valenciana).
+    ///
+    /// - Al inicio NO existe: sin sprites, collider ni sonido.
+    /// - Se activa cuando el jugador cruza el trigger X (FireChaseTrigger): aparece 9 u detrás
+    ///   del jugador y avanza a la derecha a 2.6 u/s, siguiendo suavemente la altura del jugador.
+    /// - Es una columna de 7 llamas animadas (Llamas_Incendio, 4 cuadros a 10 FPS, desfase aleatorio)
+    ///   que cubre de y − 2 a y + 12.
+    /// - Si toca al jugador: −1 vida, el jugador reaparece en el checkpoint C4, el muro se apaga
+    ///   y el trigger se rearma.
+    /// - Se detiene y se desvanece al llegar a x = 206 o cuando el jugador toca la salida.
     /// </summary>
     public class FireWallChase : MonoBehaviour, IResettable
     {
-        [Header("Cinemática de Persecución")]
-        [Tooltip("Velocidad de avance implacable del muro de fuego (2.4 u/s).")]
-        [SerializeField] private float speed = 2.4f;
+        [Header("Persecución")]
+        [SerializeField] private float velocidad = 2.6f;
+        [SerializeField] private float distanciaAparicion = 9f;
+        [SerializeField] private float finX = 206f;
+        [SerializeField] private float suavizadoAltura = 2.5f;
 
-        [Tooltip("Punto inicial en X.")]
-        [SerializeField] private float startX = 172f;
+        [Header("Llamas")]
+        [SerializeField] private Sprite[] cuadrosLlama;
+        [SerializeField] private int numeroLlamas = 7;
+        [SerializeField] private float alturaLlama = 2f;
+        [SerializeField] private float bordeInferior = -2f;
 
-        [Tooltip("Punto final en X donde se detiene la persecución.")]
-        [SerializeField] private float endX = 212f;
+        [Header("Reaparición")]
+        [Tooltip("Posición del checkpoint C4 (después del jefe).")]
+        [SerializeField] private Vector3 checkpointPersecucion = new Vector3(185.5f, 34f, 0f);
 
-        [Header("Aviso de Incendio")]
-        [Tooltip("Texto flotante o en HUD para advertir del incendio.")]
-        [SerializeField] private TextMeshProUGUI textoAvisoIncendio;
+        [Header("Referencias")]
+        [SerializeField] private FireChaseTrigger trigger;
+        [SerializeField] private AudioSource audioLoop;
 
-        [Tooltip("Duración del aviso en pantalla (2 s).")]
-        [SerializeField] private float avisoDuration = 2.0f;
+        private enum Estado { Inactivo, Persiguiendo, Apagandose }
+        private Estado estado = Estado.Inactivo;
 
-        [Header("Audio")]
-        [SerializeField] private AudioSource loopAudioSource;
+        private SpriteRenderer[] llamas;
+        private SpriteFrameAnimator[] animLlamas;
+        private BoxCollider2D col;
+        private Light2D luz;
+        private Transform jugador;
+        private PlayerHealth saludJugador;
+        private Coroutine rutinaFade;
 
-        private bool isChasing = false;
-        private bool isTriggered = false;
-        private Vector3 initialPosition;
+        public bool Activo => estado == Estado.Persiguiendo;
+
+        public void Configurar(Sprite[] cuadros, FireChaseTrigger triggerAsociado, Vector3 posicionC4, float xFinal)
+        {
+            cuadrosLlama = cuadros;
+            trigger = triggerAsociado;
+            checkpointPersecucion = posicionC4;
+            finX = xFinal;
+        }
 
         private void Awake()
         {
-            initialPosition = new Vector3(startX, transform.position.y, transform.position.z);
-            transform.position = initialPosition;
+            tag = Constantes.Tags.Hazard;
+            int capaPeligro = LayerMask.NameToLayer(Constantes.Layers.Peligro);
+            if (capaPeligro != -1) gameObject.layer = capaPeligro;
 
-            ConfigurarAudio();
+            ConstruirLlamas();
+            luz = GetComponent<Light2D>();
 
-            if (textoAvisoIncendio != null)
+            col = GetComponent<BoxCollider2D>();
+            if (col == null) col = gameObject.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            float alto = numeroLlamas * alturaLlama;
+            col.size = new Vector2(1.4f, alto);
+            col.offset = new Vector2(0f, bordeInferior + alto * 0.5f);
+
+            var rb = GetComponent<Rigidbody2D>();
+            if (rb == null) rb = gameObject.AddComponent<Rigidbody2D>();
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.useFullKinematicContacts = true;
+
+            if (audioLoop == null) audioLoop = GetComponent<AudioSource>();
+            if (audioLoop == null) audioLoop = gameObject.AddComponent<AudioSource>();
+            audioLoop.loop = true;
+            audioLoop.playOnAwake = false;
+            audioLoop.spatialBlend = 0.6f;
+            audioLoop.minDistance = 4f;
+            audioLoop.maxDistance = 24f;
+            audioLoop.rolloffMode = AudioRolloffMode.Linear;
+
+            ApagarInmediato();
+        }
+
+        private void Start()
+        {
+            if (AudioManager.Instance != null && audioLoop != null)
             {
-                textoAvisoIncendio.gameObject.SetActive(false);
+                if (audioLoop.clip == null) audioLoop.clip = AudioManager.Instance.GetAudioClipFuegoLoop();
+                AudioManager.Instance.RegistrarFuenteEfectos(audioLoop);
+            }
+
+            if (LevelManager.Instance != null)
+            {
+                LevelManager.Instance.OnJugadorReaparecio += AlReaparecerJugador;
             }
         }
 
-        private void ConfigurarAudio()
+        private void OnDestroy()
         {
-            if (loopAudioSource == null)
+            if (LevelManager.Instance != null)
             {
-                loopAudioSource = GetComponent<AudioSource>();
-                if (loopAudioSource == null) loopAudioSource = gameObject.AddComponent<AudioSource>();
+                LevelManager.Instance.OnJugadorReaparecio -= AlReaparecerJugador;
             }
-
-            if (loopAudioSource != null)
+            if (AudioManager.Instance != null && audioLoop != null)
             {
-                loopAudioSource.loop = true;
-                loopAudioSource.playOnAwake = false;
-                loopAudioSource.spatialBlend = 1.0f;
-                loopAudioSource.minDistance = 4f;
-                loopAudioSource.maxDistance = 22f;
-                loopAudioSource.rolloffMode = AudioRolloffMode.Linear;
-
-                if (AudioManager.Instance != null)
-                {
-                    loopAudioSource.clip = AudioManager.Instance.GetAudioClipFuegoLoop();
-                    AudioManager.Instance.RegistrarFuenteEfectos(loopAudioSource);
-                }
+                AudioManager.Instance.DesregistrarFuenteEfectos(audioLoop);
             }
         }
 
-        private void OnDisable()
+        private void ConstruirLlamas()
         {
-            if (AudioManager.Instance != null && loopAudioSource != null)
+            llamas = new SpriteRenderer[numeroLlamas];
+            animLlamas = new SpriteFrameAnimator[numeroLlamas];
+
+            for (int i = 0; i < numeroLlamas; i++)
             {
-                AudioManager.Instance.DesregistrarFuenteEfectos(loopAudioSource);
+                Transform existente = transform.Find($"Llama_{i}");
+                GameObject go = existente != null ? existente.gameObject : new GameObject($"Llama_{i}");
+                go.transform.SetParent(transform, false);
+                go.transform.localPosition = new Vector3(0f, bordeInferior + i * alturaLlama, 0f);
+
+                var sr = go.GetComponent<SpriteRenderer>();
+                if (sr == null) sr = go.AddComponent<SpriteRenderer>();
+                sr.sortingLayerName = Constantes.SortingLayers.PrimerPlano;
+                sr.sortingOrder = 5;
+                if (cuadrosLlama != null && cuadrosLlama.Length > 0) sr.sprite = cuadrosLlama[0];
+                llamas[i] = sr;
+
+                var anim = go.GetComponent<SpriteFrameAnimator>();
+                if (anim == null) anim = go.AddComponent<SpriteFrameAnimator>();
+                anim.Configurar(cuadrosLlama, 10f, true, false, true);
+                animLlamas[i] = anim;
             }
         }
 
-        public void IniciarPersecucion()
+        /// <summary>Llamado por el trigger X: el muro aparece detrás del jugador y empieza a avanzar.</summary>
+        public void Activar(Transform objetivo)
         {
-            if (isTriggered) return;
-            isTriggered = true;
-            isChasing = true;
+            if (estado == Estado.Persiguiendo) return;
+            if (LevelManager.Instance != null && LevelManager.Instance.NivelCompletado) return;
 
-            if (loopAudioSource != null && !loopAudioSource.isPlaying)
+            jugador = objetivo;
+            saludJugador = objetivo != null ? objetivo.GetComponent<PlayerHealth>() : null;
+            if (rutinaFade != null) { StopCoroutine(rutinaFade); rutinaFade = null; }
+
+            // El checkpoint C4 debe ser el punto de reaparición durante la huida
+            if (LevelManager.Instance != null && LevelManager.Instance.CheckpointActual.x < checkpointPersecucion.x - 1f)
             {
-                loopAudioSource.Play();
+                LevelManager.Instance.EstablecerCheckpoint(checkpointPersecucion);
             }
 
-            StartCoroutine(RutinaAvisoIncendio());
-        }
+            Vector3 p = objetivo != null ? objetivo.position : transform.position;
+            transform.position = new Vector3(p.x - distanciaAparicion, p.y, 0f);
 
-        private IEnumerator RutinaAvisoIncendio()
-        {
-            if (textoAvisoIncendio != null)
+            for (int i = 0; i < llamas.Length; i++)
             {
-                textoAvisoIncendio.text = "¡LA MINA SE INCENDIA!";
-                textoAvisoIncendio.fontSize = 56f;
-                textoAvisoIncendio.color = new Color(1.0f, 0.35f, 0.1f, 1f);
-                textoAvisoIncendio.gameObject.SetActive(true);
+                llamas[i].enabled = true;
+                llamas[i].color = Color.white;
+                animLlamas[i].Play();
             }
+            col.enabled = true;
+            if (luz != null) luz.enabled = true;
+            if (audioLoop != null && audioLoop.clip != null) audioLoop.Play();
 
-            yield return new WaitForSeconds(avisoDuration);
+            estado = Estado.Persiguiendo;
 
-            if (textoAvisoIncendio != null)
-            {
-                textoAvisoIncendio.gameObject.SetActive(false);
-            }
+            AvisoPantalla.Mostrar("¡LA MINA SE INCENDIA!", "", 2f, 56f, 34f, new Color(1f, 0.45f, 0.15f));
+            if (AudioManager.Instance != null) AudioManager.Instance.PlayDerrumbe();
+            if (ElMinero.Camara.CameraShake.Instance != null) ElMinero.Camara.CameraShake.Instance.Shake(0.5f, 0.25f);
         }
 
         private void Update()
         {
-            if (!isChasing) return;
+            if (estado != Estado.Persiguiendo) return;
 
-            // Avanzar hacia la derecha a 2.4 u/s
-            transform.Translate(Vector3.right * (speed * Time.deltaTime));
-
-            if (transform.position.x >= endX)
+            if (LevelManager.Instance != null && LevelManager.Instance.NivelCompletado)
             {
-                DetenerFuego();
+                Desvanecer();
+                return;
+            }
+
+            float x = transform.position.x + velocidad * Time.deltaTime;
+            float y = transform.position.y;
+            if (jugador != null)
+            {
+                y = Mathf.Lerp(y, jugador.position.y, Time.deltaTime * suavizadoAltura);
+            }
+            transform.position = new Vector3(x, y, 0f);
+
+            if (x >= finX)
+            {
+                Desvanecer();
             }
         }
 
-        public void DetenerFuego()
+        private void OnTriggerEnter2D(Collider2D other) => RevisarContacto(other);
+        private void OnTriggerStay2D(Collider2D other) => RevisarContacto(other);
+
+        private void RevisarContacto(Collider2D other)
         {
-            isChasing = false;
-            if (loopAudioSource != null && loopAudioSource.isPlaying)
-            {
-                loopAudioSource.Stop();
-            }
+            if (estado != Estado.Persiguiendo) return;
+            if (!other.CompareTag(Constantes.Tags.Player)) return;
+
+            var salud = other.GetComponent<PlayerHealth>();
+            if (salud == null) return;
+
+            bool golpe = salud.TakeDamage(1);
+            if (!golpe) return;
+
+            if (AudioManager.Instance != null) AudioManager.Instance.PlayDanio();
+
+            // El jugador reaparece en C4 (LevelManager lo mueve al checkpoint actual);
+            // el muro se apaga y el trigger se rearma.
+            ApagarYRearmar();
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        private void AlReaparecerJugador()
         {
-            if (other.CompareTag(Constantes.Tags.Player))
+            if (estado != Estado.Inactivo) ApagarYRearmar();
+        }
+
+        private void ApagarYRearmar()
+        {
+            ApagarInmediato();
+            if (trigger != null) trigger.Rearmar();
+        }
+
+        private void Desvanecer()
+        {
+            if (estado != Estado.Persiguiendo) return;
+            estado = Estado.Apagandose;
+            col.enabled = false;
+            rutinaFade = StartCoroutine(RutinaFade(0.5f));
+        }
+
+        private IEnumerator RutinaFade(float duracion)
+        {
+            float t = 0f;
+            float volInicial = audioLoop != null ? audioLoop.volume : 0f;
+            while (t < duracion)
             {
-                var health = other.GetComponent<PlayerHealth>();
-                if (health != null)
+                t += Time.deltaTime;
+                float a = 1f - t / duracion;
+                foreach (var sr in llamas) sr.color = new Color(1f, 1f, 1f, a);
+                if (audioLoop != null) audioLoop.volume = volInicial * a;
+                yield return null;
+            }
+            ApagarInmediato();
+            if (audioLoop != null) audioLoop.volume = volInicial;
+            rutinaFade = null;
+        }
+
+        private void ApagarInmediato()
+        {
+            estado = Estado.Inactivo;
+            if (llamas != null)
+            {
+                for (int i = 0; i < llamas.Length; i++)
                 {
-                    health.TakeDamage(1);
-                    if (AudioManager.Instance != null)
-                    {
-                        AudioManager.Instance.PlayDanio();
-                    }
+                    if (llamas[i] != null) { llamas[i].enabled = false; llamas[i].color = Color.white; }
+                    if (animLlamas[i] != null) animLlamas[i].Stop();
                 }
-
-                // Regresar a posición de inicio para darle oportunidad tras reaparecer en checkpoint
-                transform.position = initialPosition;
             }
+            if (col != null) col.enabled = false;
+            if (luz != null) luz.enabled = false;
+            if (audioLoop != null) audioLoop.Stop();
         }
 
         public void ResetObject()
         {
             StopAllCoroutines();
-            isChasing = false;
-            isTriggered = false;
-            transform.position = initialPosition;
-
-            if (loopAudioSource != null && loopAudioSource.isPlaying)
-            {
-                loopAudioSource.Stop();
-            }
-
-            if (textoAvisoIncendio != null)
-            {
-                textoAvisoIncendio.gameObject.SetActive(false);
-            }
+            rutinaFade = null;
+            ApagarInmediato();
         }
     }
 }

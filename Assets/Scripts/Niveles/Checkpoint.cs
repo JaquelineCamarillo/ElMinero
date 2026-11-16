@@ -110,6 +110,7 @@ namespace ElMinero.Niveles
 
             isActivated = true;
             ActualizarVisuales(true);
+            if (Time.timeSinceLevelLoad > 0.5f && ElMinero.Managers.AudioManager.Instance != null) ElMinero.Managers.AudioManager.Instance.PlayCheckpoint();
 
             if (Managers.LevelManager.Instance != null)
             {

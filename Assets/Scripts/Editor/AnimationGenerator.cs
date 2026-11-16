@@ -63,6 +63,9 @@ namespace ElMinero.Editor
                 // 6. Animaciones y Controladores de Enemigos (Murciélagos, Araña, Alacrán, Vagoneta)
                 GenerarAnimacionesEnemigos();
 
+                // 7. Jefe final: El Coloso de Plata Roja
+                GenerarAnimacionesColoso();
+
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
                 Debug.Log("[El Minero] ¡Todas las animaciones y controladores generados exitosamente!");
@@ -403,6 +406,64 @@ namespace ElMinero.Editor
             CrearSimpleController("Assets/Controladores/Obstaculos/Vagoneta.controller", clipCart);
         }
 
+        // ====================================================================
+        // 7. JEFE FINAL (Coloso.controller)
+        // ====================================================================
+        private static void GenerarAnimacionesColoso()
+        {
+            const string dirAnim = "Assets/Animaciones/Jefe";
+            const string dirCtrl = "Assets/Controladores/Jefe";
+            if (!Directory.Exists(dirAnim)) Directory.CreateDirectory(dirAnim);
+            if (!Directory.Exists(dirCtrl)) Directory.CreateDirectory(dirCtrl);
+
+            // (hoja, estado, fps, loop, trigger)
+            var datos = new (string hoja, string estado, float fps, bool loop, string trigger)[]
+            {
+                ("Idle", "Idle", 6f, true, "Idle"),
+                ("Caminar", "Caminar", 8f, true, "Caminar"),
+                ("Preparar_Embestida", "Preparar_Embestida", 10f, true, "Preparar"),
+                ("Embestida", "Embestida", 12f, true, "Embestir"),
+                ("Aturdido", "Aturdido", 4f, true, "Aturdir"),
+                ("Golpeado", "Golpeado", 10f, false, "Golpe"),
+                ("Pisoton", "Pisoton", 8f, false, "Pisoton"),
+                ("Lanzar", "Lanzar", 8f, false, "Lanzar"),
+                ("Derrota", "Derrota", 5f, false, "Morir")
+            };
+
+            string rutaCtrl = dirCtrl + "/Coloso.controller";
+            if (File.Exists(rutaCtrl)) AssetDatabase.DeleteAsset(rutaCtrl);
+            AnimatorController ctrl = AnimatorController.CreateAnimatorControllerAtPath(rutaCtrl);
+            var sm = ctrl.layers[0].stateMachine;
+
+            foreach (var d in datos)
+            {
+                ctrl.AddParameter(d.trigger, AnimatorControllerParameterType.Trigger);
+            }
+
+            AnimatorState estadoIdle = null;
+            foreach (var d in datos)
+            {
+                Sprite[] cuadros = EditorSpriteUtil.Cuadros($"Assets/Sprites/Jefe/Coloso_{d.hoja}.png");
+                string rutaClip = $"{dirAnim}/Coloso_{d.hoja}.anim";
+                if (File.Exists(rutaClip)) AssetDatabase.DeleteAsset(rutaClip);
+                AnimationClip clip = CrearClipSprite(rutaClip, cuadros, d.fps, d.loop);
+
+                var st = sm.AddState(d.estado);
+                st.motion = clip;
+                if (d.estado == "Idle") estadoIdle = st;
+
+                // Transición desde cualquier estado al recibir el trigger
+                var t = sm.AddAnyStateTransition(st);
+                t.AddCondition(AnimatorConditionMode.If, 0, d.trigger);
+                t.hasExitTime = false;
+                t.duration = 0f;
+                t.canTransitionToSelf = false;
+            }
+
+            if (estadoIdle != null) sm.defaultState = estadoIdle;
+            EditorUtility.SetDirty(ctrl);
+        }
+
         private static void CrearSimpleController(string path, AnimationClip defaultClip)
         {
             AnimatorController ctrl = AnimatorController.CreateAnimatorControllerAtPath(path);
@@ -428,6 +489,13 @@ namespace ElMinero.Editor
                 propertyName = "m_Sprite"
             };
 
+            EditorCurveBinding bindingImage = new EditorCurveBinding
+            {
+                type = typeof(UnityEngine.UI.Image),
+                path = "",
+                propertyName = "m_Sprite"
+            };
+
             ObjectReferenceKeyframe[] keyframes = new ObjectReferenceKeyframe[sprites.Length];
             for (int i = 0; i < sprites.Length; i++)
             {
@@ -439,6 +507,7 @@ namespace ElMinero.Editor
             }
 
             AnimationUtility.SetObjectReferenceCurve(clip, binding, keyframes);
+            AnimationUtility.SetObjectReferenceCurve(clip, bindingImage, keyframes);
 
             if (loop)
             {

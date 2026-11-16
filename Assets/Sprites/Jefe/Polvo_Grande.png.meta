@@ -108,19 +108,19 @@ TextureImporter:
       name: Polvo_Grande_0
       rect:
         serializedVersion: 2
-        x: 3
+        x: 0
         y: 0
-        width: 61
-        height: 9
+        width: 32
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 06500c9f2716fedd0800000000000000
+      spriteID: a49a382141a548144982a54e2488f9f4
       internalID: -2454636125449353888
       vertices: []
       indices: 
@@ -130,20 +130,64 @@ TextureImporter:
       name: Polvo_Grande_1
       rect:
         serializedVersion: 2
-        x: 64
+        x: 32
         y: 0
-        width: 64
-        height: 12
+        width: 32
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: d74d166f4c7d1fed0800000000000000
+      spriteID: d86284ec8267ea649ab9a1d3943eb20f
       internalID: -2381885486955113347
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Polvo_Grande_2
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f99dd69d9dbcce24a88d7c01c239d3ad
+      internalID: 311433419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Polvo_Grande_3
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6fd34a0f0bd34114ba2bda43ef6247cf
+      internalID: 1982784314
       vertices: []
       indices: 
       edges: []
@@ -152,7 +196,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 25d18013f8c23da49ba6eb55c869e88f
     internalID: 0
     vertices: []
     indices: 
@@ -164,6 +208,8 @@ TextureImporter:
     nameFileIdTable:
       Polvo_Grande_0: -2454636125449353888
       Polvo_Grande_1: -2381885486955113347
+      Polvo_Grande_2: 311433419
+      Polvo_Grande_3: 1982784314
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

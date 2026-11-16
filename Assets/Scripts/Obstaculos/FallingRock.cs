@@ -72,6 +72,7 @@ namespace ElMinero.Obstaculos
             if (collision.gameObject.layer == layerSuelo || collision.gameObject.CompareTag("Untagged"))
             {
                 hasCollided = true;
+                if (ElMinero.Managers.AudioManager.Instance != null) ElMinero.Managers.AudioManager.Instance.PlayRocaImpacto(transform.position);
                 DestruirConEfecto();
             }
         }

@@ -54,6 +54,8 @@ namespace ElMinero.Niveles
 
         private void ActivarDerrumbe()
         {
+            if (ElMinero.Managers.AudioManager.Instance != null) ElMinero.Managers.AudioManager.Instance.PlayDerrumbe();
+
             // 1. Activar bloque de derrumbe
             if (blockObject != null)
             {

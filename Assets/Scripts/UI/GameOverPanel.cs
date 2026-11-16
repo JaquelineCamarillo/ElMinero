@@ -33,7 +33,7 @@ namespace ElMinero.UI
             string nombre = PlayerPrefs.GetString("NombreJugador", "Refugio");
             if (string.IsNullOrWhiteSpace(nombre)) nombre = "Refugio";
 
-            if (textoTitulo != null) textoTitulo.text = "¡EL DERRUMBE TE ALCANZÓ!";
+            if (textoTitulo != null) textoTitulo.text = "¡EL DERRUMBE TE ALCANZO!";
             if (textoSubtitulo != null) textoSubtitulo.text = $"La mina ha atrapado a {nombre}…";
             if (textoMotivo != null) textoMotivo.text = motivo;
             if (textoEstadisticas != null)

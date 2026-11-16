@@ -98,34 +98,64 @@ Se diseñó e implementó un sistema jerárquico de enemigos heredados de `Enemy
 
 ---
 
-## 8. IntegraciÃ³n del Paquete de Recursos v3 y Perfeccionamiento TÃ©cnico
+## 8. Integración del Paquete de Recursos v3 y Perfeccionamiento Técnico
 
-Para cumplir con las especificaciones finales del juego y resolver fallos de ejecuciÃ³n detectados en el motor, se aÃ±adieron los siguientes cambios estructurales:
+Para cumplir con las especificaciones finales del juego y resolver fallos de ejecución detectados en el motor, se añadieron los siguientes cambios estructurales:
 
-1. **CatÃ¡logo de Recursos v3 (SpriteImportSetup.cs)**:
-   - Castillete_Malacate.png: Celda 48Ã—80, 4 cuadros de animaciÃ³n de rueda giratoria, pivote Bottom Center.
-   - Bola_Fuego.png: Celda 16Ã—16, 4 cuadros de animaciÃ³n, pivote Center.
-   - Humo.png: Celda 16Ã—16, 4 cuadros de advertencia en techo previa a la caÃ­da de fuego.
-   - Llamas_Incendio.png: Celda 16Ã—32, 4 cuadros de fuego vertical, pivote Bottom Center.
-   - Telarana_Techo.png: Celda 16Ã—16, pivote Top Center para anclaje al techo.
-   - Logo_ElMinero_Grande.png: TÃ­tulo estilizado en alta resoluciÃ³n (~291Ã—64 original / 1160Ã—256 en lienzo UI).
-   - Fondos del MenÃº en 3 capas independientes (FondoMenu_Capa0_Cielo, FondoMenu_Capa1_Ciudad, FondoMenu_Capa2_Frente).
+1. **Catálogo de Recursos v3 (SpriteImportSetup.cs)**:
+   - Castillete_Malacate.png: Celda 48×80, 4 cuadros de animación de rueda giratoria, pivote Bottom Center.
+   - Bola_Fuego.png: Celda 16×16, 4 cuadros de animación, pivote Center.
+   - Humo.png: Celda 16×16, 4 cuadros de advertencia en techo previa a la caída de fuego.
+   - Llamas_Incendio.png: Celda 16×32, 4 cuadros de fuego vertical, pivote Bottom Center.
+   - Telarana_Techo.png: Celda 16×16, pivote Top Center para anclaje al techo.
+   - Logo_ElMinero_Grande.png: Título estilizado en alta resolución (~291×64 original / 1160×256 en lienzo UI).
+   - Fondos del Menú en 3 capas independientes (FondoMenu_Capa0_Cielo, FondoMenu_Capa1_Ciudad, FondoMenu_Capa2_Frente).
 
 2. **Arquitectura de Audio Directo y AudioLibrary**:
-   - En lugar de depender de parÃ¡metros expuestos de AudioMixer (susceptibles a fallas de reflexiÃ³n en Unity 6), AudioManager.cs controla directamente AudioSource.volume para mÃºsica, SFX y bucles 3D.
-   - CentralizaciÃ³n de todos los clips de sonido en un ScriptableObject (AudioLibrary.asset) alojado en Assets/Resources/, garantizando disponibilidad absoluta en ejecutables autÃ³nomos.
+   - En lugar de depender de parámetros expuestos de AudioMixer (susceptibles a fallas de reflexión en Unity 6), AudioManager.cs controla directamente AudioSource.volume para música, SFX y bucles 3D.
+   - Centralización de todos los clips de sonido en un ScriptableObject (AudioLibrary.asset) alojado en Assets/Resources/, garantizando disponibilidad absoluta en ejecutables autónomos.
 
-3. **FÃ­sica del Malacate y Elevador (MineElevator.cs)**:
-   - EliminaciÃ³n de la jerarquÃ­a forzada (	ransform.SetParent); ahora el jugador es transportado calculando el desplazamiento $\Delta y$ aplicado directamente al Rigidbody2D del minero.
-   - ConexiÃ³n continua mediante LineRenderer entre la rueda del castillete y la base del elevador.
+3. **Física del Malacate y Elevador (MineElevator.cs)**:
+   - Eliminación de la jerarquía forzada (transform.SetParent); ahora el jugador es transportado calculando el desplazamiento Δy aplicado directamente al Rigidbody2D del minero.
+   - Conexión continua mediante LineRenderer entre la rueda del castillete y la base del elevador.
    - Estados de espera controlados: 0.5 s para iniciar ascenso y 3.0 s para descenso.
 
-4. **ClÃ­max del Nivel 3: Bolas de Fuego y Muro de Incendio**:
-   - FireballSpawner.cs proyecta humo en el techo durante 0.8 s antes de dejar caer una bola de fuego con fÃ­sica gravitatoria activa.
-   - FireWallChase.cs activa una persecuciÃ³n cinematogrÃ¡fica en los Ãºltimos 35 tiles de La Valenciana a .4\text{ u/s}$, con alerta "Â¡LA MINA SE INCENDIA!" (56 pt) y sonido envolvente de llamas.
+4. **Clímax del Nivel 3: Bolas de Fuego y Muro de Incendio**:
+   - FireballSpawner.cs proyecta humo en el techo durante 0.8 s antes de dejar caer una bola de fuego con física gravitatoria activa.
+   - FireWallChase.cs activa una persecución cinematográfica en los últimos 35 tiles de La Valenciana a 2.4 u/s, con alerta "¡LA MINA SE INCENDIA!" (56 pt) y sonido envolvente de llamas.
 
-5. **Parallax Interactivo del MenÃº Principal (MenuParallax.cs)**:
-   - Movimiento diferencial en 3 planos segÃºn la posiciÃ³n del cursor con oscilaciÃ³n armÃ³nica en reposo.
+5. **Parallax Interactivo del Menú Principal (MenuParallax.cs)**:
+   - Movimiento diferencial en 3 planos según la posición del cursor con oscilación armónica en reposo.
 
-6. **Selector de Calidad GrÃ¡fica Sin Dropdown**:
-   - SustituciÃ³n de TMP_Dropdown por un componente selector cÃ­clico â—€  Alta  â–¶ que opera sobre QualitySettings.names.
+6. **Opción de calidad gráfica retirada**:
+   - Por decisión de diseño se quitó la fila "Calidad" del panel de Opciones (selector, código en OptionsPanel y SettingsManager, y la clave de PlayerPrefs). El juego usa un solo nivel de calidad por defecto.
+
+---
+
+## Cambios de la versión 1.1 (noviembre 2026): interfaz, nivel 3, jefe final y escena del Templo
+
+### Interfaz
+- Textos en UTF-8 sin símbolos raros; ningún texto del juego usa ▶ ◀ ♥ ✓ ★ (las fuentes no los tienen).
+- Menú principal con un solo panel de madera (600 × 820) bajo el título, botones Pixelify Sans 36 y el minero parado sobre los rieles.
+- Panel "Controles del juego" de 1300 × 860 con todo dentro del marco; tarjeta de inicio de nivel de 1400 × 880 con miniatura de la mina y dato histórico.
+- Validador de interfaz (Herramientas > El Minero > Validar interfaz) y capturas automáticas en `Docs/Capturas/`.
+
+### Nivel 3 — La Valenciana (rediseño completo)
+- El nivel se construye **desde el mapa** `Assets/Settings/Niveles/Mapa_Nivel3.txt` (216 × 50 tiles) y ahora **sube**: galería inicial (y = 4), zona de maquinaria quemada de 1817, galería de rieles con vagoneta (y = 8), **tiro con elevador** hasta el nivel alto (y = 30), arena del jefe (y = 34) y huida del incendio hasta la salida (y = 38).
+- Tiempo límite: **220 s**. 16 vetas, 4 gemas y la pirargirita (en un nicho lateral del tiro, al que se salta desde la jaula en movimiento).
+- **Elevador del tiro** funcional: se activa al pararse en la jaula, sube a 3 u/s de y = 8 a y = 30, llega al ras del piso, baja vacío a los 3 s y vuelve abajo si el jugador reaparece. Castillete apoyado en los dos bordes del tiro, rueda animada y cable que se alarga; caen rocas por el tiro mientras sube.
+- **Incendio final** corregido: el muro de fuego no existe hasta cruzar el trigger X (después del jefe), aparece 9 u detrás del jugador, avanza a 2.6 u/s siguiendo su altura, y si lo alcanza el jugador reaparece en el checkpoint C4 y el muro se reinicia. Las bolas de fuego explotan en el piso y vuelven a un pool.
+
+### Jefe final: "El Coloso de Plata Roja"
+> **Leyenda ficticia creada para el juego**: "Cuentan los mineros de La Valenciana que, en lo más hondo de la Veta Madre, duerme un coloso de roca y plata roja. El derrumbe lo ha despertado… y bloquea la última salida."
+
+- Arena cerrada por compuertas de bloques; intro con cartel "EL COLOSO DE PLATA ROJA — Guardián de la Veta Madre" y barra de vida de 3 segmentos.
+- 3 fases: embestida (9/11/12 u/s), pisotón con ondas de choque que se saltan, lanzamiento de rocas en arco y rocas que caen del techo.
+- Solo se le hace daño **cayéndole encima cuando está aturdido** (después de chocar con la pared).
+- Al vencerlo: jingle, +300 puntos, +1 vida y se abre la salida. Si el jugador pierde una vida durante la pelea, reaparece antes de la arena y el jefe se reinicia.
+
+### Escena final jugable: `Final_Templo`
+- Reemplaza a la escena `Final`. El minero sale por el **Tiro de San Cayetano** y camina por el atrio hasta el **Templo de San Cayetano** mientras amanece: repican las campanas, el pueblo celebra, las palomas vuelan y los faroles se apagan.
+- En la puerta del templo aparece el panel final con el nombre del jugador, puntaje total, estrellas / 9, minerales distintivos / 3 y si venció al Coloso; botones Créditos (con desplazamiento sobre el amanecer) y Menú.
+- Créditos: "Jefe final y escena del Templo de San Cayetano: arte y audio generados con asistencia de IA (Claude, Anthropic)".
+

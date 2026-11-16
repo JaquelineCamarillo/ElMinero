@@ -10,8 +10,8 @@ namespace ElMinero.Editor
     /// <summary>
     /// Generador procedural de prefabs de interfaz gráfica (UI) para "El Minero".
     /// Implementa estrictamente la especificación de diseño canónico para resolución de referencia
-    /// 1920×1080 (match 0.5), escala 9-slice con pixelsPerUnitMultiplier = 0.25, tamaños mínimos de tipografía
-    /// mayores o iguales a 26 pt, selector de calidad con flechas (◀  Alta  ▶) y botones de navegación estandarizados.
+    /// 1920×1080 (match 0.5), escala 9-slice con pixelsPerUnitMultiplier = 1.5625 (1 píxel del sprite = 4 px en 1920×1080), tamaños mínimos de tipografía
+    /// mayores o iguales a 26 pt y botones de navegación estandarizados.
     /// </summary>
     public static class UIPrefabBuilder
     {
@@ -76,7 +76,7 @@ namespace ElMinero.Editor
             var imgFondo = panelRoot.AddComponent<Image>();
             imgFondo.sprite = spPanelMadera;
             imgFondo.type = Image.Type.Sliced;
-            imgFondo.pixelsPerUnitMultiplier = 0.25f;
+            imgFondo.pixelsPerUnitMultiplier = 1.5625f;
 
             var optionsScript = panelRoot.AddComponent<OptionsPanel>();
 
@@ -98,11 +98,11 @@ namespace ElMinero.Editor
             var btnVolver = goVolver.AddComponent<Button>();
             ConfigurarSpriteSwap(btnVolver, spBotonVolver, spBotonVolverRes, spBotonVolverPres);
 
-            // Vertical Layout Group dentro del panel
+            // Vertical Layout Group dentro del panel: centrado verticalmente
             var vlg = panelRoot.AddComponent<VerticalLayoutGroup>();
-            vlg.padding = new RectOffset(60, 60, 50, 50);
-            vlg.spacing = 26f;
-            vlg.childAlignment = TextAnchor.UpperCenter;
+            vlg.padding = new RectOffset(60, 60, 60, 60);
+            vlg.spacing = 30f;
+            vlg.childAlignment = TextAnchor.MiddleCenter;
             vlg.childControlWidth = true;
             vlg.childControlHeight = false;
             vlg.childForceExpandWidth = true;
@@ -119,69 +119,48 @@ namespace ElMinero.Editor
             tmpTitulo.color = Color.white;
             goTitulo.AddComponent<LayoutElement>().minHeight = 80f;
 
-            // Fila Música
+            // Fila Música (margen izquierdo 96 px: icono 48 + 24 espacio + etiqueta 260 + slider)
             GameObject filaMusica = new GameObject("Fila_Musica");
             filaMusica.transform.SetParent(panelRoot.transform, false);
             var hlgMusica = filaMusica.AddComponent<HorizontalLayoutGroup>();
+            hlgMusica.padding = new RectOffset(96, 60, 0, 0);
             hlgMusica.spacing = 24f;
-            hlgMusica.childAlignment = TextAnchor.MiddleCenter;
+            hlgMusica.childAlignment = TextAnchor.MiddleLeft;
             hlgMusica.childControlWidth = false;
             hlgMusica.childControlHeight = false;
             filaMusica.AddComponent<LayoutElement>().minHeight = 64f;
 
-            CrearIcono(filaMusica.transform, "Icono_Musica", spIconoMusica, new Vector2(56f, 56f));
-            CrearTexto(filaMusica.transform, "Label", "Música:", fontTexto, 34f, new Vector2(220f, 50f));
-            Slider sliderMusica = CrearSlider(filaMusica.transform, "Slider_Musica", spSliderFondo, spSliderRelleno, spSliderManija, new Vector2(560f, 44f));
+            CrearIcono(filaMusica.transform, "Icono_Musica", spIconoMusica, new Vector2(48f, 48f));
+            CrearTexto(filaMusica.transform, "Label", "Música:", fontTexto, 34f, new Vector2(260f, 50f));
+            Slider sliderMusica = CrearSlider(filaMusica.transform, "Slider_Musica", spSliderFondo, spSliderRelleno, spSliderManija, new Vector2(520f, 44f));
 
-            // Fila Efectos
+            // Fila Efectos (margen izquierdo 96 px: icono 48 + 24 espacio + etiqueta 260 + slider)
             GameObject filaEfectos = new GameObject("Fila_Efectos");
             filaEfectos.transform.SetParent(panelRoot.transform, false);
             var hlgEfectos = filaEfectos.AddComponent<HorizontalLayoutGroup>();
+            hlgEfectos.padding = new RectOffset(96, 60, 0, 0);
             hlgEfectos.spacing = 24f;
-            hlgEfectos.childAlignment = TextAnchor.MiddleCenter;
+            hlgEfectos.childAlignment = TextAnchor.MiddleLeft;
             hlgEfectos.childControlWidth = false;
             hlgEfectos.childControlHeight = false;
             filaEfectos.AddComponent<LayoutElement>().minHeight = 64f;
 
-            CrearIcono(filaEfectos.transform, "Icono_Efectos", spIconoEfectos, new Vector2(56f, 56f));
-            CrearTexto(filaEfectos.transform, "Label", "Efectos:", fontTexto, 34f, new Vector2(220f, 50f));
-            Slider sliderEfectos = CrearSlider(filaEfectos.transform, "Slider_Efectos", spSliderFondo, spSliderRelleno, spSliderManija, new Vector2(560f, 44f));
+            CrearIcono(filaEfectos.transform, "Icono_Efectos", spIconoEfectos, new Vector2(48f, 48f));
+            CrearTexto(filaEfectos.transform, "Label", "Efectos:", fontTexto, 34f, new Vector2(260f, 50f));
+            Slider sliderEfectos = CrearSlider(filaEfectos.transform, "Slider_Efectos", spSliderFondo, spSliderRelleno, spSliderManija, new Vector2(520f, 44f));
 
-            // Toggle Música
-            Toggle toggleMusica = CrearToggle(panelRoot.transform, "Toggle_Musica", "Activar música de fondo", spToggleFondo, spToggleCheck, fontTexto);
-            panelRoot.transform.Find("Toggle_Musica").gameObject.AddComponent<LayoutElement>().minHeight = 64f;
+            // Fila Toggle Música (margen izquierdo 96 px)
+            GameObject filaToggle = new GameObject("Fila_Toggle");
+            filaToggle.transform.SetParent(panelRoot.transform, false);
+            var hlgToggle = filaToggle.AddComponent<HorizontalLayoutGroup>();
+            hlgToggle.padding = new RectOffset(96, 60, 0, 0);
+            hlgToggle.spacing = 24f;
+            hlgToggle.childAlignment = TextAnchor.MiddleLeft;
+            hlgToggle.childControlWidth = false;
+            hlgToggle.childControlHeight = false;
+            filaToggle.AddComponent<LayoutElement>().minHeight = 64f;
 
-            // Fila Selector de Calidad (Sección D: ◀  Alta  ▶)
-            GameObject filaCalidad = new GameObject("Fila_Calidad");
-            filaCalidad.transform.SetParent(panelRoot.transform, false);
-            var hlgCalidad = filaCalidad.AddComponent<HorizontalLayoutGroup>();
-            hlgCalidad.spacing = 24f;
-            hlgCalidad.childAlignment = TextAnchor.MiddleCenter;
-            hlgCalidad.childControlWidth = false;
-            hlgCalidad.childControlHeight = false;
-            filaCalidad.AddComponent<LayoutElement>().minHeight = 70f;
-
-            CrearTexto(filaCalidad.transform, "Label", "Calidad:", fontTexto, 34f, new Vector2(240f, 50f));
-
-            // Botón Flecha Izquierda ◀
-            Button btnCalidadAnt = CrearBotonMadera(filaCalidad.transform, "Boton_Calidad_Ant", "◀", spBotonMadera, spBotonMaderaRes, spBotonMaderaPres, fontTexto, 34f, 60f);
-            btnCalidadAnt.GetComponent<RectTransform>().sizeDelta = new Vector2(72f, 60f);
-
-            // Texto Nombre Calidad
-            GameObject goTxtCalidad = new GameObject("Texto_Calidad");
-            goTxtCalidad.transform.SetParent(filaCalidad.transform, false);
-            var rectTc = goTxtCalidad.AddComponent<RectTransform>();
-            rectTc.sizeDelta = new Vector2(300f, 50f);
-            var tmpCalidad = goTxtCalidad.AddComponent<TextMeshProUGUI>();
-            tmpCalidad.font = fontTexto;
-            tmpCalidad.fontSize = 34f;
-            tmpCalidad.alignment = TextAlignmentOptions.Center;
-            tmpCalidad.text = "Alta";
-            tmpCalidad.color = new Color(1f, 0.9f, 0.5f);
-
-            // Botón Flecha Derecha ▶
-            Button btnCalidadSig = CrearBotonMadera(filaCalidad.transform, "Boton_Calidad_Sig", "▶", spBotonMadera, spBotonMaderaRes, spBotonMaderaPres, fontTexto, 34f, 60f);
-            btnCalidadSig.GetComponent<RectTransform>().sizeDelta = new Vector2(72f, 60f);
+            Toggle toggleMusica = CrearToggle(filaToggle.transform, "Toggle_Musica", "Activar música de fondo", spToggleFondo, spToggleCheck, fontTexto);
 
             // Fila Botones de Acción (Controles y Borrar Progreso)
             GameObject filaAcciones = new GameObject("Fila_Acciones");
@@ -199,41 +178,70 @@ namespace ElMinero.Editor
             Button btnBorrar = CrearBotonMadera(filaAcciones.transform, "Boton_BorrarProgreso", "Borrar Progreso", spBotonMadera, spBotonMaderaRes, spBotonMaderaPres, fontTexto, 34f, 88f);
             btnBorrar.GetComponent<RectTransform>().sizeDelta = new Vector2(360f, 88f);
 
-            // Subpanel de Controles (Modal superpuesto 1100x700)
-            GameObject panelControles = CrearSubpanelModal(panelRoot.transform, "Subpanel_Controles", spPanelMadera, new Vector2(1100f, 700f));
-            GameObject contTexto = new GameObject("Texto_Controles");
-            contTexto.transform.SetParent(panelControles.transform, false);
-            var rectCt = contTexto.AddComponent<RectTransform>();
-            rectCt.anchorMin = Vector2.zero;
-            rectCt.anchorMax = Vector2.one;
-            rectCt.offsetMin = new Vector2(40f, 110f);
-            rectCt.offsetMax = new Vector2(-40f, -40f);
-            var tmpCt = contTexto.AddComponent<TextMeshProUGUI>();
-            tmpCt.font = fontTexto;
-            tmpCt.fontSize = 32f;
-            tmpCt.text = "<b><size=44>CONTROLES DEL JUEGO</size></b>\n\n" +
-                         "<b>TECLADO:</b>\n" +
-                         "• <b>A / D</b> o <b>Flechas</b> : Moverse a los lados\n" +
-                         "• <b>Espacio</b> : Saltar (mantén para mayor altura)\n" +
-                         "• <b>Escape / P</b> : Menú de Pausa\n\n" +
-                         "<b>GAMEPAD:</b>\n" +
-                         "• <b>Stick Izquierdo / D-Pad</b> : Moverse\n" +
-                         "• <b>Botón Sur (A/X)</b> : Saltar\n" +
-                         "• <b>Start / Menú</b> : Pausa\n\n" +
-                         "<b>PANTALLA TÁCTIL:</b>\n" +
-                         "• Botones virtuales en pantalla.";
-            tmpCt.color = Color.white;
+            // Subpanel de Controles (Modal superpuesto 1300x860, SetAsLastSibling)
+            GameObject panelControles = CrearSubpanelModal(panelRoot.transform, "Subpanel_Controles", spPanelMadera, new Vector2(1300f, 860f));
+            panelControles.transform.SetAsLastSibling();
 
-            Button btnCerrarControles = CrearBotonMadera(panelControles.transform, "Boton_CerrarControles", "Cerrar", spBotonMadera, spBotonMaderaRes, spBotonMaderaPres, fontTexto, 34f, 88f);
+            GameObject contArea = new GameObject("Area_Contenido");
+            contArea.transform.SetParent(panelControles.transform, false);
+            var rectArea = contArea.AddComponent<RectTransform>();
+            rectArea.anchorMin = Vector2.zero;
+            rectArea.anchorMax = Vector2.one;
+            rectArea.offsetMin = new Vector2(72f, 150f);
+            rectArea.offsetMax = new Vector2(-72f, -64f);
+
+            var vlgArea = contArea.AddComponent<VerticalLayoutGroup>();
+            vlgArea.spacing = 10f;
+            vlgArea.childAlignment = TextAnchor.UpperLeft;
+            vlgArea.childControlWidth = true;
+            vlgArea.childControlHeight = true;
+            vlgArea.childForceExpandWidth = true;
+            vlgArea.childForceExpandHeight = false;
+
+            // Título Controles (Press Start 2P 44, Auto Size 30-44, una sola línea)
+            GameObject goTitCtrl = new GameObject("Titulo_Controles");
+            goTitCtrl.transform.SetParent(contArea.transform, false);
+            var tmpTitCtrl = goTitCtrl.AddComponent<TextMeshProUGUI>();
+            tmpTitCtrl.font = fontTitulo;
+            tmpTitCtrl.text = "CONTROLES DEL JUEGO";
+            tmpTitCtrl.fontSize = 44f;
+            tmpTitCtrl.enableAutoSizing = true;
+            tmpTitCtrl.fontSizeMin = 30f;
+            tmpTitCtrl.fontSizeMax = 44f;
+            tmpTitCtrl.textWrappingMode = TextWrappingModes.NoWrap;
+            tmpTitCtrl.alignment = TextAlignmentOptions.Center;
+            tmpTitCtrl.color = Color.white;
+            goTitCtrl.AddComponent<LayoutElement>().minHeight = 56f;
+
+            // Secciones con subtítulos Pixelify Sans 32 y renglones en 28 con "-"
+            CrearSeccionControles(contArea.transform, "TECLADO", new string[] {
+                "- A / D o Flechas : Moverse a los lados",
+                "- Espacio : Saltar (mantén para mayor altura)",
+                "- Escape / P : Menú de Pausa"
+            }, fontTexto);
+
+            CrearSeccionControles(contArea.transform, "CONTROL (GAMEPAD)", new string[] {
+                "- Stick Izquierdo / D-Pad : Moverse",
+                "- Botón Sur (A/X) : Saltar",
+                "- Start / Menú : Pausa"
+            }, fontTexto);
+
+            CrearSeccionControles(contArea.transform, "PANTALLA TÁCTIL", new string[] {
+                "- Botones virtuales en pantalla"
+            }, fontTexto);
+
+            Button btnCerrarControles = CrearBotonMadera(panelControles.transform, "Boton_CerrarControles", "Cerrar", spBotonMadera, spBotonMaderaRes, spBotonMaderaPres, fontTexto, 34f, 84f);
             var rectBcc = btnCerrarControles.GetComponent<RectTransform>();
             rectBcc.anchorMin = new Vector2(0.5f, 0f);
             rectBcc.anchorMax = new Vector2(0.5f, 0f);
-            rectBcc.anchoredPosition = new Vector2(0f, 50f);
-            rectBcc.sizeDelta = new Vector2(360f, 88f);
+            rectBcc.pivot = new Vector2(0.5f, 0f);
+            rectBcc.anchoredPosition = new Vector2(0f, 48f);
+            rectBcc.sizeDelta = new Vector2(360f, 84f);
             panelControles.SetActive(false);
 
             // Modal Confirmar Borrado (900x500)
             GameObject modalBorrar = CrearSubpanelModal(panelRoot.transform, "Modal_ConfirmarBorrado", spPanelMadera, new Vector2(900f, 500f));
+            modalBorrar.transform.SetAsLastSibling();
             GameObject textoMb = new GameObject("Texto_Confirmar");
             textoMb.transform.SetParent(modalBorrar.transform, false);
             var rectMb = textoMb.AddComponent<RectTransform>();
@@ -281,9 +289,6 @@ namespace ElMinero.Editor
             so.FindProperty("sliderMusica").objectReferenceValue = sliderMusica;
             so.FindProperty("sliderEfectos").objectReferenceValue = sliderEfectos;
             so.FindProperty("toggleMusica").objectReferenceValue = toggleMusica;
-            so.FindProperty("botonCalidadAnterior").objectReferenceValue = btnCalidadAnt;
-            so.FindProperty("botonCalidadSiguiente").objectReferenceValue = btnCalidadSig;
-            so.FindProperty("textoCalidad").objectReferenceValue = tmpCalidad;
             so.FindProperty("botonControles").objectReferenceValue = btnControles;
             so.FindProperty("panelControles").objectReferenceValue = panelControles;
             so.FindProperty("botonCerrarControles").objectReferenceValue = btnCerrarControles;
@@ -296,9 +301,35 @@ namespace ElMinero.Editor
             so.ApplyModifiedProperties();
 
             string prefabPath = PrefabUIPath + "OptionsPanel.prefab";
+            ElMineroBuilder.DecorarPanelesEn(panelRoot);
             PrefabUtility.SaveAsPrefabAsset(panelRoot, prefabPath);
             GameObject.DestroyImmediate(panelRoot);
             return AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        }
+
+        private static void CrearSeccionControles(Transform parent, string subtitulo, string[] lineas, TMP_FontAsset fontTexto)
+        {
+            GameObject goSub = new GameObject("Subtitulo_" + subtitulo.Replace(" ", "_"));
+            goSub.transform.SetParent(parent, false);
+            var tmpSub = goSub.AddComponent<TextMeshProUGUI>();
+            tmpSub.font = fontTexto;
+            tmpSub.fontSize = 32f;
+            tmpSub.fontStyle = FontStyles.Bold;
+            tmpSub.color = new Color(1f, 0.85f, 0.4f);
+            tmpSub.text = subtitulo;
+            goSub.AddComponent<LayoutElement>().minHeight = 36f;
+
+            foreach (var l in lineas)
+            {
+                GameObject goLine = new GameObject("Linea");
+                goLine.transform.SetParent(parent, false);
+                var tmpLine = goLine.AddComponent<TextMeshProUGUI>();
+                tmpLine.font = fontTexto;
+                tmpLine.fontSize = 28f;
+                tmpLine.color = Color.white;
+                tmpLine.text = l;
+                goLine.AddComponent<LayoutElement>().minHeight = 30f;
+            }
         }
 
         // ====================================================================
@@ -324,7 +355,7 @@ namespace ElMinero.Editor
             var imgFondo = panelRoot.AddComponent<Image>();
             imgFondo.sprite = spPanelMadera;
             imgFondo.type = Image.Type.Sliced;
-            imgFondo.pixelsPerUnitMultiplier = 0.25f;
+            imgFondo.pixelsPerUnitMultiplier = 1.5625f;
 
             var credScript = panelRoot.AddComponent<CreditsPanel>();
 
@@ -351,7 +382,7 @@ namespace ElMinero.Editor
             rectTit.anchoredPosition = new Vector2(0f, -50f);
             rectTit.sizeDelta = new Vector2(800f, 60f);
             var tmpTitulo = goTitulo.AddComponent<TextMeshProUGUI>();
-            tmpTitulo.text = "CRÉDITOS";
+            tmpTitulo.text = "CREDITOS";
             tmpTitulo.fontSize = 56f;
             tmpTitulo.font = fontTitulo;
             tmpTitulo.alignment = TextAlignmentOptions.Center;
@@ -410,9 +441,6 @@ namespace ElMinero.Editor
                            "<b>HISTORIA Y MINERÍA</b>\n" +
                            "Mina de Rayas · El Nopal · La Valenciana\n" +
                            "Guanajuato, México — Siglo XIX\n\n" +
-                           "<b>TIPOGRAFÍAS</b>\n" +
-                           "Press Start 2P (CodeMan38, SIL OFL 1.1)\n" +
-                           "Pixelify Sans (Stefie Justprince, SIL OFL 1.1)\n\n" +
                            "<i>¡Gracias por jugar!</i>";
 
             SerializedObject so = new SerializedObject(credScript);
@@ -421,6 +449,7 @@ namespace ElMinero.Editor
             so.ApplyModifiedProperties();
 
             string prefabPath = PrefabUIPath + "CreditsPanel.prefab";
+            ElMineroBuilder.DecorarPanelesEn(panelRoot);
             PrefabUtility.SaveAsPrefabAsset(panelRoot, prefabPath);
             GameObject.DestroyImmediate(panelRoot);
             return AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
@@ -459,38 +488,54 @@ namespace ElMinero.Editor
             var imgFondo = panelRoot.AddComponent<Image>();
             imgFondo.sprite = spPanelMadera;
             imgFondo.type = Image.Type.Sliced;
-            imgFondo.pixelsPerUnitMultiplier = 0.25f;
+            imgFondo.pixelsPerUnitMultiplier = 1.5625f;
 
             var selScript = panelRoot.AddComponent<LevelSelectPanel>();
 
-            // Botón Volver (104x104)
+            // Botón Volver (96x96), dentro del marco interior
             GameObject goVolver = new GameObject("Boton_Volver");
             goVolver.transform.SetParent(panelRoot.transform, false);
             var rectVolver = goVolver.AddComponent<RectTransform>();
             rectVolver.anchorMin = new Vector2(0f, 1f);
             rectVolver.anchorMax = new Vector2(0f, 1f);
             rectVolver.pivot = new Vector2(0f, 1f);
-            rectVolver.anchoredPosition = new Vector2(36f, -36f);
-            rectVolver.sizeDelta = new Vector2(104f, 104f);
+            rectVolver.anchoredPosition = new Vector2(60f, -56f);
+            rectVolver.sizeDelta = new Vector2(96f, 96f);
             var imgVolver = goVolver.AddComponent<Image>();
             imgVolver.sprite = spBotonVolver;
             var btnVolver = goVolver.AddComponent<Button>();
             ConfigurarSpriteSwap(btnVolver, spBotonVolver, spBotonVolverRes, spBotonVolverPres);
 
-            // Título: "SELECCIÓN DE NIVELES" (PressStart2P 60 pt)
+            // Título sobre una cinta roja con orillas doradas
+            GameObject goCinta = new GameObject("Cinta_Titulo");
+            goCinta.transform.SetParent(panelRoot.transform, false);
+            var rectCinta = goCinta.AddComponent<RectTransform>();
+            rectCinta.anchorMin = new Vector2(0.5f, 1f);
+            rectCinta.anchorMax = new Vector2(0.5f, 1f);
+            rectCinta.anchoredPosition = new Vector2(0f, -100f);
+            rectCinta.sizeDelta = new Vector2(980f, 80f);
+            var imgCinta = goCinta.AddComponent<Image>();
+            imgCinta.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Decoracion/Cinta_Titulo.png");
+            imgCinta.type = Image.Type.Sliced;
+            imgCinta.pixelsPerUnitMultiplier = 1.5625f;
+            imgCinta.raycastTarget = false;
+
             GameObject goTitulo = new GameObject("Titulo");
-            goTitulo.transform.SetParent(panelRoot.transform, false);
+            goTitulo.transform.SetParent(goCinta.transform, false);
             var rectTit = goTitulo.AddComponent<RectTransform>();
-            rectTit.anchorMin = new Vector2(0.5f, 1f);
-            rectTit.anchorMax = new Vector2(0.5f, 1f);
-            rectTit.anchoredPosition = new Vector2(0f, -60f);
-            rectTit.sizeDelta = new Vector2(1200f, 70f);
+            rectTit.anchorMin = Vector2.zero;
+            rectTit.anchorMax = Vector2.one;
+            rectTit.offsetMin = new Vector2(70f, 6f);
+            rectTit.offsetMax = new Vector2(-70f, -6f);
             var tmpTitulo = goTitulo.AddComponent<TextMeshProUGUI>();
-            tmpTitulo.text = "SELECCIÓN DE NIVELES";
-            tmpTitulo.fontSize = 60f;
+            tmpTitulo.text = "SELECCION DE NIVELES";
             tmpTitulo.font = fontTitulo;
+            tmpTitulo.enableAutoSizing = true;
+            tmpTitulo.fontSizeMin = 24f;
+            tmpTitulo.fontSizeMax = 42f;
             tmpTitulo.alignment = TextAlignmentOptions.Center;
-            tmpTitulo.color = Color.white;
+            tmpTitulo.color = new Color(1f, 0.91f, 0.59f);
+            tmpTitulo.raycastTarget = false;
 
             // Fila de 3 tarjetas (420x640 cada una, espaciado 40 px)
             GameObject goFila = new GameObject("Fila_Tarjetas");
@@ -498,7 +543,7 @@ namespace ElMinero.Editor
             var rectFila = goFila.AddComponent<RectTransform>();
             rectFila.anchorMin = new Vector2(0.5f, 0.5f);
             rectFila.anchorMax = new Vector2(0.5f, 0.5f);
-            rectFila.anchoredPosition = new Vector2(0f, -40f);
+            rectFila.anchoredPosition = new Vector2(0f, -55f);
             rectFila.sizeDelta = new Vector2(1380f, 650f);
 
             var hlg = goFila.AddComponent<HorizontalLayoutGroup>();
@@ -508,9 +553,9 @@ namespace ElMinero.Editor
             hlg.childControlHeight = false;
 
             // Construir 3 tarjetas canónicas
-            var t1 = CrearTarjetaNivel(goFila.transform, 1, "Nivel1_MinaRayas", "1 · Mina Rayas", spMiniN1, spBotonNivel, spBotonNivelRes, spBotonNivelPres, spCandado, spEstrellaVacia, fontTitulo, fontTexto);
-            var t2 = CrearTarjetaNivel(goFila.transform, 2, "Nivel2_ElNopal", "2 · El Nopal", spMiniN2, spBotonNivel, spBotonNivelRes, spBotonNivelPres, spCandado, spEstrellaVacia, fontTitulo, fontTexto);
-            var t3 = CrearTarjetaNivel(goFila.transform, 3, "Nivel3_LaValenciana", "3 · La Valenciana", spMiniN3, spBotonNivel, spBotonNivelRes, spBotonNivelPres, spCandado, spEstrellaVacia, fontTitulo, fontTexto);
+            var t1 = CrearTarjetaNivel(goFila.transform, 1, "Nivel1_MinaRayas", "Mina Rayas", spMiniN1, spBotonNivel, spBotonNivelRes, spBotonNivelPres, spCandado, spEstrellaVacia, fontTitulo, fontTexto);
+            var t2 = CrearTarjetaNivel(goFila.transform, 2, "Nivel2_ElNopal", "El Nopal", spMiniN2, spBotonNivel, spBotonNivelRes, spBotonNivelPres, spCandado, spEstrellaVacia, fontTitulo, fontTexto);
+            var t3 = CrearTarjetaNivel(goFila.transform, 3, "Nivel3_LaValenciana", "La Valenciana", spMiniN3, spBotonNivel, spBotonNivelRes, spBotonNivelPres, spCandado, spEstrellaVacia, fontTitulo, fontTexto);
 
             SerializedObject so = new SerializedObject(selScript);
             so.FindProperty("botonVolver").objectReferenceValue = btnVolver;
@@ -525,6 +570,7 @@ namespace ElMinero.Editor
             so.ApplyModifiedProperties();
 
             string prefabPath = PrefabUIPath + "LevelSelectPanel.prefab";
+            ElMineroBuilder.DecorarPanelesEn(panelRoot);
             PrefabUtility.SaveAsPrefabAsset(panelRoot, prefabPath);
             GameObject.DestroyImmediate(panelRoot);
             return AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
@@ -552,51 +598,90 @@ namespace ElMinero.Editor
             var imgFondo = goTarjeta.AddComponent<Image>();
             imgFondo.sprite = spBoton;
             imgFondo.type = Image.Type.Sliced;
-            imgFondo.pixelsPerUnitMultiplier = 0.25f;
+            imgFondo.pixelsPerUnitMultiplier = 1.5625f;
 
             var btn = goTarjeta.AddComponent<Button>();
             ConfigurarSpriteSwap(btn, spBoton, spBotonRes, spBotonPres);
 
-            // Miniatura (360x200)
+            Sprite spMarcoMini = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Decoracion/Marco_Miniatura.png");
+            Sprite spMedalla = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Decoracion/Medalla.png");
+            Sprite spBanda = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Campo_Texto.png");
+            Sprite spSeparador = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Menu/Menu_Separador.png");
+
+            // Miniatura (360x200) con marco de hierro
             GameObject goMini = new GameObject("Miniatura");
             goMini.transform.SetParent(goTarjeta.transform, false);
             var rectMini = goMini.AddComponent<RectTransform>();
             rectMini.anchorMin = new Vector2(0.5f, 1f);
             rectMini.anchorMax = new Vector2(0.5f, 1f);
-            rectMini.anchoredPosition = new Vector2(0f, -140f);
+            rectMini.anchoredPosition = new Vector2(0f, -192f);
             rectMini.sizeDelta = new Vector2(360f, 200f);
             var imgMini = goMini.AddComponent<Image>();
             imgMini.sprite = miniatura;
-            imgMini.preserveAspect = true;
+            imgMini.raycastTarget = false;
 
-            // Título de la Mina (34 pt)
+            GameObject goMarcoMini = new GameObject("Marco_Miniatura");
+            goMarcoMini.transform.SetParent(goTarjeta.transform, false);
+            var rectMarco = goMarcoMini.AddComponent<RectTransform>();
+            rectMarco.anchorMin = new Vector2(0.5f, 1f);
+            rectMarco.anchorMax = new Vector2(0.5f, 1f);
+            rectMarco.anchoredPosition = new Vector2(0f, -192f);
+            rectMarco.sizeDelta = new Vector2(384f, 224f);
+            var imgMarco = goMarcoMini.AddComponent<Image>();
+            imgMarco.sprite = spMarcoMini;
+            imgMarco.type = Image.Type.Sliced;
+            imgMarco.fillCenter = false;
+            imgMarco.pixelsPerUnitMultiplier = 1.5625f;
+            imgMarco.raycastTarget = false;
+
+            // Nombre de la mina
             GameObject goTitulo = new GameObject("Texto_TituloMina");
             goTitulo.transform.SetParent(goTarjeta.transform, false);
             var rectTit = goTitulo.AddComponent<RectTransform>();
             rectTit.anchorMin = new Vector2(0.5f, 1f);
             rectTit.anchorMax = new Vector2(0.5f, 1f);
-            rectTit.anchoredPosition = new Vector2(0f, -40f);
-            rectTit.sizeDelta = new Vector2(380f, 60f);
+            rectTit.anchoredPosition = new Vector2(20f, -48f);
+            rectTit.sizeDelta = new Vector2(320f, 50f);
             var tmpTit = goTitulo.AddComponent<TextMeshProUGUI>();
             tmpTit.font = fontTexto;
             tmpTit.fontSize = 34f;
+            tmpTit.enableAutoSizing = true;
+            tmpTit.fontSizeMin = 24f;
+            tmpTit.fontSizeMax = 34f;
             tmpTit.fontStyle = FontStyles.Bold;
             tmpTit.alignment = TextAlignmentOptions.Center;
-            tmpTit.color = Color.white;
+            tmpTit.color = new Color(0.96f, 0.91f, 0.8f);
             tmpTit.text = nombreMina;
+            tmpTit.raycastTarget = false;
+
+            // Banda oscura para las estrellas
+            GameObject goBanda = new GameObject("Banda_Estrellas");
+            goBanda.transform.SetParent(goTarjeta.transform, false);
+            var rectBanda = goBanda.AddComponent<RectTransform>();
+            rectBanda.anchorMin = new Vector2(0.5f, 1f);
+            rectBanda.anchorMax = new Vector2(0.5f, 1f);
+            rectBanda.anchoredPosition = new Vector2(0f, -360f);
+            rectBanda.sizeDelta = new Vector2(300f, 84f);
+            var imgBanda = goBanda.AddComponent<Image>();
+            imgBanda.sprite = spBanda;
+            imgBanda.type = Image.Type.Sliced;
+            imgBanda.pixelsPerUnitMultiplier = 1.5625f;
+            imgBanda.raycastTarget = false;
 
             // Fila de 3 Estrellas (56x56 cada una)
             GameObject goEstrellas = new GameObject("Fila_Estrellas");
             goEstrellas.transform.SetParent(goTarjeta.transform, false);
             var rectEst = goEstrellas.AddComponent<RectTransform>();
-            rectEst.anchorMin = new Vector2(0.5f, 0.45f);
-            rectEst.anchorMax = new Vector2(0.5f, 0.45f);
-            rectEst.anchoredPosition = new Vector2(0f, -20f);
+            rectEst.anchorMin = new Vector2(0.5f, 1f);
+            rectEst.anchorMax = new Vector2(0.5f, 1f);
+            rectEst.anchoredPosition = new Vector2(0f, -360f);
             rectEst.sizeDelta = new Vector2(240f, 60f);
 
             var hlgEst = goEstrellas.AddComponent<HorizontalLayoutGroup>();
             hlgEst.spacing = 18f;
             hlgEst.childAlignment = TextAnchor.MiddleCenter;
+            hlgEst.childControlWidth = false;
+            hlgEst.childControlHeight = false;
 
             Image[] iconos = new Image[3];
             for (int i = 0; i < 3; i++)
@@ -608,23 +693,71 @@ namespace ElMinero.Editor
                 var ie = goE.AddComponent<Image>();
                 ie.sprite = spEstrellaVacia;
                 ie.preserveAspect = true;
+                ie.raycastTarget = false;
                 iconos[i] = ie;
             }
 
-            // Récords (30 pt)
+            // Separador dorado
+            GameObject goSep = new GameObject("Separador");
+            goSep.transform.SetParent(goTarjeta.transform, false);
+            var rectSep = goSep.AddComponent<RectTransform>();
+            rectSep.anchorMin = new Vector2(0.5f, 1f);
+            rectSep.anchorMax = new Vector2(0.5f, 1f);
+            rectSep.anchoredPosition = new Vector2(0f, -432f);
+            rectSep.sizeDelta = new Vector2(320f, 20f);
+            var imgSep = goSep.AddComponent<Image>();
+            imgSep.sprite = spSeparador;
+            imgSep.raycastTarget = false;
+
+            // Récords (28 pt, dos renglones)
             GameObject goRec = new GameObject("Texto_Record");
             goRec.transform.SetParent(goTarjeta.transform, false);
             var rectRec = goRec.AddComponent<RectTransform>();
-            rectRec.anchorMin = new Vector2(0.5f, 0f);
-            rectRec.anchorMax = new Vector2(0.5f, 0f);
-            rectRec.anchoredPosition = new Vector2(0f, 120f);
-            rectRec.sizeDelta = new Vector2(380f, 50f);
+            rectRec.anchorMin = new Vector2(0.5f, 1f);
+            rectRec.anchorMax = new Vector2(0.5f, 1f);
+            rectRec.anchoredPosition = new Vector2(0f, -492f);
+            rectRec.sizeDelta = new Vector2(360f, 76f);
             var tmpRec = goRec.AddComponent<TextMeshProUGUI>();
             tmpRec.font = fontTexto;
-            tmpRec.fontSize = 30f;
+            tmpRec.fontSize = 28f;
             tmpRec.alignment = TextAlignmentOptions.Center;
             tmpRec.color = new Color(0.95f, 0.9f, 0.75f);
             tmpRec.text = "Sin récord aún";
+            tmpRec.raycastTarget = false;
+
+            // Medalla con el número del nivel (sobre la esquina)
+            GameObject goMedalla = new GameObject("Medalla_Numero");
+            goMedalla.transform.SetParent(goTarjeta.transform, false);
+            var rectMed = goMedalla.AddComponent<RectTransform>();
+            rectMed.anchorMin = new Vector2(0f, 1f);
+            rectMed.anchorMax = new Vector2(0f, 1f);
+            rectMed.pivot = new Vector2(0.5f, 0.5f);
+            rectMed.anchoredPosition = new Vector2(26f, -26f);
+            rectMed.sizeDelta = new Vector2(80f, 80f);
+            var imgMed = goMedalla.AddComponent<Image>();
+            imgMed.sprite = spMedalla;
+            imgMed.raycastTarget = false;
+            GameObject goNum = new GameObject("Numero");
+            goNum.transform.SetParent(goMedalla.transform, false);
+            var rectNum = goNum.AddComponent<RectTransform>();
+            rectNum.anchorMin = Vector2.zero;
+            rectNum.anchorMax = Vector2.one;
+            rectNum.offsetMin = new Vector2(0f, 2f);
+            rectNum.offsetMax = new Vector2(4f, 0f);
+            var tmpNum = goNum.AddComponent<TextMeshProUGUI>();
+            tmpNum.font = fontTitulo;
+            tmpNum.fontSize = 30f;
+            tmpNum.alignment = TextAlignmentOptions.Center;
+            tmpNum.color = new Color(0.28f, 0.16f, 0.04f);
+            tmpNum.text = numero.ToString();
+            tmpNum.raycastTarget = false;
+
+            // Efecto al pasar el ratón: crece un poco y el nombre se vuelve dorado
+            var anim = goTarjeta.AddComponent<BotonMenuAnimado>();
+            var soAnim = new SerializedObject(anim);
+            soAnim.FindProperty("texto").objectReferenceValue = tmpTit;
+            soAnim.FindProperty("escalaResaltado").floatValue = 1.04f;
+            soAnim.ApplyModifiedPropertiesWithoutUndo();
 
             // Candado / Estado
             GameObject goLock = new GameObject("Contenedor_Candado");
@@ -640,8 +773,8 @@ namespace ElMinero.Editor
             var rectIc = goIconoCandado.AddComponent<RectTransform>();
             rectIc.anchorMin = new Vector2(0.5f, 0.5f);
             rectIc.anchorMax = new Vector2(0.5f, 0.5f);
-            rectIc.anchoredPosition = new Vector2(0f, 30f);
-            rectIc.sizeDelta = new Vector2(80f, 80f);
+            rectIc.anchoredPosition = new Vector2(0f, 128f); // sobre la miniatura
+            rectIc.sizeDelta = new Vector2(96f, 96f);
             var imgLock = goIconoCandado.AddComponent<Image>();
             imgLock.sprite = spCandado;
             imgLock.preserveAspect = true;
@@ -651,7 +784,7 @@ namespace ElMinero.Editor
             var rectEstad = goEstado.AddComponent<RectTransform>();
             rectEstad.anchorMin = new Vector2(0.5f, 0f);
             rectEstad.anchorMax = new Vector2(0.5f, 0f);
-            rectEstad.anchoredPosition = new Vector2(0f, 50f);
+            rectEstad.anchoredPosition = new Vector2(0f, 56f);
             rectEstad.sizeDelta = new Vector2(380f, 50f);
             var tmpEstad = goEstado.AddComponent<TextMeshProUGUI>();
             tmpEstad.font = fontTexto;
@@ -717,7 +850,7 @@ namespace ElMinero.Editor
             var imgFondo = panelRoot.AddComponent<Image>();
             imgFondo.sprite = spPanelMadera;
             imgFondo.type = Image.Type.Sliced;
-            imgFondo.pixelsPerUnitMultiplier = 0.25f;
+            imgFondo.pixelsPerUnitMultiplier = 1.5625f;
 
             var resScript = panelRoot.AddComponent<ResultsPanel>();
 
@@ -727,11 +860,11 @@ namespace ElMinero.Editor
             var rectTit = goTitulo.AddComponent<RectTransform>();
             rectTit.anchorMin = new Vector2(0.5f, 1f);
             rectTit.anchorMax = new Vector2(0.5f, 1f);
-            rectTit.anchoredPosition = new Vector2(0f, -65f);
-            rectTit.sizeDelta = new Vector2(1100f, 70f);
+            rectTit.anchoredPosition = new Vector2(0f, -82f);
+            rectTit.sizeDelta = new Vector2(1040f, 70f);
             var tmpTit = goTitulo.AddComponent<TextMeshProUGUI>();
             tmpTit.font = fontTitulo;
-            tmpTit.fontSize = 60f;
+            tmpTit.fontSize = 56f;
             tmpTit.text = "¡NIVEL COMPLETADO!";
             tmpTit.alignment = TextAlignmentOptions.Center;
             tmpTit.color = new Color(1f, 0.85f, 0.4f);
@@ -742,7 +875,7 @@ namespace ElMinero.Editor
             var rectFrase = goFrase.AddComponent<RectTransform>();
             rectFrase.anchorMin = new Vector2(0.5f, 1f);
             rectFrase.anchorMax = new Vector2(0.5f, 1f);
-            rectFrase.anchoredPosition = new Vector2(0f, -145f);
+            rectFrase.anchoredPosition = new Vector2(0f, -152f);
             rectFrase.sizeDelta = new Vector2(1000f, 50f);
             var tmpFrase = goFrase.AddComponent<TextMeshProUGUI>();
             tmpFrase.font = fontTexto;
@@ -812,7 +945,7 @@ namespace ElMinero.Editor
             TextMeshProUGUI tGemas = CrearTextoStat(goStats.transform, "Texto_Gemas", "Gemas: 0 / 0", fontTexto);
             TextMeshProUGUI tPlata = CrearTextoStat(goStats.transform, "Texto_Plata", "Plata: 0 / 0", fontTexto);
             TextMeshProUGUI tTiempo = CrearTextoStat(goStats.transform, "Texto_Tiempo", "Tiempo restante: 0.0s", fontTexto);
-            TextMeshProUGUI tVidas = CrearTextoStat(goStats.transform, "Texto_Vidas", "Vidas restantes: 3 ♥", fontTexto);
+            TextMeshProUGUI tVidas = CrearTextoStat(goStats.transform, "Texto_Vidas", "Vidas restantes: 3", fontTexto);
             TextMeshProUGUI tScore = CrearTextoStat(goStats.transform, "Texto_PuntosNivel", "Puntos nivel: 0", fontTexto);
             TextMeshProUGUI tTotal = CrearTextoStat(goStats.transform, "Texto_PuntosTotal", "Total acumulado: 0", fontTexto);
 
@@ -822,21 +955,21 @@ namespace ElMinero.Editor
             var rectBtn = goBotones.AddComponent<RectTransform>();
             rectBtn.anchorMin = new Vector2(0.5f, 0f);
             rectBtn.anchorMax = new Vector2(0.5f, 0f);
-            rectBtn.anchoredPosition = new Vector2(0f, 70f);
-            rectBtn.sizeDelta = new Vector2(1080f, 88f);
+            rectBtn.anchoredPosition = new Vector2(0f, 122f); // por encima del marco interior y del remate
+            rectBtn.sizeDelta = new Vector2(1020f, 88f);
 
             var hlgBtn = goBotones.AddComponent<HorizontalLayoutGroup>();
             hlgBtn.spacing = 30f;
             hlgBtn.childAlignment = TextAnchor.MiddleCenter;
 
             Button btnSig = CrearBotonMadera(goBotones.transform, "Boton_Siguiente", "Siguiente nivel", spBotonMadera, spBotonMaderaRes, spBotonMaderaPres, fontTexto, 34f, 88f);
-            btnSig.GetComponent<RectTransform>().sizeDelta = new Vector2(340f, 88f);
+            btnSig.GetComponent<RectTransform>().sizeDelta = new Vector2(320f, 88f);
 
             Button btnRep = CrearBotonMadera(goBotones.transform, "Boton_Repetir", "Repetir", spBotonMadera, spBotonMaderaRes, spBotonMaderaPres, fontTexto, 34f, 88f);
-            btnRep.GetComponent<RectTransform>().sizeDelta = new Vector2(340f, 88f);
+            btnRep.GetComponent<RectTransform>().sizeDelta = new Vector2(320f, 88f);
 
             Button btnMen = CrearBotonMadera(goBotones.transform, "Boton_Menu", "Menú", spBotonMadera, spBotonMaderaRes, spBotonMaderaPres, fontTexto, 34f, 88f);
-            btnMen.GetComponent<RectTransform>().sizeDelta = new Vector2(340f, 88f);
+            btnMen.GetComponent<RectTransform>().sizeDelta = new Vector2(320f, 88f);
 
             SerializedObject so = new SerializedObject(resScript);
             so.FindProperty("textoTitulo").objectReferenceValue = tmpTit;
@@ -866,6 +999,7 @@ namespace ElMinero.Editor
             panelRoot.SetActive(false);
 
             string prefabPath = PrefabUIPath + "ResultsPanel.prefab";
+            ElMineroBuilder.DecorarPanelesEn(panelRoot);
             PrefabUtility.SaveAsPrefabAsset(panelRoot, prefabPath);
             GameObject.DestroyImmediate(panelRoot);
             return AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
@@ -906,7 +1040,7 @@ namespace ElMinero.Editor
             var imgFondo = panelRoot.AddComponent<Image>();
             imgFondo.sprite = spPanelMadera;
             imgFondo.type = Image.Type.Sliced;
-            imgFondo.pixelsPerUnitMultiplier = 0.25f;
+            imgFondo.pixelsPerUnitMultiplier = 1.5625f;
 
             var goScript = panelRoot.AddComponent<GameOverPanel>();
 
@@ -916,12 +1050,16 @@ namespace ElMinero.Editor
             var rectTit = goTit.AddComponent<RectTransform>();
             rectTit.anchorMin = new Vector2(0.5f, 1f);
             rectTit.anchorMax = new Vector2(0.5f, 1f);
-            rectTit.anchoredPosition = new Vector2(0f, -70f);
-            rectTit.sizeDelta = new Vector2(1150f, 70f);
+            rectTit.anchoredPosition = new Vector2(0f, -80f);
+            rectTit.sizeDelta = new Vector2(1040f, 70f); // 1200 − 2 × 80 de margen: dentro del marco
             var tmpTit = goTit.AddComponent<TextMeshProUGUI>();
             tmpTit.font = fontTitulo;
             tmpTit.fontSize = 56f;
-            tmpTit.text = "¡EL DERRUMBE TE ALCANZÓ!";
+            tmpTit.text = "¡EL DERRUMBE TE ALCANZO!";
+            tmpTit.enableAutoSizing = true;
+            tmpTit.fontSizeMin = 30f;
+            tmpTit.fontSizeMax = 52f;
+            tmpTit.textWrappingMode = TextWrappingModes.NoWrap;
             tmpTit.alignment = TextAlignmentOptions.Center;
             tmpTit.color = new Color(0.95f, 0.25f, 0.25f);
 
@@ -976,7 +1114,7 @@ namespace ElMinero.Editor
             var rectBtn = goBotones.AddComponent<RectTransform>();
             rectBtn.anchorMin = new Vector2(0.5f, 0f);
             rectBtn.anchorMax = new Vector2(0.5f, 0f);
-            rectBtn.anchoredPosition = new Vector2(0f, 70f);
+            rectBtn.anchoredPosition = new Vector2(0f, 122f);
             rectBtn.sizeDelta = new Vector2(800f, 88f);
 
             var hlgBtn = goBotones.AddComponent<HorizontalLayoutGroup>();
@@ -1001,6 +1139,7 @@ namespace ElMinero.Editor
             panelRoot.SetActive(false);
 
             string prefabPath = PrefabUIPath + "GameOverPanel.prefab";
+            ElMineroBuilder.DecorarPanelesEn(panelRoot);
             PrefabUtility.SaveAsPrefabAsset(panelRoot, prefabPath);
             GameObject.DestroyImmediate(panelRoot);
             return AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
@@ -1021,80 +1160,130 @@ namespace ElMinero.Editor
 
             GameObject cardRoot = new GameObject("LevelStartCard");
             var rectRoot = cardRoot.AddComponent<RectTransform>();
-            rectRoot.sizeDelta = new Vector2(1100f, 650f);
+            rectRoot.sizeDelta = new Vector2(1400f, 880f);
             rectRoot.anchorMin = new Vector2(0.5f, 0.5f);
             rectRoot.anchorMax = new Vector2(0.5f, 0.5f);
+            rectRoot.pivot = new Vector2(0.5f, 0.5f);
 
             var imgFondo = cardRoot.AddComponent<Image>();
             imgFondo.sprite = spPanelMadera;
             imgFondo.type = Image.Type.Sliced;
-            imgFondo.pixelsPerUnitMultiplier = 0.25f;
+            imgFondo.pixelsPerUnitMultiplier = 1.5625f;
 
             var cardScript = cardRoot.AddComponent<LevelStartCard>();
 
-            // Miniatura (400x220)
-            GameObject goMini = new GameObject("Miniatura_Mina");
-            goMini.transform.SetParent(cardRoot.transform, false);
-            var rectMini = goMini.AddComponent<RectTransform>();
-            rectMini.anchorMin = new Vector2(0.5f, 1f);
-            rectMini.anchorMax = new Vector2(0.5f, 1f);
-            rectMini.anchoredPosition = new Vector2(0f, -140f);
-            rectMini.sizeDelta = new Vector2(400f, 220f);
-            var imgMini = goMini.AddComponent<Image>();
-            imgMini.preserveAspect = true;
-            // No fondo blanco: si el sprite aún no está asignado, ocultar el color
-            imgMini.color = Color.white;
-
-            // Nombre Mina (PressStart2P 48 pt)
+            // Título dentro del marco: área superior con margen 56 y alto 100
             GameObject goNombre = new GameObject("Texto_NombreMina");
             goNombre.transform.SetParent(cardRoot.transform, false);
             var rectNom = goNombre.AddComponent<RectTransform>();
-            rectNom.anchorMin = new Vector2(0.5f, 1f);
-            rectNom.anchorMax = new Vector2(0.5f, 1f);
-            rectNom.anchoredPosition = new Vector2(0f, -40f);
-            rectNom.sizeDelta = new Vector2(1000f, 60f);
+            rectNom.anchorMin = new Vector2(0f, 1f);
+            rectNom.anchorMax = new Vector2(1f, 1f);
+            rectNom.pivot = new Vector2(0.5f, 1f);
+            rectNom.anchoredPosition = new Vector2(0f, -56f);
+            rectNom.sizeDelta = new Vector2(-112f, 100f);
             var tmpNom = goNombre.AddComponent<TextMeshProUGUI>();
             tmpNom.font = fontTitulo;
             tmpNom.fontSize = 48f;
+            tmpNom.enableAutoSizing = true;
+            tmpNom.fontSizeMin = 32f;
+            tmpNom.fontSizeMax = 48f;
+            tmpNom.textWrappingMode = TextWrappingModes.NoWrap;
             tmpNom.alignment = TextAlignmentOptions.Center;
             tmpNom.color = new Color(1f, 0.85f, 0.4f);
 
-            // Dato Histórico (PixelifySans 32 pt)
+            // Cuerpo en dos columnas (Horizontal Layout Group, padding 64, spacing 48)
+            GameObject goCuerpo = new GameObject("Cuerpo_DosColumnas");
+            goCuerpo.transform.SetParent(cardRoot.transform, false);
+            var rectCuerpo = goCuerpo.AddComponent<RectTransform>();
+            rectCuerpo.anchorMin = new Vector2(0f, 0f);
+            rectCuerpo.anchorMax = new Vector2(1f, 1f);
+            // Margen horizontal lo da el padding (64) del HorizontalLayoutGroup:
+            // 64 + 380 + 48 + 760 + 64 = 1316 < 1400, así cabe dentro del marco.
+            rectCuerpo.offsetMin = new Vector2(0f, 160f);
+            rectCuerpo.offsetMax = new Vector2(0f, -170f);
+
+            var hlg = goCuerpo.AddComponent<HorizontalLayoutGroup>();
+            hlg.padding = new RectOffset(64, 64, 20, 20);
+            hlg.spacing = 48f;
+            hlg.childAlignment = TextAnchor.MiddleCenter;
+            hlg.childControlWidth = false;
+            hlg.childControlHeight = false;
+            hlg.childForceExpandWidth = false;
+            hlg.childForceExpandHeight = false;
+
+            // Izquierda: Miniatura (380x216)
+            GameObject goMini = new GameObject("Miniatura_Mina");
+            goMini.transform.SetParent(goCuerpo.transform, false);
+            var rectMini = goMini.AddComponent<RectTransform>();
+            rectMini.sizeDelta = new Vector2(380f, 216f);
+            var imgMini = goMini.AddComponent<Image>();
+            imgMini.preserveAspect = true;
+            imgMini.color = Color.white;
+            var leMini = goMini.AddComponent<LayoutElement>();
+            leMini.minWidth = 380f;
+            leMini.preferredWidth = 380f;
+            leMini.minHeight = 216f;
+            leMini.preferredHeight = 216f;
+
+            // Derecha: Columna de texto (Dato Histórico y Objetivo)
+            GameObject goColDer = new GameObject("Columna_Derecha");
+            goColDer.transform.SetParent(goCuerpo.transform, false);
+            var rectColDer = goColDer.AddComponent<RectTransform>();
+            rectColDer.sizeDelta = new Vector2(760f, 440f);
+            var leColDer = goColDer.AddComponent<LayoutElement>();
+            leColDer.minWidth = 700f;
+            leColDer.preferredWidth = 760f;
+            leColDer.minHeight = 400f;
+
+            var vlgDer = goColDer.AddComponent<VerticalLayoutGroup>();
+            vlgDer.spacing = 24f;
+            vlgDer.childAlignment = TextAnchor.MiddleLeft;
+            vlgDer.childControlWidth = true;
+            vlgDer.childControlHeight = true;
+            vlgDer.childForceExpandWidth = true;
+            vlgDer.childForceExpandHeight = false;
+
+            // Dato Histórico (Pixelify Sans 30, Word Wrap, Auto Size 24-30)
             GameObject goDato = new GameObject("Texto_DatoHistorico");
-            goDato.transform.SetParent(cardRoot.transform, false);
-            var rectDato = goDato.AddComponent<RectTransform>();
-            rectDato.anchorMin = new Vector2(0.5f, 0.5f);
-            rectDato.anchorMax = new Vector2(0.5f, 0.5f);
-            rectDato.anchoredPosition = new Vector2(0f, -30f);
-            rectDato.sizeDelta = new Vector2(980f, 120f);
+            goDato.transform.SetParent(goColDer.transform, false);
             var tmpDato = goDato.AddComponent<TextMeshProUGUI>();
             tmpDato.font = fontTexto;
-            tmpDato.fontSize = 32f;
-            tmpDato.alignment = TextAlignmentOptions.Center;
+            tmpDato.fontSize = 30f;
+            tmpDato.textWrappingMode = TextWrappingModes.Normal;
+            tmpDato.enableAutoSizing = true;
+            tmpDato.fontSizeMin = 24f;
+            tmpDato.fontSizeMax = 30f;
+            tmpDato.alignment = TextAlignmentOptions.TopLeft;
             tmpDato.color = Color.white;
+            var leDato = goDato.AddComponent<LayoutElement>();
+            leDato.minHeight = 300f;
+            leDato.preferredHeight = 330f;
+            leDato.flexibleHeight = 1f;
+            tmpDato.overflowMode = TextOverflowModes.Truncate;
 
-            // Objetivo (PixelifySans 30 pt)
+            // Objetivo (28, cursiva, color #E0C080)
             GameObject goObj = new GameObject("Texto_Objetivo");
-            goObj.transform.SetParent(cardRoot.transform, false);
-            var rectObj = goObj.AddComponent<RectTransform>();
-            rectObj.anchorMin = new Vector2(0.5f, 0.5f);
-            rectObj.anchorMax = new Vector2(0.5f, 0.5f);
-            rectObj.anchoredPosition = new Vector2(0f, -120f);
-            rectObj.sizeDelta = new Vector2(980f, 50f);
+            goObj.transform.SetParent(goColDer.transform, false);
             var tmpObj = goObj.AddComponent<TextMeshProUGUI>();
             tmpObj.font = fontTexto;
-            tmpObj.fontSize = 30f;
+            tmpObj.fontSize = 28f;
             tmpObj.fontStyle = FontStyles.Italic;
-            tmpObj.alignment = TextAlignmentOptions.Center;
-            tmpObj.color = new Color(0.9f, 0.9f, 0.9f);
+            tmpObj.alignment = TextAlignmentOptions.TopLeft;
+            tmpObj.color = new Color(0.88f, 0.75f, 0.50f); // #E0C080
+            tmpObj.text = "Objetivo: sube a la siguiente mina antes de que el derrumbe te alcance.";
+            tmpObj.textWrappingMode = TextWrappingModes.Normal;
+            var leObj = goObj.AddComponent<LayoutElement>();
+            leObj.minHeight = 76f;
+            leObj.preferredHeight = 76f;
 
-            // Botón ¡A escapar! (340x80, text 34 pt)
-            Button btnEscapar = CrearBotonMadera(cardRoot.transform, "Boton_Escapar", "¡A escapar!", spBotonMadera, spBotonMaderaRes, spBotonMaderaPres, fontTexto, 34f, 80f);
+            // Botón "¡A escapar!" (400x88, abajo-centro, pos (0, 48), dentro del marco)
+            Button btnEscapar = CrearBotonMadera(cardRoot.transform, "Boton_Escapar", "¡A escapar!", spBotonMadera, spBotonMaderaRes, spBotonMaderaPres, fontTexto, 34f, 88f);
             var rectBtn = btnEscapar.GetComponent<RectTransform>();
             rectBtn.anchorMin = new Vector2(0.5f, 0f);
             rectBtn.anchorMax = new Vector2(0.5f, 0f);
-            rectBtn.anchoredPosition = new Vector2(0f, 50f);
-            rectBtn.sizeDelta = new Vector2(340f, 80f);
+            rectBtn.pivot = new Vector2(0.5f, 0f);
+            rectBtn.anchoredPosition = new Vector2(0f, 48f);
+            rectBtn.sizeDelta = new Vector2(400f, 88f);
 
             SerializedObject so = new SerializedObject(cardScript);
             so.FindProperty("miniaturaMina").objectReferenceValue = imgMini;
@@ -1105,6 +1294,7 @@ namespace ElMinero.Editor
             so.ApplyModifiedProperties();
 
             string prefabPath = PrefabUIPath + "LevelStartCard.prefab";
+            ElMineroBuilder.DecorarPanelesEn(cardRoot);
             PrefabUtility.SaveAsPrefabAsset(cardRoot, prefabPath);
             GameObject.DestroyImmediate(cardRoot);
             return AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
@@ -1170,7 +1360,7 @@ namespace ElMinero.Editor
             var imgBg = goBg.AddComponent<Image>();
             imgBg.sprite = spFondo;
             imgBg.type = Image.Type.Sliced;
-            imgBg.pixelsPerUnitMultiplier = 0.25f;
+            imgBg.pixelsPerUnitMultiplier = 1.5625f;
 
             GameObject goFillArea = new GameObject("Fill Area");
             goFillArea.transform.SetParent(goSlider.transform, false);
@@ -1188,7 +1378,7 @@ namespace ElMinero.Editor
             var imgFill = goFill.AddComponent<Image>();
             imgFill.sprite = spRelleno;
             imgFill.type = Image.Type.Sliced;
-            imgFill.pixelsPerUnitMultiplier = 0.25f;
+            imgFill.pixelsPerUnitMultiplier = 1.5625f;
 
             GameObject goHandleArea = new GameObject("Handle Slide Area");
             goHandleArea.transform.SetParent(goSlider.transform, false);
@@ -1234,7 +1424,7 @@ namespace ElMinero.Editor
             var imgBg = goBg.AddComponent<Image>();
             imgBg.sprite = spFondo;
             imgBg.type = Image.Type.Sliced;
-            imgBg.pixelsPerUnitMultiplier = 0.25f;
+            imgBg.pixelsPerUnitMultiplier = 1.5625f;
 
             GameObject goCheck = new GameObject("Checkmark");
             goCheck.transform.SetParent(goBg.transform, false);
@@ -1276,7 +1466,7 @@ namespace ElMinero.Editor
             var img = goBtn.AddComponent<Image>();
             img.sprite = normal;
             img.type = Image.Type.Sliced;
-            img.pixelsPerUnitMultiplier = 0.25f;
+            img.pixelsPerUnitMultiplier = 1.5625f;
 
             var btn = goBtn.AddComponent<Button>();
             ConfigurarSpriteSwap(btn, normal, res, pres);
@@ -1314,7 +1504,7 @@ namespace ElMinero.Editor
             var img = goModal.AddComponent<Image>();
             img.sprite = spFondo;
             img.type = Image.Type.Sliced;
-            img.pixelsPerUnitMultiplier = 0.25f;
+            img.pixelsPerUnitMultiplier = 1.5625f;
             img.color = new Color(0.95f, 0.95f, 0.95f, 0.98f);
 
             var le = goModal.AddComponent<LayoutElement>();

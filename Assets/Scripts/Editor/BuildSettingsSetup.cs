@@ -22,7 +22,7 @@ namespace ElMinero.Editor
             "Assets/Scenes/Nivel1_MinaRayas.unity",
             "Assets/Scenes/Nivel2_ElNopal.unity",
             "Assets/Scenes/Nivel3_LaValenciana.unity",
-            "Assets/Scenes/Final.unity"
+            "Assets/Scenes/Final_Templo.unity"
         };
 
         [MenuItem("Herramientas/El Minero/Builds/Configurar Build Settings", priority = 80)]

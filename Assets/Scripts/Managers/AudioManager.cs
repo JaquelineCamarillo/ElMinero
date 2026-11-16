@@ -503,9 +503,17 @@ namespace ElMinero.Managers
         // EFECTOS DE SONIDO (SFX POOL)
         // ====================================================================
 
+        // Evita que el mismo efecto suene dos veces en el mismo instante
+        // (por ejemplo, el enemigo y PlayerHealth reportando el mismo golpe).
+        private readonly Dictionary<AudioClip, float> ultimaVezClip = new Dictionary<AudioClip, float>();
+
         public void PlaySFX(AudioClip clip, float volume = 1.0f, float pitchVariation = 0f)
         {
             if (clip == null || sfxPool.Count == 0) return;
+
+            float ahora = Time.unscaledTime;
+            if (ultimaVezClip.TryGetValue(clip, out float ultima) && ahora - ultima < 0.06f) return;
+            ultimaVezClip[clip] = ahora;
 
             AudioSource src = sfxPool[currentSfxIndex];
             currentSfxIndex = (currentSfxIndex + 1) % sfxPool.Count;
@@ -533,6 +541,27 @@ namespace ElMinero.Managers
 
         public void PlayRocaCae() => PlaySFX(sfxRocaCae, 0.75f);
         public void PlayRocaImpacto() => PlaySFX(sfxRocaImpacto, 0.85f, 0.05f);
+
+        /// <summary>
+        /// Reproduce un efecto solo si su origen está cerca de lo que ve la cámara,
+        /// bajando el volumen con la distancia (rocas, plataformas, derrumbes lejanos).
+        /// </summary>
+        public void PlaySFXCerca(AudioClip clip, Vector3 posicion, float volume = 1f, float pitchVariation = 0f)
+        {
+            if (clip == null) return;
+            Camera cam = Camera.main;
+            if (cam == null) { PlaySFX(clip, volume, pitchVariation); return; }
+            float medioAncho = cam.orthographicSize * cam.aspect;
+            float distancia = Mathf.Abs(posicion.x - cam.transform.position.x);
+            if (distancia > medioAncho + 4f) return;
+            float factor = distancia <= medioAncho ? 1f : 1f - (distancia - medioAncho) / 4f;
+            PlaySFX(clip, volume * Mathf.Clamp01(factor), pitchVariation);
+        }
+
+        public void PlayRocaCae(Vector3 pos) => PlaySFXCerca(sfxRocaCae, pos, 0.55f, 0.08f);
+        public void PlayRocaImpacto(Vector3 pos) => PlaySFXCerca(sfxRocaImpacto, pos, 0.7f, 0.08f);
+        public void PlayPlataformaCruje(Vector3 pos) => PlaySFXCerca(sfxPlataformaCruje, pos, 0.85f);
+        public void PlayPlataformaColapso(Vector3 pos) => PlaySFXCerca(sfxPlataformaColapso, pos, 0.95f);
         public void PlayPlataformaCruje() => PlaySFX(sfxPlataformaCruje, 0.85f);
         public void PlayPlataformaColapso() => PlaySFX(sfxPlataformaColapso, 0.95f);
         public void PlayTemblor() => PlaySFX(sfxTemblor, 1.0f);
@@ -580,6 +609,46 @@ namespace ElMinero.Managers
             RegistrarFuenteEfectos(src);
             src.Play();
             return src;
+        }
+
+        // ====================================================================
+        // AUDIO DEL JEFE FINAL, NIVEL 3 Y ESCENA DEL TEMPLO (por nombre de archivo)
+        // ====================================================================
+
+        private readonly Dictionary<string, AudioClip> cacheExtras = new Dictionary<string, AudioClip>();
+
+        /// <summary>
+        /// Devuelve un clip por su nombre de archivo (por ejemplo "Coloso_Rugido" o "Musica_Jefe_Coloso").
+        /// En el build se toma de AudioLibrary (Resources); en el editor hay respaldo por AssetDatabase.
+        /// </summary>
+        public AudioClip ObtenerClip(string nombre)
+        {
+            if (string.IsNullOrEmpty(nombre)) return null;
+            if (cacheExtras.TryGetValue(nombre, out AudioClip enCache) && enCache != null) return enCache;
+
+            if (audioLibrary == null) audioLibrary = Resources.Load<AudioLibrary>("AudioLibrary");
+            AudioClip clip = audioLibrary != null ? audioLibrary.BuscarClip(nombre) : null;
+#if UNITY_EDITOR
+            if (clip == null) clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audios/SFX/" + nombre + ".wav");
+            if (clip == null) clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audios/Musica/" + nombre + ".ogg");
+#endif
+            if (clip != null) cacheExtras[nombre] = clip;
+            return clip;
+        }
+
+        /// <summary>Reproduce un efecto por nombre de archivo.</summary>
+        public void PlaySFXNombre(string nombre, float volumen = 1f)
+        {
+            PlaySFX(ObtenerClip(nombre), volumen);
+        }
+
+        /// <summary>Reproduce una pista de música por nombre de archivo con crossfade.</summary>
+        public void PlayMusicNombre(string nombre, bool loop = true, float fade = 0.8f)
+        {
+            AudioClip clip = ObtenerClip(nombre);
+            if (clip == null) return;
+            SetMusicUrgency(false);
+            PlayMusic(clip, loop, fade);
         }
 
         public AudioClip GetAudioClipVagonetaLoop() => sfxVagonetaLoop;

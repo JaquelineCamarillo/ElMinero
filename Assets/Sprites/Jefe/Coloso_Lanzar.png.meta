@@ -111,19 +111,19 @@ TextureImporter:
       name: Coloso_Lanzar_0
       rect:
         serializedVersion: 2
-        x: 13
+        x: 0
         y: 0
-        width: 45
+        width: 64
         height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 75dadc2fe24f940f0800000000000000
+      spriteID: d8c44d624a50011499565945efd30324
       internalID: -1132105348827730601
       vertices: []
       indices: 
@@ -133,19 +133,19 @@ TextureImporter:
       name: Coloso_Lanzar_1
       rect:
         serializedVersion: 2
-        x: 63
+        x: 64
         y: 0
-        width: 59
-        height: 57
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 5ded3a94d4e891450800000000000000
+      spriteID: 08c0c41e332809046bccd8c6716ea91b
       internalID: 6060031236202815189
       vertices: []
       indices: 
@@ -155,19 +155,19 @@ TextureImporter:
       name: Coloso_Lanzar_2
       rect:
         serializedVersion: 2
-        x: 130
+        x: 128
         y: 0
-        width: 56
-        height: 57
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: f46e79f1165fc7b20800000000000000
+      spriteID: ada0a4736840e8c4aa6cb9bb2f1ed81f
       internalID: 3133649238233704015
       vertices: []
       indices: 
@@ -177,7 +177,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 4074306c7e8cc064199de95f1ef89c9f
     internalID: 0
     vertices: []
     indices: 

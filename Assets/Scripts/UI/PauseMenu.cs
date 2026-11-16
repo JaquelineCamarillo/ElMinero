@@ -47,6 +47,8 @@ namespace ElMinero.UI
             {
                 optionsPanel.AlCerrar -= OnOptionsClosed;
             }
+            // Al reiniciar o volver al menú, la música deja de sonar "apagada"
+            if (isPaused && AudioManager.Instance != null) AudioManager.Instance.SetPauseMusicMuffle(false);
         }
 
         private void Update()
@@ -93,6 +95,11 @@ namespace ElMinero.UI
         {
             isPaused = true;
             Time.timeScale = 0f;
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayPausa();
+                AudioManager.Instance.SetPauseMusicMuffle(true);
+            }
             if (pausePanel != null) pausePanel.SetActive(true);
         }
 
@@ -100,6 +107,7 @@ namespace ElMinero.UI
         {
             isPaused = false;
             Time.timeScale = 1f;
+            if (AudioManager.Instance != null) AudioManager.Instance.SetPauseMusicMuffle(false);
             if (pausePanel != null) pausePanel.SetActive(false);
             if (optionsPanel != null) optionsPanel.gameObject.SetActive(false);
         }

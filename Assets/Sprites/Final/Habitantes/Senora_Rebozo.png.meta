@@ -114,19 +114,19 @@ TextureImporter:
       name: Senora_Rebozo_0
       rect:
         serializedVersion: 2
-        x: 7
+        x: 0
         y: 0
-        width: 18
+        width: 32
         height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 69faddce9fcaa5a30800000000000000
+      spriteID: 3794fdd5144cb4c49bf732271de25d4f
       internalID: 4204863391524564886
       vertices: []
       indices: 
@@ -136,19 +136,19 @@ TextureImporter:
       name: Senora_Rebozo_1
       rect:
         serializedVersion: 2
-        x: 39
+        x: 32
         y: 0
-        width: 18
-        height: 31
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: c50cbcabf195145c0800000000000000
+      spriteID: 7586b26388d277a46a163c65d388184c
       internalID: -4233004181938782116
       vertices: []
       indices: 
@@ -158,19 +158,19 @@ TextureImporter:
       name: Senora_Rebozo_2
       rect:
         serializedVersion: 2
-        x: 69
+        x: 64
         y: 0
-        width: 20
+        width: 32
         height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 3765474b1dedfbcc0800000000000000
+      spriteID: c60785de41557084f8676486b36ad910
       internalID: -3692988177163463053
       vertices: []
       indices: 
@@ -180,19 +180,19 @@ TextureImporter:
       name: Senora_Rebozo_3
       rect:
         serializedVersion: 2
-        x: 99
+        x: 96
         y: 0
-        width: 22
+        width: 32
         height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: e3c7650e8e8e04520800000000000000
+      spriteID: 0ab3b13551c0b5e4ab60954c0587cd6c
       internalID: 2684401464806636606
       vertices: []
       indices: 
@@ -202,7 +202,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 32ef3912d0d4ec3459b96bbf7128efef
     internalID: 0
     vertices: []
     indices: 

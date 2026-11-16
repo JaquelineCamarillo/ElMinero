@@ -35,7 +35,7 @@ namespace ElMinero.Editor
     /// - Victoria.unity
     /// - Derrota.unity
     /// </summary>
-    public static class LevelBuilder
+    public static partial class LevelBuilder
     {
         [MenuItem("Herramientas/El Minero/7. Construir escenas", priority = 70)]
         public static void ConstruirTodasLasEscenas()
@@ -64,8 +64,8 @@ namespace ElMinero.Editor
                 ConstruirNivel2_ElNopal();
                 ConstruirNivel3_LaValenciana();
 
-                // 3. Escena Final (Superficie y Templo de San Cayetano)
-                ConstruirFinal();
+                // 3. Escena final jugable (salida por el Tiro de San Cayetano hasta el Templo)
+                ConstruirFinalTemplo();
 
                 // 4. Limpieza de escenas obsoletas
                 EliminarEscenasObsoletas();
@@ -82,340 +82,6 @@ namespace ElMinero.Editor
             {
                 EditorUtility.ClearProgressBar();
             }
-        }
-
-        // ====================================================================
-        // 1. MENÚ PRINCIPAL (Parallax 3 capas, Logo Grande, Panel 620x740)
-        // ====================================================================
-        public static void ConstruirMenuPrincipal()
-        {
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-
-            // Cámara
-            GameObject camObj = new GameObject("Main Camera");
-            camObj.tag = "MainCamera";
-            camObj.transform.position = new Vector3(0f, 0f, -10f);
-            var cam = camObj.AddComponent<Camera>();
-            cam.orthographic = true;
-            cam.orthographicSize = 5f;
-            cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = new Color(0.12f, 0.09f, 0.19f);
-            camObj.AddComponent<AudioListener>();
-            camObj.AddComponent<UniversalAdditionalCameraData>();
-
-            // Fondo visual con efecto Parallax de 3 capas
-            GameObject rootFondo = new GameObject("Fondo_Parallax_Menu");
-            var parallaxComp = rootFondo.AddComponent<MenuParallax>();
-
-            // Capa 0: Cielo nocturno con luna
-            GameObject goCapa0 = new GameObject("Capa0_Cielo");
-            goCapa0.transform.SetParent(rootFondo.transform);
-            goCapa0.transform.position = new Vector3(0f, 0f, 0f);
-            goCapa0.transform.localScale = new Vector3(1.15f, 1.15f, 1f);
-            var sr0 = goCapa0.AddComponent<SpriteRenderer>();
-            sr0.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Fondos/Menu/FondoMenu_Capa0_Cielo.png");
-            sr0.sortingLayerName = Constantes.SortingLayers.Fondo;
-            sr0.sortingOrder = -10;
-
-            // Capa 1: Cañada de Guanajuato y Basílica
-            GameObject goCapa1 = new GameObject("Capa1_Ciudad");
-            goCapa1.transform.SetParent(rootFondo.transform);
-            goCapa1.transform.position = new Vector3(0f, -0.2f, 0f);
-            goCapa1.transform.localScale = new Vector3(1.15f, 1.15f, 1f);
-            var sr1 = goCapa1.AddComponent<SpriteRenderer>();
-            sr1.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Fondos/Menu/FondoMenu_Capa1_Ciudad.png");
-            sr1.sortingLayerName = Constantes.SortingLayers.Fondo;
-            sr1.sortingOrder = -5;
-
-            // Capa 2: Frente (Bocamina, rieles, faroles, vagoneta)
-            GameObject goCapa2 = new GameObject("Capa2_Frente");
-            goCapa2.transform.SetParent(rootFondo.transform);
-            goCapa2.transform.position = new Vector3(0f, -0.3f, 0f);
-            goCapa2.transform.localScale = new Vector3(1.15f, 1.15f, 1f);
-            var sr2 = goCapa2.AddComponent<SpriteRenderer>();
-            sr2.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Fondos/Menu/FondoMenu_Capa2_Frente.png");
-            sr2.sortingLayerName = Constantes.SortingLayers.Fondo;
-            sr2.sortingOrder = 0;
-
-            // Configurar referencias en MenuParallax
-            SerializedObject soParallax = new SerializedObject(parallaxComp);
-            soParallax.FindProperty("capaCielo").objectReferenceValue = goCapa0.transform;
-            soParallax.FindProperty("capaCiudad").objectReferenceValue = goCapa1.transform;
-            soParallax.FindProperty("capaFrente").objectReferenceValue = goCapa2.transform;
-            soParallax.ApplyModifiedProperties();
-
-            // Luz global
-            GameObject luz = new GameObject("LuzGlobal");
-            var l2d = luz.AddComponent<Light2D>();
-            l2d.lightType = Light2D.LightType.Global;
-            l2d.intensity = 1.0f;
-            ElMineroBuilder.AsignarCapasALuz2D(l2d);
-
-            // Personaje Minero en Idle sobre los rieles a la izquierda (~200px visual)
-            GameObject mineroObj = new GameObject("Minero_Menu");
-            mineroObj.transform.position = new Vector3(-4.5f, -2.5f, 0f);
-            mineroObj.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
-            var srM = mineroObj.AddComponent<SpriteRenderer>();
-            srM.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Jugador/Minero_Idle.png");
-            srM.sortingLayerName = Constantes.SortingLayers.Escenario;
-            srM.sortingOrder = 5;
-            var animM = mineroObj.AddComponent<Animator>();
-            animM.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Jugador/Minero.controller");
-
-            // Canvas UI
-            GameObject canvasObj = CrearCanvasBase("Canvas_MenuPrincipal");
-            var menuCtrl = canvasObj.AddComponent<MainMenuController>();
-
-            TMP_FontAsset fontTitulo = FontAssetBuilder.ObtenerPressStart2P();
-            TMP_FontAsset fontTexto = FontAssetBuilder.ObtenerPixelifySans();
-
-            // Logo Grande centrado arriba
-            GameObject logoObj = new GameObject("Logo_ElMinero");
-            logoObj.transform.SetParent(canvasObj.transform, false);
-            var rectLogo = logoObj.AddComponent<RectTransform>();
-            rectLogo.anchorMin = new Vector2(0.5f, 1f);
-            rectLogo.anchorMax = new Vector2(0.5f, 1f);
-            rectLogo.pivot = new Vector2(0.5f, 1f);
-            rectLogo.anchoredPosition = new Vector2(0f, -40f);
-            rectLogo.sizeDelta = new Vector2(1160f, 256f);
-            var imgLogo = logoObj.AddComponent<Image>();
-            Sprite logoGrande = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Logo_ElMinero_Grande.png");
-            if (logoGrande == null) logoGrande = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Logo_ElMinero.png");
-            imgLogo.sprite = logoGrande;
-            imgLogo.preserveAspect = true;
-
-            // Panel de Botones a la derecha (620x740)
-            GameObject panelMadera = new GameObject("Panel_Lateral");
-            panelMadera.transform.SetParent(canvasObj.transform, false);
-            var rectPanel = panelMadera.AddComponent<RectTransform>();
-            rectPanel.anchorMin = new Vector2(1f, 0.5f);
-            rectPanel.anchorMax = new Vector2(1f, 0.5f);
-            rectPanel.pivot = new Vector2(1f, 0.5f);
-            rectPanel.anchoredPosition = new Vector2(-120f, -40f);
-            rectPanel.sizeDelta = new Vector2(620f, 740f);
-            var imgPanel = panelMadera.AddComponent<Image>();
-            imgPanel.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
-            imgPanel.type = Image.Type.Sliced;
-            imgPanel.pixelsPerUnitMultiplier = 0.25f;
-
-            // Etiqueta Nombre
-            GameObject labelNombre = new GameObject("Label_Nombre");
-            labelNombre.transform.SetParent(panelMadera.transform, false);
-            var rectLn = labelNombre.AddComponent<RectTransform>();
-            rectLn.anchoredPosition = new Vector2(0f, 295f);
-            rectLn.sizeDelta = new Vector2(540f, 36f);
-            var tmpLn = labelNombre.AddComponent<TextMeshProUGUI>();
-            tmpLn.font = fontTexto;
-            tmpLn.text = "Nombre del Minero:";
-            tmpLn.fontSize = 30f;
-            tmpLn.alignment = TextAlignmentOptions.Center;
-            tmpLn.color = new Color(0.96f, 0.91f, 0.75f);
-
-            // InputField de Nombre (540x76)
-            GameObject inputObj = new GameObject("InputField_Nombre");
-            inputObj.transform.SetParent(panelMadera.transform, false);
-            var rectInput = inputObj.AddComponent<RectTransform>();
-            rectInput.anchoredPosition = new Vector2(0f, 225f);
-            rectInput.sizeDelta = new Vector2(540f, 76f);
-            var imgInput = inputObj.AddComponent<Image>();
-            imgInput.color = new Color(0.10f, 0.07f, 0.05f, 0.92f);
-
-            // Placeholder
-            GameObject phObj = new GameObject("Placeholder");
-            phObj.transform.SetParent(inputObj.transform, false);
-            var rectPh = phObj.AddComponent<RectTransform>();
-            rectPh.anchorMin = Vector2.zero;
-            rectPh.anchorMax = Vector2.one;
-            rectPh.offsetMin = new Vector2(16f, 0f);
-            rectPh.offsetMax = new Vector2(-16f, 0f);
-            var tmpPh = phObj.AddComponent<TextMeshProUGUI>();
-            tmpPh.font = fontTexto;
-            tmpPh.fontSize = 28f;
-            tmpPh.alignment = TextAlignmentOptions.Midline;
-            tmpPh.color = new Color(0.6f, 0.55f, 0.5f, 0.7f);
-            tmpPh.text = "Refugio";
-
-            // Texto ingresado
-            GameObject textObj = new GameObject("Text");
-            textObj.transform.SetParent(inputObj.transform, false);
-            var rectTxt = textObj.AddComponent<RectTransform>();
-            rectTxt.anchorMin = Vector2.zero;
-            rectTxt.anchorMax = Vector2.one;
-            rectTxt.offsetMin = new Vector2(16f, 0f);
-            rectTxt.offsetMax = new Vector2(-16f, 0f);
-            var tmpText = textObj.AddComponent<TextMeshProUGUI>();
-            tmpText.font = fontTexto;
-            tmpText.fontSize = 34f;
-            tmpText.alignment = TextAlignmentOptions.Midline;
-            tmpText.color = new Color(1f, 0.88f, 0.35f);
-
-            var inputField = inputObj.AddComponent<TMP_InputField>();
-            inputField.textViewport = rectInput;
-            inputField.textComponent = tmpText;
-            inputField.placeholder = tmpPh;
-            inputField.characterLimit = 12;
-
-            // 6 Botones del menú (Continuar, Nuevo Juego, Niveles, Opciones, Créditos, Salir)
-            Button btnContinue = CrearBotonMadera(panelMadera.transform, "Boton_Continuar", "Continuar", new Vector2(0f, 135f), new Vector2(540f, 84f));
-            Button btnPlay = CrearBotonMadera(panelMadera.transform, "Boton_Jugar", "Nuevo Juego", new Vector2(0f, 45f), new Vector2(540f, 84f));
-            Button btnLevels = CrearBotonMadera(panelMadera.transform, "Boton_Niveles", "Niveles", new Vector2(0f, -45f), new Vector2(540f, 84f));
-            Button btnOptions = CrearBotonMadera(panelMadera.transform, "Boton_Opciones", "Opciones", new Vector2(0f, -135f), new Vector2(540f, 84f));
-            Button btnCredits = CrearBotonMadera(panelMadera.transform, "Boton_Creditos", "Créditos", new Vector2(0f, -225f), new Vector2(540f, 84f));
-            Button btnQuit = CrearBotonMadera(panelMadera.transform, "Boton_Salir", "Salir", new Vector2(0f, -305f), new Vector2(540f, 56f));
-
-            // Texto Versión en esquina inferior izquierda
-            GameObject verObj = new GameObject("Texto_Version");
-            verObj.transform.SetParent(canvasObj.transform, false);
-            var rectVer = verObj.AddComponent<RectTransform>();
-            rectVer.anchorMin = new Vector2(0f, 0f);
-            rectVer.anchorMax = new Vector2(0f, 0f);
-            rectVer.pivot = new Vector2(0f, 0f);
-            rectVer.anchoredPosition = new Vector2(40f, 30f);
-            rectVer.sizeDelta = new Vector2(300f, 40f);
-            var tmpVer = verObj.AddComponent<TextMeshProUGUI>();
-            tmpVer.font = fontTexto;
-            tmpVer.text = "v1.0.0";
-            tmpVer.fontSize = 28f;
-            tmpVer.alignment = TextAlignmentOptions.BottomLeft;
-            tmpVer.color = new Color(0.8f, 0.8f, 0.8f, 0.85f);
-
-            // Instanciar Prefabs Modales (Niveles, Opciones, Créditos)
-            GameObject pLevelSelect = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/LevelSelectPanel.prefab");
-            GameObject pOptions = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/OptionsPanel.prefab");
-            GameObject pCredits = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/UI/CreditsPanel.prefab");
-
-            LevelSelectPanel levelSelectComp = null;
-            if (pLevelSelect != null)
-            {
-                var inst = (GameObject)PrefabUtility.InstantiatePrefab(pLevelSelect, canvasObj.transform);
-                levelSelectComp = inst.GetComponent<LevelSelectPanel>();
-                inst.SetActive(false);
-            }
-
-            OptionsPanel optionsComp = null;
-            if (pOptions != null)
-            {
-                var inst = (GameObject)PrefabUtility.InstantiatePrefab(pOptions, canvasObj.transform);
-                optionsComp = inst.GetComponent<OptionsPanel>();
-                inst.SetActive(false);
-            }
-
-            CreditsPanel creditsComp = null;
-            if (pCredits != null)
-            {
-                var inst = (GameObject)PrefabUtility.InstantiatePrefab(pCredits, canvasObj.transform);
-                creditsComp = inst.GetComponent<CreditsPanel>();
-                inst.SetActive(false);
-            }
-
-            // Asignar referencias en MainMenuController
-            SerializedObject soMenu = new SerializedObject(menuCtrl);
-            soMenu.FindProperty("nameInputField").objectReferenceValue = inputField;
-            soMenu.FindProperty("playButton").objectReferenceValue = btnPlay;
-            soMenu.FindProperty("continueButton").objectReferenceValue = btnContinue;
-            soMenu.FindProperty("levelsButton").objectReferenceValue = btnLevels;
-            soMenu.FindProperty("optionsButton").objectReferenceValue = btnOptions;
-            soMenu.FindProperty("creditsButton").objectReferenceValue = btnCredits;
-            soMenu.FindProperty("quitButton").objectReferenceValue = btnQuit;
-            soMenu.FindProperty("levelSelectPanel").objectReferenceValue = levelSelectComp;
-            soMenu.FindProperty("optionsPanel").objectReferenceValue = optionsComp;
-            soMenu.FindProperty("creditsPanel").objectReferenceValue = creditsComp;
-            soMenu.FindProperty("versionText").objectReferenceValue = tmpVer;
-            soMenu.ApplyModifiedProperties();
-
-            // Managers persistentes
-            CrearSistemasPersistentes();
-
-            EditorSceneManager.SaveScene(scene, "Assets/Scenes/MenuPrincipal.unity");
-            Debug.Log("[LevelBuilder] Escena MenuPrincipal.unity construida exitosamente.");
-        }
-
-        // ====================================================================
-        // 2. PANTALLA SPLASH (Sección 3.1)
-        // ====================================================================
-        public static void ConstruirSplash()
-        {
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-
-            // Cámara
-            GameObject camObj = new GameObject("Main Camera");
-            camObj.tag = "MainCamera";
-            camObj.transform.position = new Vector3(0f, 0f, -10f);
-            var cam = camObj.AddComponent<Camera>();
-            cam.orthographic = true;
-            cam.orthographicSize = 5f;
-            cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = new Color(0.05f, 0.05f, 0.08f);
-            camObj.AddComponent<AudioListener>();
-            camObj.AddComponent<UniversalAdditionalCameraData>();
-
-            // Canvas
-            GameObject canvasObj = CrearCanvasBase("Canvas_Splash");
-            var splashCtrl = canvasObj.AddComponent<SplashController>();
-
-            TMP_FontAsset fontTexto = FontAssetBuilder.ObtenerPixelifySans();
-
-            // Grupo 1: Logo Autora + Texto UTNG
-            GameObject goGrupoAutora = new GameObject("Grupo_Autora");
-            goGrupoAutora.transform.SetParent(canvasObj.transform, false);
-            var rectGa = goGrupoAutora.AddComponent<RectTransform>();
-            rectGa.anchorMin = Vector2.zero;
-            rectGa.anchorMax = Vector2.one;
-            rectGa.offsetMin = Vector2.zero;
-            rectGa.offsetMax = Vector2.zero;
-            var cgAutora = goGrupoAutora.AddComponent<CanvasGroup>();
-
-            GameObject goLogoAutora = new GameObject("Logo_Autora");
-            goLogoAutora.transform.SetParent(goGrupoAutora.transform, false);
-            var rectLa = goLogoAutora.AddComponent<RectTransform>();
-            rectLa.anchorMin = new Vector2(0.5f, 0.55f);
-            rectLa.anchorMax = new Vector2(0.5f, 0.55f);
-            rectLa.sizeDelta = new Vector2(280f, 280f);
-            var imgLa = goLogoAutora.AddComponent<Image>();
-            imgLa.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Logo_Autora.png");
-            imgLa.preserveAspect = true;
-
-            GameObject goTxtUtng = new GameObject("Texto_UTNG");
-            goTxtUtng.transform.SetParent(goGrupoAutora.transform, false);
-            var rectUtng = goTxtUtng.AddComponent<RectTransform>();
-            rectUtng.anchorMin = new Vector2(0.5f, 0.35f);
-            rectUtng.anchorMax = new Vector2(0.5f, 0.35f);
-            rectUtng.sizeDelta = new Vector2(600f, 40f);
-            var tmpUtng = goTxtUtng.AddComponent<TextMeshProUGUI>();
-            tmpUtng.font = fontTexto;
-            tmpUtng.text = "UTNG · Creación de Videojuegos";
-            tmpUtng.fontSize = 22f;
-            tmpUtng.alignment = TextAlignmentOptions.Center;
-            tmpUtng.color = new Color(0.9f, 0.85f, 0.75f);
-
-            // Grupo 2: Logo El Minero
-            GameObject goGrupoJuego = new GameObject("Grupo_LogoJuego");
-            goGrupoJuego.transform.SetParent(canvasObj.transform, false);
-            var rectGj = goGrupoJuego.AddComponent<RectTransform>();
-            rectGj.anchorMin = Vector2.zero;
-            rectGj.anchorMax = Vector2.one;
-            rectGj.offsetMin = Vector2.zero;
-            rectGj.offsetMax = Vector2.zero;
-            var cgJuego = goGrupoJuego.AddComponent<CanvasGroup>();
-
-            GameObject goLogoJuego = new GameObject("Logo_ElMinero");
-            goLogoJuego.transform.SetParent(goGrupoJuego.transform, false);
-            var rectLj = goLogoJuego.AddComponent<RectTransform>();
-            rectLj.anchorMin = new Vector2(0.5f, 0.5f);
-            rectLj.anchorMax = new Vector2(0.5f, 0.5f);
-            rectLj.sizeDelta = new Vector2(520f, 200f);
-            var imgLj = goLogoJuego.AddComponent<Image>();
-            imgLj.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Logo_ElMinero.png");
-            imgLj.preserveAspect = true;
-
-            SerializedObject so = new SerializedObject(splashCtrl);
-            so.FindProperty("grupoAutora").objectReferenceValue = cgAutora;
-            so.FindProperty("grupoLogoJuego").objectReferenceValue = cgJuego;
-            so.ApplyModifiedProperties();
-
-            CrearSistemasPersistentes();
-            EditorSceneManager.SaveScene(scene, "Assets/Scenes/Splash.unity");
-            Debug.Log("[LevelBuilder] Escena Splash.unity guardada.");
         }
 
         // ====================================================================
@@ -462,7 +128,7 @@ namespace ElMinero.Editor
             var imgPo = panelOscuro.AddComponent<Image>();
             imgPo.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
             imgPo.type = Image.Type.Sliced;
-            imgPo.pixelsPerUnitMultiplier = 0.25f;
+            imgPo.pixelsPerUnitMultiplier = 1.5625f;
             imgPo.color = new Color(0.12f, 0.1f, 0.12f, 0.95f);
 
             // Texto narrativo tipo máquina de escribir (46 pt)
@@ -740,6 +406,7 @@ namespace ElMinero.Editor
             {
                 "Assets/Scenes/Victoria.unity",
                 "Assets/Scenes/Derrota.unity",
+                "Assets/Scenes/Final.unity", // final viejo (reemplazado por Final_Templo)
                 "Assets/Scenes/SampleScene.unity"
             };
 
@@ -750,562 +417,6 @@ namespace ElMinero.Editor
                     AssetDatabase.DeleteAsset(path);
                     Debug.Log($"[LevelBuilder] Escena obsoleta eliminada: {path}");
                 }
-            }
-        }
-
-        // ====================================================================
-        // 4. NIVEL 1 — MINA RAYAS (130u, 110s, 6 vetas, 2 gemas, 4 huecos, 7 spawners, 2 derrumbes)
-        // ====================================================================
-        public static void ConstruirNivel1_MinaRayas()
-        {
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-
-            Color bgVioleta = new Color(0.12f, 0.09f, 0.19f); // #1E1630
-            Color luzAmbar = new Color(0.96f, 0.83f, 0.54f);
-
-            // 1. Iluminación URP 2D
-            CrearIluminacionNivel(bgVioleta, 0.75f);
-
-            // 2. Parallax 3 Capas Mina Rayas (extendido a 130u)
-            CrearParallaxNivel("MinaRayas", 130f);
-
-            // 3. Grid y Tilemaps
-            int layerSuelo = LayerMask.NameToLayer(Constantes.Layers.Suelo);
-            if (layerSuelo == -1) layerSuelo = 8;
-            GameObject gridObj = new GameObject("Grid");
-            gridObj.AddComponent<Grid>();
-
-            Tilemap tmSuelo = CrearTilemap(gridObj, "Tilemap_Suelo", Constantes.SortingLayers.Escenario, layerSuelo, true);
-            Tilemap tmDeco = CrearTilemap(gridObj, "Tilemap_Decoracion", Constantes.SortingLayers.Objetos, 0, false);
-
-            ConstruirTerrenoNivel1(tmSuelo, tmDeco);
-            FinalizarColisionesTilemap(tmSuelo);
-
-            // 4. Huecos Letales (4 huecos)
-            CrearHuecoLetal(new Vector3(20f, -4f, 0f), new Vector2(5f, 2f));
-            CrearHuecoLetal(new Vector3(68f, -4f, 0f), new Vector2(5f, 2f));
-            CrearHuecoLetal(new Vector3(86f, -4f, 0f), new Vector2(5f, 2f));
-            CrearHuecoLetal(new Vector3(108f, -4f, 0f), new Vector2(5f, 2f));
-
-            // 5. Plataformas fijas con escalones alcanzables (ΔY <= 1.3u)
-            CrearPlataformaFija(new Vector3(5f, 0.3f, 0f), layerSuelo);     // Escalón bajo
-            CrearPlataformaFija(new Vector3(20f, 0.2f, 0f), layerSuelo);    // Sobre Hueco 1
-            CrearPlataformaFija(new Vector3(35f, 0.3f, 0f), layerSuelo);    // Escalera 1A
-            CrearPlataformaFija(new Vector3(39f, 1.4f, 0f), layerSuelo);    // Escalera 1B
-            CrearPlataformaFija(new Vector3(43f, 0.4f, 0f), layerSuelo);    // Escalera 1C
-            CrearPlataformaFija(new Vector3(54f, 0.3f, 0f), layerSuelo);    // Escalera 2A
-            CrearPlataformaFija(new Vector3(58f, 1.4f, 0f), layerSuelo);    // Escalera 2B
-            CrearPlataformaFija(new Vector3(68f, 0.2f, 0f), layerSuelo);    // Sobre Hueco 2
-            CrearPlataformaFija(new Vector3(77f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(86f, 0.3f, 0f), layerSuelo);    // Sobre Hueco 3
-            CrearPlataformaFija(new Vector3(98f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(108f, 0.2f, 0f), layerSuelo);   // Sobre Hueco 4
-            CrearPlataformaFija(new Vector3(115f, 0.5f, 0f), layerSuelo);
-
-            // 6. Coleccionables (6 vetas de plata, 2 gemas)
-            CrearVetaPlata(new Vector3(5f, 1.3f, 0f));
-            CrearVetaPlata(new Vector3(39f, 2.4f, 0f));
-            CrearVetaPlata(new Vector3(58f, 2.4f, 0f));
-            CrearVetaPlata(new Vector3(77f, 1.4f, 0f));
-            CrearVetaPlata(new Vector3(98f, 1.4f, 0f));
-            CrearVetaPlata(new Vector3(115f, 1.5f, 0f));
-
-            CrearGemaAmatista(new Vector3(20f, 1.4f, 0f)); // Sobre hueco 1
-            CrearGemaAmatista(new Vector3(86f, 1.5f, 0f)); // Sobre hueco 3
-
-            // Mineral distintivo Nivel 1: Aguilarita
-            CrearMineralDistintivo("Mineral_Aguilarita", new Vector3(58f, 3.5f, 0f));
-
-            // Enemigos Nivel 1: 2 Murciélagos estándar
-            CrearMurcielago(new Vector3(25f, 2.5f, 0f), 5f);
-            CrearMurcielago(new Vector3(75f, 2.5f, 0f), 5f);
-
-            // Elevador tipo malacate
-            CrearElevador(new Vector3(50f, -1f, 0f), new Vector3(50f, 3f, 0f), 2f);
-
-            // 7. Obstáculos: 7 Spawners de Rocas rápidos (intervalo 2.0s - 2.2s)
-            CrearRockSpawner(new Vector3(12f, 7f, 0f), 2.2f);
-            CrearRockSpawner(new Vector3(28f, 7f, 0f), 2.2f);
-            CrearRockSpawner(new Vector3(48f, 7f, 0f), 2.0f);
-            CrearRockSpawner(new Vector3(64f, 7f, 0f), 2.2f);
-            CrearRockSpawner(new Vector3(80f, 7f, 0f), 2.0f);
-            CrearRockSpawner(new Vector3(95f, 7f, 0f), 2.2f);
-            CrearRockSpawner(new Vector3(112f, 7f, 0f), 1.8f);
-
-            // 8. Checkpoints funcionales (con Capilla en el centro)
-            CrearCheckpoint(new Vector3(30f, -0.5f, 0f));
-            CrearCheckpointCapilla(new Vector3(73f, -0.5f, 0f));
-            CrearCheckpoint(new Vector3(102f, -0.5f, 0f));
-
-            // 9. Zonas de derrumbe sorpresa (2 derrumbes que colapsan tras pasar)
-            CrearZonaDerrumbe(new Vector3(46f, 0f, 0f), new Vector3(41f, -0.5f, 0f));
-            CrearZonaDerrumbe(new Vector3(92f, 0f, 0f), new Vector3(87f, -0.5f, 0f));
-
-            // 10. Temblor periódico
-            CrearMineTremor();
-
-            // 11. Salida del nivel (Túnel al final X = 124)
-            CrearSalida(new Vector3(124f, -1f, 0f), false);
-
-            // 12. Ambientación (Antorchas)
-            CrearAntorchaConLuz(new Vector3(-5f, 0.8f, 0f), luzAmbar);
-            CrearAntorchaConLuz(new Vector3(14f, 0.8f, 0f), luzAmbar);
-            CrearAntorchaConLuz(new Vector3(32f, 0.8f, 0f), luzAmbar);
-            CrearAntorchaConLuz(new Vector3(50f, 0.8f, 0f), luzAmbar);
-            CrearAntorchaConLuz(new Vector3(70f, 0.8f, 0f), luzAmbar);
-            CrearAntorchaConLuz(new Vector3(90f, 0.8f, 0f), luzAmbar);
-            CrearAntorchaConLuz(new Vector3(108f, 0.8f, 0f), luzAmbar);
-            CrearAntorchaConLuz(new Vector3(122f, 0.8f, 0f), luzAmbar);
-
-            // 13. Jugador (Minero)
-            GameObject jugador = CrearJugador(new Vector3(-7f, 0.5f, 0f), layerSuelo);
-
-            // 14. Cámara Cinemachine y Brain
-            ConfigurarCamaraNivel(jugador, bgVioleta, new Vector2(-15f, -6f), new Vector2(135f, 12f));
-
-            // 15. Managers y HUD
-            var configN1 = AssetDatabase.LoadAssetAtPath<LevelConfig>("Assets/Settings/Niveles/LevelConfig_Nivel1.asset");
-            ConfigurarManagersYHUD(jugador, configN1, 6, 2);
-
-            EditorSceneManager.SaveScene(scene, "Assets/Scenes/Nivel1_MinaRayas.unity");
-        }
-
-        // ====================================================================
-        // 5. NIVEL 2 — EL NOPAL (170u, 120s, 8 vetas, 3 gemas, 4 plat móviles, 6 huecos, 10 spawners, 3 derrumbes)
-        // ====================================================================
-        public static void ConstruirNivel2_ElNopal()
-        {
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-
-            Color bgAmbar = new Color(0.16f, 0.10f, 0.05f); // #2A1A0E
-            Color luzAmbarCalido = new Color(1.0f, 0.82f, 0.48f); // #FFD27A
-
-            CrearIluminacionNivel(bgAmbar, 0.7f);
-            CrearParallaxNivel("ElNopal", 170f);
-
-            int layerSuelo = LayerMask.NameToLayer(Constantes.Layers.Suelo);
-            if (layerSuelo == -1) layerSuelo = 8;
-            GameObject gridObj = new GameObject("Grid");
-            gridObj.AddComponent<Grid>();
-
-            Tilemap tmSuelo = CrearTilemap(gridObj, "Tilemap_Suelo", Constantes.SortingLayers.Escenario, layerSuelo, true);
-            Tilemap tmDeco = CrearTilemap(gridObj, "Tilemap_Decoracion", Constantes.SortingLayers.Objetos, 0, false);
-
-            ConstruirTerrenoNivel2(tmSuelo, tmDeco);
-            FinalizarColisionesTilemap(tmSuelo);
-
-            // 6 Huecos Letales
-            CrearHuecoLetal(new Vector3(14f, -4f, 0f), new Vector2(6f, 2f));
-            CrearHuecoLetal(new Vector3(44f, -4f, 0f), new Vector2(12f, 2f));
-            CrearHuecoLetal(new Vector3(78f, -4f, 0f), new Vector2(8f, 2f));
-            CrearHuecoLetal(new Vector3(98f, -4f, 0f), new Vector2(8f, 2f));
-            CrearHuecoLetal(new Vector3(126f, -4f, 0f), new Vector2(8f, 2f));
-            CrearHuecoLetal(new Vector3(152f, -4f, 0f), new Vector2(8f, 2f));
-
-            // Plataformas Móviles sobre los huecos
-            CrearPlataformaMovil(new Vector3(11f, 0.2f, 0f), new Vector3(17f, 0.2f, 0f), 2.2f, layerSuelo);
-            CrearPlataformaMovil(new Vector3(37f, 0.2f, 0f), new Vector3(43f, 0.2f, 0f), 2.0f, layerSuelo);
-            CrearPlataformaMovil(new Vector3(44f, 0.5f, 0f), new Vector3(49f, 0.5f, 0f), 2.2f, layerSuelo);
-            CrearPlataformaMovil(new Vector3(94f, 0.3f, 0f), new Vector3(101f, 0.3f, 0f), 2.5f, layerSuelo);
-            CrearPlataformaMovil(new Vector3(122f, 0.4f, 0f), new Vector3(129f, 0.4f, 0f), 3.0f, layerSuelo);
-
-            // Plataformas fijas con escalones alcanzables (ΔY <= 1.3u)
-            CrearPlataformaFija(new Vector3(24f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(58f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(62f, 1.4f, 0f), layerSuelo); // Escalón alto accesible
-            CrearPlataformaFija(new Vector3(76f, 0.2f, 0f), layerSuelo); // Sobre hueco 3A
-            CrearPlataformaFija(new Vector3(80f, 0.5f, 0f), layerSuelo); // Sobre hueco 3B
-            CrearPlataformaFija(new Vector3(86f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(110f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(114f, 1.5f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(138f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(152f, 0.3f, 0f), layerSuelo); // Sobre hueco 6
-
-            // 8 Vetas de plata
-            CrearVetaPlata(new Vector3(4f, 0.5f, 0f));
-            CrearVetaPlata(new Vector3(24f, 1.4f, 0f));
-            CrearVetaPlata(new Vector3(45f, 1.5f, 0f));
-            CrearVetaPlata(new Vector3(62f, 2.4f, 0f));
-            CrearVetaPlata(new Vector3(86f, 1.4f, 0f));
-            CrearVetaPlata(new Vector3(114f, 2.5f, 0f));
-            CrearVetaPlata(new Vector3(138f, 1.4f, 0f));
-            CrearVetaPlata(new Vector3(158f, 0.5f, 0f));
-
-            // 3 Gemas de amatista
-            CrearGemaAmatista(new Vector3(42f, 1.6f, 0f));
-            CrearGemaAmatista(new Vector3(97f, 1.4f, 0f));
-            CrearGemaAmatista(new Vector3(126f, 1.5f, 0f));
-
-            // Mineral distintivo Nivel 2: Pepita de Oro
-            CrearMineralDistintivo("Mineral_PepitaOro", new Vector3(97f, 2.8f, 0f));
-
-            // Enemigos Nivel 2: 3 Arañas que bajan y 2 Murciélagos
-            CrearArana(new Vector3(32f, 5.5f, 0f));
-            CrearArana(new Vector3(88f, 5.5f, 0f));
-            CrearArana(new Vector3(142f, 5.5f, 0f));
-            CrearMurcielago(new Vector3(20f, 2.5f, 0f), 6f);
-            CrearMurcielago(new Vector3(110f, 2.5f, 0f), 6f);
-
-            // Obstáculos Nivel 2: 2 Vagonetas desbocadas con triggers
-            CrearVagoneta(new Vector3(45f, 0f, 0f), new Vector3(65f, -1.2f, 0f), Vector2.left, 22f);
-            CrearVagoneta(new Vector3(120f, 0f, 0f), new Vector3(140f, -1.2f, 0f), Vector2.left, 22f);
-
-            // 10 Rock spawners rápidos (intervalo 1.8s)
-            CrearRockSpawner(new Vector3(8f, 7f, 0f), 1.8f);
-            CrearRockSpawner(new Vector3(20f, 7f, 0f), 1.8f);
-            CrearRockSpawner(new Vector3(32f, 7f, 0f), 1.8f);
-            CrearRockSpawner(new Vector3(52f, 7f, 0f), 1.8f);
-            CrearRockSpawner(new Vector3(68f, 7f, 0f), 1.8f);
-            CrearRockSpawner(new Vector3(88f, 7f, 0f), 1.8f);
-            CrearRockSpawner(new Vector3(105f, 7f, 0f), 1.8f);
-            CrearRockSpawner(new Vector3(126f, 7f, 0f), 1.8f);
-            CrearRockSpawner(new Vector3(142f, 7f, 0f), 1.8f);
-            CrearRockSpawner(new Vector3(156f, 7f, 0f), 1.8f);
-
-            // 4 Checkpoints (con Capillas intermedias)
-            CrearCheckpoint(new Vector3(28f, -0.5f, 0f));
-            CrearCheckpointCapilla(new Vector3(66f, -0.5f, 0f));
-            CrearCheckpoint(new Vector3(108f, -0.5f, 0f));
-            CrearCheckpointCapilla(new Vector3(142f, -0.5f, 0f));
-
-            // 3 Zonas de derrumbe sorpresa
-            CrearZonaDerrumbe(new Vector3(54f, 0f, 0f), new Vector3(49f, -0.5f, 0f));
-            CrearZonaDerrumbe(new Vector3(104f, 0f, 0f), new Vector3(99f, -0.5f, 0f));
-            CrearZonaDerrumbe(new Vector3(158f, 0f, 0f), new Vector3(153f, -0.5f, 0f));
-
-            CrearMineTremor();
-            CrearSalida(new Vector3(164f, -1f, 0f), false);
-
-            CrearAntorchaConLuz(new Vector3(-5f, 0.8f, 0f), luzAmbarCalido);
-            CrearAntorchaConLuz(new Vector3(18f, 0.8f, 0f), luzAmbarCalido);
-            CrearAntorchaConLuz(new Vector3(38f, 0.8f, 0f), luzAmbarCalido);
-            CrearAntorchaConLuz(new Vector3(56f, 0.8f, 0f), luzAmbarCalido);
-            CrearAntorchaConLuz(new Vector3(76f, 0.8f, 0f), luzAmbarCalido);
-            CrearAntorchaConLuz(new Vector3(96f, 0.8f, 0f), luzAmbarCalido);
-            CrearAntorchaConLuz(new Vector3(116f, 0.8f, 0f), luzAmbarCalido);
-            CrearAntorchaConLuz(new Vector3(136f, 0.8f, 0f), luzAmbarCalido);
-            CrearAntorchaConLuz(new Vector3(154f, 0.8f, 0f), luzAmbarCalido);
-            CrearAntorchaConLuz(new Vector3(162f, 0.8f, 0f), luzAmbarCalido);
-
-            GameObject jugador = CrearJugador(new Vector3(-7f, 0.5f, 0f), layerSuelo);
-            ConfigurarCamaraNivel(jugador, bgAmbar, new Vector2(-15f, -6f), new Vector2(175f, 14f));
-
-            var configN2 = AssetDatabase.LoadAssetAtPath<LevelConfig>("Assets/Settings/Niveles/LevelConfig_Nivel2.asset");
-            ConfigurarManagersYHUD(jugador, configN2, 8, 3);
-
-            EditorSceneManager.SaveScene(scene, "Assets/Scenes/Nivel2_ElNopal.unity");
-        }
-
-        // ====================================================================
-        // 6. NIVEL 3 — LA VALENCIANA (210u, 130s, 10 vetas, 4 gemas, 9 quebradizas, 2 móviles, 9 huecos, 14 spawners, 4 derrumbes)
-        // ====================================================================
-        public static void ConstruirNivel3_LaValenciana()
-        {
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-
-            Color bgRojo = new Color(0.16f, 0.04f, 0.04f); // #2A0A0A
-            Color luzFuego = new Color(1.0f, 0.69f, 0.38f); // #FFB060
-
-            CrearIluminacionNivel(bgRojo, 0.65f);
-            CrearParallaxNivel("LaValenciana", 210f);
-
-            int layerSuelo = LayerMask.NameToLayer(Constantes.Layers.Suelo);
-            if (layerSuelo == -1) layerSuelo = 8;
-            GameObject gridObj = new GameObject("Grid");
-            gridObj.AddComponent<Grid>();
-
-            Tilemap tmSuelo = CrearTilemap(gridObj, "Tilemap_Suelo", Constantes.SortingLayers.Escenario, layerSuelo, true);
-            Tilemap tmDeco = CrearTilemap(gridObj, "Tilemap_Decoracion", Constantes.SortingLayers.Objetos, 0, false);
-
-            ConstruirTerrenoNivel3(tmSuelo, tmDeco);
-            FinalizarColisionesTilemap(tmSuelo);
-
-            // 9 Huecos Letales
-            CrearHuecoLetal(new Vector3(11f, -4f, 0f), new Vector2(6f, 2f));
-            CrearHuecoLetal(new Vector3(25f, -4f, 0f), new Vector2(6f, 2f));
-            CrearHuecoLetal(new Vector3(47f, -4f, 0f), new Vector2(14f, 2f));
-            CrearHuecoLetal(new Vector3(83f, -4f, 0f), new Vector2(14f, 2f));
-            CrearHuecoLetal(new Vector3(104f, -4f, 0f), new Vector2(12f, 2f));
-            CrearHuecoLetal(new Vector3(132f, -4f, 0f), new Vector2(12f, 2f));
-            CrearHuecoLetal(new Vector3(152f, -4f, 0f), new Vector2(8f, 2f));
-            CrearHuecoLetal(new Vector3(172f, -4f, 0f), new Vector2(12f, 2f));
-            CrearHuecoLetal(new Vector3(191f, -4f, 0f), new Vector2(10f, 2f));
-
-            // Plataformas Quebradizas
-            CrearPlataformaQuebradiza(new Vector3(11f, 0.2f, 0f), layerSuelo);
-            CrearPlataformaQuebradiza(new Vector3(25f, 0.2f, 0f), layerSuelo);
-            CrearPlataformaQuebradiza(new Vector3(43f, 0.2f, 0f), layerSuelo);
-            CrearPlataformaQuebradiza(new Vector3(51f, 0.2f, 0f), layerSuelo);
-            CrearPlataformaQuebradiza(new Vector3(79f, 0.2f, 0f), layerSuelo);
-            CrearPlataformaQuebradiza(new Vector3(101f, 0.2f, 0f), layerSuelo);
-            CrearPlataformaQuebradiza(new Vector3(106f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaQuebradiza(new Vector3(129f, 0.2f, 0f), layerSuelo);
-            CrearPlataformaQuebradiza(new Vector3(152f, 0.2f, 0f), layerSuelo);
-            CrearPlataformaQuebradiza(new Vector3(175f, 0.3f, 0f), layerSuelo);
-            CrearPlataformaQuebradiza(new Vector3(189f, 0.2f, 0f), layerSuelo);
-            CrearPlataformaQuebradiza(new Vector3(193f, 0.4f, 0f), layerSuelo);
-
-            // Plataformas Móviles
-            CrearPlataformaMovil(new Vector3(83f, 0.4f, 0f), new Vector3(88f, 0.4f, 0f), 2.5f, layerSuelo);
-            CrearPlataformaMovil(new Vector3(166f, 0.3f, 0f), new Vector3(173f, 0.3f, 0f), 2.8f, layerSuelo);
-
-            // Plataformas fijas con escalones alcanzables (ΔY <= 1.3u)
-            CrearPlataformaFija(new Vector3(18f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(35f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(47f, 0.5f, 0f), layerSuelo);  // Sobre hueco 3
-            CrearPlataformaFija(new Vector3(64f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(68f, 1.4f, 0f), layerSuelo);  // Escalón alto
-            CrearPlataformaFija(new Vector3(94f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(118f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(122f, 1.5f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(134f, 0.5f, 0f), layerSuelo); // Sobre hueco 6
-            CrearPlataformaFija(new Vector3(144f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(162f, 0.4f, 0f), layerSuelo);
-            CrearPlataformaFija(new Vector3(182f, 0.4f, 0f), layerSuelo);
-
-            // 10 Vetas de plata
-            CrearVetaPlata(new Vector3(4f, 0.5f, 0f));
-            CrearVetaPlata(new Vector3(18f, 1.4f, 0f));
-            CrearVetaPlata(new Vector3(47f, 1.5f, 0f));
-            CrearVetaPlata(new Vector3(68f, 2.4f, 0f));
-            CrearVetaPlata(new Vector3(86f, 1.4f, 0f));
-            CrearVetaPlata(new Vector3(106f, 1.4f, 0f));
-            CrearVetaPlata(new Vector3(122f, 2.5f, 0f));
-            CrearVetaPlata(new Vector3(144f, 1.4f, 0f));
-            CrearVetaPlata(new Vector3(162f, 1.4f, 0f));
-            CrearVetaPlata(new Vector3(182f, 1.4f, 0f));
-
-            // 4 Gemas de amatista
-            CrearGemaAmatista(new Vector3(25f, 1.4f, 0f));
-            CrearGemaAmatista(new Vector3(51f, 1.4f, 0f));
-            CrearGemaAmatista(new Vector3(134f, 1.5f, 0f));
-            CrearGemaAmatista(new Vector3(193f, 1.5f, 0f));
-
-            // Mineral distintivo Nivel 3: Pirargirita
-            CrearMineralDistintivo("Mineral_Pirargirita", new Vector3(144f, 2.8f, 0f));
-
-            // Enemigos Nivel 3: 3 Alacranes, 3 Murciélagos Rojos en picada, 2 Arañas
-            CrearAlacran(new Vector3(35f, -1.5f, 0f), 4f);
-            CrearAlacran(new Vector3(94f, -1.5f, 0f), 5f);
-            CrearAlacran(new Vector3(162f, -1.5f, 0f), 4f);
-
-            CrearMurcielagoRojo(new Vector3(20f, 4.0f, 0f));
-            CrearMurcielagoRojo(new Vector3(80f, 4.0f, 0f));
-            CrearMurcielagoRojo(new Vector3(150f, 4.0f, 0f));
-
-            CrearArana(new Vector3(60f, 6.0f, 0f));
-            CrearArana(new Vector3(130f, 6.0f, 0f));
-
-            // Obstáculos Nivel 3: 2 Vagonetas, 2 Llamas de gas, 1 Elevador malacate
-            CrearVagoneta(new Vector3(50f, 0f, 0f), new Vector3(72f, -1.2f, 0f), Vector2.left, 22f);
-            CrearVagoneta(new Vector3(154f, 0f, 0f), new Vector3(175f, -1.2f, 0f), Vector2.left, 22f);
-
-            CrearFuego(new Vector3(104f, -1.6f, 0f));
-            CrearFuego(new Vector3(172f, -1.6f, 0f));
-
-            CrearElevador(new Vector3(118f, -1.8f, 0f), new Vector3(118f, 2.8f, 0f), 2.4f);
-
-            // 14 Spawners de Rocas implacables (intervalo urgente 1.3s)
-            CrearRockSpawner(new Vector3(6f, 8f, 0f), 1.3f);
-            CrearRockSpawner(new Vector3(16f, 8f, 0f), 1.3f);
-            CrearRockSpawner(new Vector3(26f, 8f, 0f), 1.3f);
-            CrearRockSpawner(new Vector3(44f, 8f, 0f), 1.3f);
-            CrearRockSpawner(new Vector3(56f, 8f, 0f), 1.3f);
-            CrearRockSpawner(new Vector3(74f, 8f, 0f), 1.3f);
-            CrearRockSpawner(new Vector3(88f, 8f, 0f), 1.3f);
-            CrearRockSpawner(new Vector3(104f, 8f, 0f), 1.3f);
-            CrearRockSpawner(new Vector3(120f, 8f, 0f), 1.3f);
-            CrearRockSpawner(new Vector3(136f, 8f, 0f), 1.3f);
-            CrearRockSpawner(new Vector3(150f, 8f, 0f), 1.3f);
-            CrearRockSpawner(new Vector3(168f, 8f, 0f), 1.3f);
-            CrearRockSpawner(new Vector3(184f, 8f, 0f), 1.3f);
-            CrearRockSpawner(new Vector3(198f, 8f, 0f), 1.3f);
-
-            // 5 Checkpoints (con Capillas intermedias)
-            CrearCheckpoint(new Vector3(32f, -0.5f, 0f));
-            CrearCheckpointCapilla(new Vector3(72f, -0.5f, 0f));
-            CrearCheckpoint(new Vector3(114f, -0.5f, 0f));
-            CrearCheckpointCapilla(new Vector3(158f, -0.5f, 0f));
-            CrearCheckpoint(new Vector3(180f, -0.5f, 0f));
-
-            // 4 Zonas de derrumbe sorpresa
-            CrearZonaDerrumbe(new Vector3(58f, 0f, 0f), new Vector3(53f, -0.5f, 0f));
-            CrearZonaDerrumbe(new Vector3(112f, 0f, 0f), new Vector3(107f, -0.5f, 0f));
-            CrearZonaDerrumbe(new Vector3(160f, 0f, 0f), new Vector3(155f, -0.5f, 0f));
-            CrearZonaDerrumbe(new Vector3(198f, 0f, 0f), new Vector3(194f, -0.5f, 0f));
-
-            CrearMineTremor();
-
-            // Salida a la Superficie (Final)
-            // Spawners de Bolas de Fuego cayendo del techo en Nivel 3
-            CrearBolaFuegoSpawner(new Vector3(182f, 7.5f, 0f), 3.0f, 0.5f);
-            CrearBolaFuegoSpawner(new Vector3(192f, 7.5f, 0f), 3.2f, 1.2f);
-            CrearBolaFuegoSpawner(new Vector3(200f, 7.5f, 0f), 2.8f, 0.8f);
-
-            // Muro de Fuego perseguidor en los últimos 35 tiles de La Valenciana
-            CrearMuroIncendio(new Vector3(172f, -1.5f, 0f), 205f, new Vector3(175f, 0f, 0f));
-
-            CrearSalida(new Vector3(204f, -1f, 0f), true);
-
-            CrearAntorchaConLuz(new Vector3(-5f, 0.8f, 0f), luzFuego);
-            CrearAntorchaConLuz(new Vector3(18f, 0.8f, 0f), luzFuego);
-            CrearAntorchaConLuz(new Vector3(36f, 0.8f, 0f), luzFuego);
-            CrearAntorchaConLuz(new Vector3(54f, 0.8f, 0f), luzFuego);
-            CrearAntorchaConLuz(new Vector3(72f, 0.8f, 0f), luzFuego);
-            CrearAntorchaConLuz(new Vector3(90f, 0.8f, 0f), luzFuego);
-            CrearAntorchaConLuz(new Vector3(108f, 0.8f, 0f), luzFuego);
-            CrearAntorchaConLuz(new Vector3(126f, 0.8f, 0f), luzFuego);
-            CrearAntorchaConLuz(new Vector3(144f, 0.8f, 0f), luzFuego);
-            CrearAntorchaConLuz(new Vector3(162f, 0.8f, 0f), luzFuego);
-            CrearAntorchaConLuz(new Vector3(180f, 0.8f, 0f), luzFuego);
-            CrearAntorchaConLuz(new Vector3(198f, 0.8f, 0f), luzFuego);
-            CrearAntorchaConLuz(new Vector3(202f, 0.8f, 0f), luzFuego);
-
-            GameObject jugador = CrearJugador(new Vector3(-7f, 0.5f, 0f), layerSuelo);
-            ConfigurarCamaraNivel(jugador, bgRojo, new Vector2(-15f, -6f), new Vector2(215f, 15f));
-
-            var configN3 = AssetDatabase.LoadAssetAtPath<LevelConfig>("Assets/Settings/Niveles/LevelConfig_Nivel3.asset");
-            ConfigurarManagersYHUD(jugador, configN3, 10, 4);
-
-            EditorSceneManager.SaveScene(scene, "Assets/Scenes/Nivel3_LaValenciana.unity");
-        }
-
-        // ====================================================================
-        // CONSTRUCCIÓN PROCEDURAL DE TERRENOS POR NIVEL
-        // ====================================================================
-        private static void ConstruirTerrenoNivel1(Tilemap tmSuelo, Tilemap tmDeco)
-        {
-            string nivel = "MinaRayas";
-            Tile t0 = CargarTile(nivel, 0); // Sup-Izq
-            Tile t1 = CargarTile(nivel, 1); // Superficie
-            Tile t2 = CargarTile(nivel, 2); // Sup-Der
-            Tile t9 = CargarTile(nivel, 9); // Relleno
-            Tile t17 = CargarTile(nivel, 17); // Techo
-            Tile t7 = CargarTile(nivel, 7); // Estalactita
-
-            // Suelo extendido de X = -12 a X = 128 con 4 huecos
-            for (int x = -12; x <= 128; x++)
-            {
-                bool esHueco = (x >= 18 && x <= 22) || (x >= 66 && x <= 70) || (x >= 84 && x <= 88) || (x >= 106 && x <= 110);
-
-                if (!esHueco)
-                {
-                    Tile sup = (x == -12) ? t0 : (x == 128 ? t2 : t1);
-                    if (x == 17 || x == 65 || x == 83 || x == 105) sup = t2;
-                    else if (x == 23 || x == 71 || x == 89 || x == 111) sup = t0;
-
-                    tmSuelo.SetTile(new Vector3Int(x, -2, 0), sup);
-                    tmSuelo.SetTile(new Vector3Int(x, -3, 0), t9);
-                    tmSuelo.SetTile(new Vector3Int(x, -4, 0), t9);
-                }
-
-                // Techo
-                tmSuelo.SetTile(new Vector3Int(x, 6, 0), t17);
-                tmSuelo.SetTile(new Vector3Int(x, 7, 0), t9);
-
-                // Estalactitas periódicas
-                if (x % 7 == 0 && t7 != null)
-                {
-                    tmDeco.SetTile(new Vector3Int(x, 5, 0), t7);
-                }
-            }
-
-            // Paredes laterales de la mina para contener al jugador
-            for (int y = -1; y <= 5; y++)
-            {
-                tmSuelo.SetTile(new Vector3Int(-12, y, 0), t9);
-                tmSuelo.SetTile(new Vector3Int(128, y, 0), t9);
-            }
-        }
-
-        private static void ConstruirTerrenoNivel2(Tilemap tmSuelo, Tilemap tmDeco)
-        {
-            string nivel = "ElNopal";
-            Tile t0 = CargarTile(nivel, 0);
-            Tile t1 = CargarTile(nivel, 1);
-            Tile t2 = CargarTile(nivel, 2);
-            Tile t9 = CargarTile(nivel, 9);
-            Tile t17 = CargarTile(nivel, 17);
-            Tile t7 = CargarTile(nivel, 7);
-
-            // Suelo extendido de X = -12 a X = 168 con 6 huecos
-            for (int x = -12; x <= 168; x++)
-            {
-                bool esHueco = (x >= 11 && x <= 17) || (x >= 38 && x <= 50) || (x >= 74 && x <= 82) || 
-                               (x >= 94 && x <= 102) || (x >= 122 && x <= 130) || (x >= 148 && x <= 156);
-
-                if (!esHueco)
-                {
-                    Tile sup = t1;
-                    if (x == 10 || x == 37 || x == 73 || x == 93 || x == 121 || x == 147) sup = t2;
-                    else if (x == 18 || x == 51 || x == 83 || x == 103 || x == 131 || x == 157) sup = t0;
-
-                    tmSuelo.SetTile(new Vector3Int(x, -2, 0), sup);
-                    tmSuelo.SetTile(new Vector3Int(x, -3, 0), t9);
-                    tmSuelo.SetTile(new Vector3Int(x, -4, 0), t9);
-                }
-
-                // Techo
-                tmSuelo.SetTile(new Vector3Int(x, 6, 0), t17);
-                tmSuelo.SetTile(new Vector3Int(x, 7, 0), t9);
-
-                if (x % 8 == 0 && t7 != null)
-                {
-                    tmDeco.SetTile(new Vector3Int(x, 5, 0), t7);
-                }
-            }
-
-            // Paredes laterales
-            for (int y = -1; y <= 5; y++)
-            {
-                tmSuelo.SetTile(new Vector3Int(-12, y, 0), t9);
-                tmSuelo.SetTile(new Vector3Int(168, y, 0), t9);
-            }
-        }
-
-        private static void ConstruirTerrenoNivel3(Tilemap tmSuelo, Tilemap tmDeco)
-        {
-            string nivel = "LaValenciana";
-            Tile t0 = CargarTile(nivel, 0);
-            Tile t1 = CargarTile(nivel, 1);
-            Tile t2 = CargarTile(nivel, 2);
-            Tile t9 = CargarTile(nivel, 9);
-            Tile t17 = CargarTile(nivel, 17);
-            Tile t7 = CargarTile(nivel, 7);
-
-            // Suelo extendido de X = -12 a X = 208 con 9 huecos desafiantes
-            for (int x = -12; x <= 208; x++)
-            {
-                bool esHueco = (x >= 8 && x <= 14) || (x >= 22 && x <= 28) || (x >= 40 && x <= 54) ||
-                               (x >= 76 && x <= 90) || (x >= 98 && x <= 110) || (x >= 126 && x <= 138) ||
-                               (x >= 148 && x <= 156) || (x >= 166 && x <= 178) || (x >= 186 && x <= 196);
-
-                if (!esHueco)
-                {
-                    Tile sup = t1;
-                    if (x == 7 || x == 21 || x == 39 || x == 75 || x == 97 || x == 125 || x == 147 || x == 165 || x == 185) sup = t2;
-                    else if (x == 15 || x == 29 || x == 55 || x == 91 || x == 111 || x == 139 || x == 157 || x == 179 || x == 197) sup = t0;
-
-                    tmSuelo.SetTile(new Vector3Int(x, -2, 0), sup);
-                    tmSuelo.SetTile(new Vector3Int(x, -3, 0), t9);
-                    tmSuelo.SetTile(new Vector3Int(x, -4, 0), t9);
-                }
-
-                // Techo
-                tmSuelo.SetTile(new Vector3Int(x, 7, 0), t17);
-                tmSuelo.SetTile(new Vector3Int(x, 8, 0), t9);
-
-                if (x % 6 == 0 && t7 != null)
-                {
-                    tmDeco.SetTile(new Vector3Int(x, 6, 0), t7);
-                }
-            }
-
-            // Paredes laterales
-            for (int y = -1; y <= 6; y++)
-            {
-                tmSuelo.SetTile(new Vector3Int(-12, y, 0), t9);
-                tmSuelo.SetTile(new Vector3Int(208, y, 0), t9);
             }
         }
 
@@ -1533,7 +644,7 @@ namespace ElMinero.Editor
             anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/Controladores/Coleccionables/Gema.controller");
         }
 
-        private static void CrearRockSpawner(Vector3 pos, float intervalo)
+        private static RockSpawner CrearRockSpawner(Vector3 pos, float intervalo)
         {
             int layerPeligro = LayerMask.NameToLayer(Constantes.Layers.Peligro);
             if (layerPeligro == -1) layerPeligro = 0;
@@ -1576,68 +687,7 @@ namespace ElMinero.Editor
             warnTemplate.transform.SetParent(spawnerObj.transform);
             rockTemplate.SetActive(false);
             warnTemplate.SetActive(false);
-        }
-
-        private static void CrearBolaFuegoSpawner(Vector3 pos, float intervalo, float delayInicial)
-        {
-            GameObject spawnerObj = new GameObject("BolaFuego_Spawner");
-            spawnerObj.transform.position = pos;
-
-            // Objeto hijo para humo de advertencia en el techo
-            GameObject smokeObj = new GameObject("Aviso_Humo");
-            smokeObj.transform.SetParent(spawnerObj.transform, false);
-            smokeObj.transform.localPosition = Vector3.zero;
-            var srSmoke = smokeObj.AddComponent<SpriteRenderer>();
-            srSmoke.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Obstaculos/Humo.png");
-            srSmoke.sortingLayerName = Constantes.SortingLayers.Objetos;
-
-            // Prefab de bola de fuego
-            GameObject prefabBola = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Obstaculos/Bola_Fuego.prefab");
-
-            var spawner = spawnerObj.AddComponent<FireballSpawner>();
-            spawner.Configurar(intervalo, delayInicial, prefabBola, smokeObj);
-        }
-
-        private static void CrearMuroIncendio(Vector3 startPos, float endX, Vector3 triggerPos)
-        {
-            GameObject wallObj = new GameObject("Muro_Incendio");
-            wallObj.transform.position = startPos;
-            wallObj.tag = Constantes.Tags.Hazard;
-            int layerPeligro = LayerMask.NameToLayer(Constantes.Layers.Peligro);
-            if (layerPeligro != -1) wallObj.layer = layerPeligro;
-
-            // Columna de 5 llamas apiladas (Llamas_Incendio.png)
-            Sprite spLlama = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Obstaculos/Llamas_Incendio.png");
-            for (int i = 0; i < 5; i++)
-            {
-                GameObject llama = new GameObject($"Llama_{i}");
-                llama.transform.SetParent(wallObj.transform, false);
-                llama.transform.localPosition = new Vector3(0f, i * 2f, 0f);
-                var sr = llama.AddComponent<SpriteRenderer>();
-                sr.sprite = spLlama;
-                sr.sortingLayerName = Constantes.SortingLayers.Objetos;
-            }
-
-            var col = wallObj.AddComponent<BoxCollider2D>();
-            col.isTrigger = true;
-            col.size = new Vector2(1.5f, 10f);
-            col.offset = new Vector2(0f, 4.5f);
-
-            var audioSrc = wallObj.AddComponent<AudioSource>();
-            audioSrc.clip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/Fuego_Loop.wav");
-            audioSrc.loop = true;
-            audioSrc.playOnAwake = false;
-
-            var fireWall = wallObj.AddComponent<FireWallChase>();
-
-            // Trigger para activar la persecución
-            GameObject trigObj = new GameObject("Trigger_Incendio");
-            trigObj.transform.position = triggerPos;
-            var trigCol = trigObj.AddComponent<BoxCollider2D>();
-            trigCol.isTrigger = true;
-            trigCol.size = new Vector2(2f, 8f);
-            var trigScript = trigObj.AddComponent<FireChaseTrigger>();
-            trigScript.Configurar(fireWall);
+            return spawner;
         }
 
         private static void CrearCheckpoint(Vector3 pos)
@@ -2255,7 +1305,7 @@ namespace ElMinero.Editor
             var imgP = panelPausa.AddComponent<Image>();
             imgP.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Panel_Madera.png");
             imgP.type = Image.Type.Sliced;
-            imgP.pixelsPerUnitMultiplier = 0.25f;
+            imgP.pixelsPerUnitMultiplier = 1.5625f;
 
             // Título Pausa
             GameObject tObj = new GameObject("Texto_Pausa");
@@ -2361,8 +1411,9 @@ namespace ElMinero.Editor
             var scaler = canvasObj.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920, 1080);
-            scaler.matchWidthOrHeight = 0.5f;
+            scaler.matchWidthOrHeight = 1f; // prioriza el alto: en pantallas anchas nada se corta arriba/abajo
             canvasObj.AddComponent<GraphicRaycaster>();
+            ElMineroBuilder.AgregarDecoradorPaneles(canvasObj);
 
             if (UnityEngine.Object.FindAnyObjectByType<EventSystem>() == null)
             {
@@ -2374,7 +1425,7 @@ namespace ElMinero.Editor
             return canvasObj;
         }
 
-        private static Button CrearBotonMadera(Transform parent, string name, string texto, Vector2 pos, Vector2 size, Vector2 anchorMin = default, Vector2 anchorMax = default)
+        private static Button CrearBotonMadera(Transform parent, string name, string texto, Vector2 pos, Vector2 size, Vector2 anchorMin = default, Vector2 anchorMax = default, float fontSize = 34f)
         {
             if (anchorMin == default) anchorMin = new Vector2(0.5f, 0.5f);
             if (anchorMax == default) anchorMax = new Vector2(0.5f, 0.5f);
@@ -2388,14 +1439,26 @@ namespace ElMinero.Editor
             rect.anchoredPosition = pos;
             rect.sizeDelta = size;
 
+            Sprite spNormal = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Boton_Madera.png");
+            Sprite spRes = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Boton_Madera_Resaltado.png");
+            Sprite spPres = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Boton_Madera_Presionado.png");
+
             var img = btnObj.AddComponent<Image>();
-            img.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Boton_Madera.png");
+            img.sprite = spNormal;
             img.type = Image.Type.Sliced;
-            img.pixelsPerUnitMultiplier = 0.25f;
+            img.pixelsPerUnitMultiplier = 1.5625f;
 
             var btn = btnObj.AddComponent<Button>();
+            btn.transition = Selectable.Transition.SpriteSwap;
+            SpriteState ss = new SpriteState
+            {
+                highlightedSprite = spRes != null ? spRes : spNormal,
+                pressedSprite = spPres != null ? spPres : spNormal,
+                selectedSprite = spRes != null ? spRes : spNormal
+            };
+            btn.spriteState = ss;
 
-            // Texto del botón
+            // Texto del botón con fuente PixelifySans
             GameObject txtObj = new GameObject("Texto");
             txtObj.transform.SetParent(btnObj.transform, false);
             var rectT = txtObj.AddComponent<RectTransform>();
@@ -2404,11 +1467,16 @@ namespace ElMinero.Editor
             rectT.offsetMin = Vector2.zero;
             rectT.offsetMax = Vector2.zero;
             var tmp = txtObj.AddComponent<TextMeshProUGUI>();
+            tmp.font = FontAssetBuilder.ObtenerPixelifySans();
             tmp.text = texto;
-            tmp.fontSize = 34f;
+            tmp.fontSize = fontSize;
             tmp.fontStyle = FontStyles.Bold;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = new Color(0.95f, 0.9f, 0.8f);
+
+            var le = btnObj.AddComponent<LayoutElement>();
+            le.minHeight = size.y;
+            le.preferredHeight = size.y;
 
             return btn;
         }

@@ -114,19 +114,19 @@ TextureImporter:
       name: Nino_0
       rect:
         serializedVersion: 2
-        x: 8
+        x: 0
         y: 0
-        width: 17
-        height: 28
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: e2f7f4337a85fbd90800000000000000
+      spriteID: 2733ff018c1b3de4983e4123cb948d1a
       internalID: -7079842614059499730
       vertices: []
       indices: 
@@ -136,19 +136,19 @@ TextureImporter:
       name: Nino_1
       rect:
         serializedVersion: 2
-        x: 40
+        x: 32
         y: 0
-        width: 17
-        height: 28
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: b74c1c519eb4457b0800000000000000
+      spriteID: f16406863e9ab29479aa23c8310588f4
       internalID: -5236477002260560773
       vertices: []
       indices: 
@@ -158,19 +158,19 @@ TextureImporter:
       name: Nino_2
       rect:
         serializedVersion: 2
-        x: 71
-        y: 1
-        width: 20
-        height: 30
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 64
+        y: 0
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 729956eb6f51dd130800000000000000
+      spriteID: e11a0ea5ed3a3f8458f3cf9857babebd
       internalID: 3593052227211991335
       vertices: []
       indices: 
@@ -180,19 +180,19 @@ TextureImporter:
       name: Nino_3
       rect:
         serializedVersion: 2
-        x: 103
+        x: 96
         y: 0
-        width: 20
-        height: 29
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 2a61976392329d320800000000000000
+      spriteID: 2d7dc09f70183564e92f0e83456c85db
       internalID: 2583134521188226722
       vertices: []
       indices: 
@@ -202,7 +202,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 75fa82aa3496096468abb902b971fb1b
     internalID: 0
     vertices: []
     indices: 

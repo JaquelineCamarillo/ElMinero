@@ -6,45 +6,69 @@ using ElMinero.Utilidades;
 namespace ElMinero.Obstaculos
 {
     /// <summary>
-    /// Generador de bolas de fuego en el techo de la mina (Nivel 3).
-    /// Muestra humo de advertencia (Humo.png) en el techo durante 0.8 s antes de soltar la bola de fuego.
-    /// Funciona de forma periódica y se reinicia mediante IResettable.
+    /// Generador de bolas de fuego en el techo (nivel 3), con pool.
+    /// Muestra humo de aviso 0.8 s antes de soltar cada bola y solo lanza
+    /// si el jugador está a menos de 14 u.
     /// </summary>
     public class FireballSpawner : MonoBehaviour, IResettable
     {
-        [Header("Configuración de Tiempos")]
-        [Tooltip("Intervalo entre bolas de fuego.")]
-        [SerializeField] private float interval = 3.5f;
-
-        [Tooltip("Tiempo de advertencia previa con humo (0.8 s).")]
+        [Header("Tiempos")]
+        [SerializeField] private float interval = 3.2f;
         [SerializeField] private float warningTime = 0.8f;
-
-        [Tooltip("Desfase inicial para no sincronizar todos los spawners.")]
         [SerializeField] private float initialDelay = 0.5f;
 
-        [Header("Prefabs y Referencias")]
-        [SerializeField] private GameObject fireballPrefab;
+        [Header("Distancia de activación")]
+        [SerializeField] private float distanciaJugador = 14f;
+
+        [Header("Referencias")]
+        [Tooltip("Plantilla desactivada (hija de este objeto) con Fireball, Rigidbody2D y CircleCollider2D.")]
+        [SerializeField] private Fireball plantilla;
         [SerializeField] private GameObject smokeWarningObject;
+        [SerializeField] private int tamanoPool = 3;
 
+        private readonly Queue<Fireball> libres = new Queue<Fireball>();
+        private readonly List<Fireball> todas = new List<Fireball>();
         private Coroutine spawnRoutine;
-        private List<GameObject> activeFireballs = new List<GameObject>();
+        private Transform jugador;
 
-        private void Start()
-        {
-            if (smokeWarningObject != null)
-            {
-                smokeWarningObject.SetActive(false);
-            }
-
-            spawnRoutine = StartCoroutine(RutinaSpawn());
-        }
-
-        public void Configurar(float nuevoIntervalo, float retrasoInicial, GameObject prefabBola, GameObject objHumo)
+        public void Configurar(float nuevoIntervalo, float retrasoInicial, Fireball plantillaBola, GameObject objHumo)
         {
             interval = nuevoIntervalo;
             initialDelay = retrasoInicial;
-            fireballPrefab = prefabBola;
+            plantilla = plantillaBola;
             smokeWarningObject = objHumo;
+        }
+
+        private void Awake()
+        {
+            if (plantilla != null)
+            {
+                plantilla.gameObject.SetActive(false);
+                for (int i = 0; i < tamanoPool; i++)
+                {
+                    Fireball fb = Instantiate(plantilla, transform.position, Quaternion.identity);
+                    fb.name = $"Bola_Fuego_{i}";
+                    fb.gameObject.SetActive(false);
+                    todas.Add(fb);
+                    libres.Enqueue(fb);
+                }
+            }
+        }
+
+        private void Start()
+        {
+            if (smokeWarningObject != null) smokeWarningObject.SetActive(false);
+            spawnRoutine = StartCoroutine(RutinaSpawn());
+        }
+
+        private bool JugadorCerca()
+        {
+            if (jugador == null)
+            {
+                GameObject p = GameObject.FindGameObjectWithTag(Constantes.Tags.Player);
+                if (p != null) jugador = p.transform;
+            }
+            return jugador != null && Vector2.Distance(jugador.position, transform.position) < distanciaJugador;
         }
 
         private IEnumerator RutinaSpawn()
@@ -53,49 +77,43 @@ namespace ElMinero.Obstaculos
 
             while (true)
             {
-                // 1. Advertencia de humo en el techo (0.8 s)
-                if (smokeWarningObject != null)
+                if (!JugadorCerca())
                 {
-                    smokeWarningObject.SetActive(true);
+                    yield return new WaitForSeconds(0.25f);
+                    continue;
                 }
 
+                if (smokeWarningObject != null) smokeWarningObject.SetActive(true);
                 yield return new WaitForSeconds(warningTime);
+                if (smokeWarningObject != null) smokeWarningObject.SetActive(false);
 
-                if (smokeWarningObject != null)
+                if (libres.Count > 0)
                 {
-                    smokeWarningObject.SetActive(false);
+                    Fireball fb = libres.Dequeue();
+                    fb.Lanzar(transform.position - new Vector3(0f, 0.5f, 0f), Devolver);
                 }
 
-                // 2. Generar bola de fuego cayendo
-                if (fireballPrefab != null)
-                {
-                    GameObject fb = Instantiate(fireballPrefab, transform.position - new Vector3(0f, 0.4f, 0f), Quaternion.identity);
-                    activeFireballs.Add(fb);
-                }
-
-                // 3. Pausa hasta la siguiente bola
                 yield return new WaitForSeconds(interval);
             }
+        }
+
+        private void Devolver(Fireball fb)
+        {
+            if (fb != null && !libres.Contains(fb)) libres.Enqueue(fb);
         }
 
         public void ResetObject()
         {
             if (spawnRoutine != null) StopCoroutine(spawnRoutine);
+            if (smokeWarningObject != null) smokeWarningObject.SetActive(false);
 
-            if (smokeWarningObject != null)
+            libres.Clear();
+            foreach (var fb in todas)
             {
-                smokeWarningObject.SetActive(false);
+                if (fb == null) continue;
+                fb.gameObject.SetActive(false);
+                libres.Enqueue(fb);
             }
-
-            // Limpiar bolas de fuego huérfanas
-            for (int i = activeFireballs.Count - 1; i >= 0; i--)
-            {
-                if (activeFireballs[i] != null)
-                {
-                    Destroy(activeFireballs[i]);
-                }
-            }
-            activeFireballs.Clear();
 
             spawnRoutine = StartCoroutine(RutinaSpawn());
         }

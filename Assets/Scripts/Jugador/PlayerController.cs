@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using ElMinero.Utilidades;
+using ElMinero.Managers;
 
 namespace ElMinero.Jugador
 {
@@ -64,6 +65,8 @@ namespace ElMinero.Jugador
 
         // Variables de estado
         private bool isGrounded;
+        private float tiempoEnAire;
+        private float temporizadorPasos;
         private float coyoteCounter;
         private float jumpBufferCounter;
         private bool isFacingRight = true;
@@ -73,6 +76,11 @@ namespace ElMinero.Jugador
         // Soporte para plataformas móviles
         private Rigidbody2D activeMovingPlatformRb;
 
+        // Control bloqueado (intro del jefe, escenas cinemáticas) y empujes
+        private bool controlBloqueado = false;
+        private float movimientoForzado = 0f;
+        private float knockbackTimer = 0f;
+
         // Propiedades públicas para animador, HUD y otros sistemas
         public bool IsGrounded => isGrounded;
         public Vector2 Velocity => rb != null ? rb.linearVelocity : Vector2.zero;
@@ -80,6 +88,10 @@ namespace ElMinero.Jugador
         public float JumpHeight => jumpHeight;
         public bool IsInvulnerable => isInvulnerable;
         public bool IsFacingRight => isFacingRight;
+        public bool ControlBloqueado => controlBloqueado;
+
+        /// <summary>Entrada horizontal efectiva (la del jugador o la forzada durante una cinemática).</summary>
+        private float EntradaHorizontal => controlBloqueado ? movimientoForzado : inputHandler.MoveInput;
 
         private void Awake()
         {
@@ -127,6 +139,25 @@ namespace ElMinero.Jugador
             CheckGround();
             HandleJumpTimers();
             HandleFacingDirection();
+            SonidoPasos();
+        }
+
+        /// <summary>Pasos alternados mientras camina sobre el suelo.</summary>
+        private void SonidoPasos()
+        {
+            float vx = rb != null ? rb.linearVelocity.x : 0f;
+            if (activeMovingPlatformRb != null) vx -= activeMovingPlatformRb.linearVelocity.x;
+            if (!isGrounded || Mathf.Abs(vx) < 1f || Time.timeScale <= 0f)
+            {
+                temporizadorPasos = 0.05f;
+                return;
+            }
+            temporizadorPasos -= Time.deltaTime;
+            if (temporizadorPasos <= 0f)
+            {
+                temporizadorPasos = 0.3f;
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayPasos();
+            }
         }
 
         private void FixedUpdate()
@@ -143,16 +174,30 @@ namespace ElMinero.Jugador
 
             if (isGrounded)
             {
+                // Aterrizaje: solo si de verdad estuvo en el aire (no en pequeños escalones)
+                if (!wasGrounded && tiempoEnAire > 0.15f && Time.timeSinceLevelLoad > 0.5f)
+                {
+                    if (AudioManager.Instance != null) AudioManager.Instance.PlayAterrizar();
+                    temporizadorPasos = 0.25f;
+                }
+                tiempoEnAire = 0f;
                 coyoteCounter = coyoteTime;
             }
             else
             {
+                tiempoEnAire += Time.deltaTime;
                 coyoteCounter -= Time.deltaTime;
             }
         }
 
         private void HandleJumpTimers()
         {
+            if (controlBloqueado)
+            {
+                jumpBufferCounter = 0f;
+                return;
+            }
+
             // Buffer de salto al pulsar
             if (inputHandler.JumpTriggered)
             {
@@ -186,11 +231,18 @@ namespace ElMinero.Jugador
             float initialJumpVelocity = Mathf.Sqrt(2f * effectiveGravity * jumpHeight);
 
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, initialJumpVelocity);
+            if (AudioManager.Instance != null) AudioManager.Instance.PlaySalto();
         }
 
         private void ApplyHorizontalMovement()
         {
-            float targetVelocityX = inputHandler.MoveInput * moveSpeed;
+            if (knockbackTimer > 0f)
+            {
+                knockbackTimer -= Time.fixedDeltaTime;
+                return;
+            }
+
+            float targetVelocityX = EntradaHorizontal * moveSpeed;
 
             // Si está sobre una plataforma móvil, sumar su velocidad horizontal
             if (activeMovingPlatformRb != null)
@@ -216,11 +268,12 @@ namespace ElMinero.Jugador
 
         private void HandleFacingDirection()
         {
-            if (inputHandler.MoveInput > 0.05f && !isFacingRight)
+            float entrada = EntradaHorizontal;
+            if (entrada > 0.05f && !isFacingRight)
             {
                 Flip(true);
             }
-            else if (inputHandler.MoveInput < -0.05f && isFacingRight)
+            else if (entrada < -0.05f && isFacingRight)
             {
                 Flip(false);
             }
@@ -277,6 +330,42 @@ namespace ElMinero.Jugador
 
             isInvulnerable = false;
             invulnerabilityCoroutine = null;
+        }
+
+        // ====================================================================
+        // CONTROL BLOQUEADO, REBOTE Y EMPUJE
+        // ====================================================================
+
+        /// <summary>
+        /// Quita o devuelve el control al jugador. Con control bloqueado se puede forzar
+        /// una caminata automática (-1 izquierda, 0 quieto, 1 derecha).
+        /// </summary>
+        public void BloquearControl(bool bloquear, float caminarForzado = 0f)
+        {
+            controlBloqueado = bloquear;
+            movimientoForzado = bloquear ? Mathf.Clamp(caminarForzado, -1f, 1f) : 0f;
+            if (bloquear && Mathf.Approximately(caminarForzado, 0f) && rb != null)
+            {
+                rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            }
+        }
+
+        /// <summary>Rebote vertical (por ejemplo, al caerle encima al jefe).</summary>
+        public void Rebotar(float factor = 1f)
+        {
+            if (rb == null) return;
+            float g = Mathf.Abs(Physics2D.gravity.y) * customGravityScale;
+            float v = Mathf.Sqrt(2f * g * jumpHeight) * factor;
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, v);
+            coyoteCounter = 0f;
+        }
+
+        /// <summary>Empuje con velocidad fija durante un tiempo corto (ignora la entrada horizontal).</summary>
+        public void Empujar(Vector2 velocidad, float duracion = 0.35f)
+        {
+            if (rb == null) return;
+            rb.linearVelocity = velocidad;
+            knockbackTimer = duracion;
         }
 
         // ====================================================================

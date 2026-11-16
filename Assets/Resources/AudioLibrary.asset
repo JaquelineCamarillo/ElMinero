@@ -50,3 +50,24 @@ MonoBehaviour:
   sfxEstrella2: {fileID: 8300000, guid: 6a3632463ba5a924b91fe4c46bd50907, type: 3}
   sfxEstrella3: {fileID: 8300000, guid: ccb36c2c6f7d0a344b3d6f53b13ab2ee, type: 3}
   sfxDesbloqueoNivel: {fileID: 8300000, guid: 6d84826a278617e4083ddf56ead5ed81, type: 3}
+  musicJefeColoso: {fileID: 8300000, guid: b509001f8fc978147bb950c3f0249d68, type: 3}
+  musicJefeDerrotado: {fileID: 8300000, guid: 6238da3a171550249964ef56cb6fef80, type: 3}
+  musicFinalAmanecer: {fileID: 8300000, guid: 34aeac576e7c22b4193a9bb36e2ad9a1, type: 3}
+  clipsExtra:
+  - {fileID: 8300000, guid: 71c115a9833988842b5abf8234f52902, type: 3}
+  - {fileID: 8300000, guid: f3f4883bc2a90c4449d215328862af85, type: 3}
+  - {fileID: 8300000, guid: 9582657d1fcb6db45878b4604ecc671a, type: 3}
+  - {fileID: 8300000, guid: 1aef410dd36553348a0e06bb95c6e018, type: 3}
+  - {fileID: 8300000, guid: d82bf32955762ac4985e57e198cb511c, type: 3}
+  - {fileID: 8300000, guid: 5637ee256407acc45b349888ebefc3a4, type: 3}
+  - {fileID: 8300000, guid: 21a5b887244bf634bba00d1b640bd856, type: 3}
+  - {fileID: 8300000, guid: d873685bca052d74fa7c0cfc4cf6dfaf, type: 3}
+  - {fileID: 8300000, guid: 9a8620afd5ad2d54682a35c69456626e, type: 3}
+  - {fileID: 8300000, guid: 329cbb19581b96441906c60818dde36f, type: 3}
+  - {fileID: 8300000, guid: 2142adfe4dd176149a78d99ed4e07788, type: 3}
+  - {fileID: 8300000, guid: d80c66a1dfb97774c90cc5978f1c71d4, type: 3}
+  - {fileID: 8300000, guid: 023875239c7fb8643bc01a240b7ad3b2, type: 3}
+  - {fileID: 8300000, guid: 06b59a60e0a990a4886f440c828d1ea5, type: 3}
+  - {fileID: 8300000, guid: e978f2a2abefc4f4d88777e9be0bf250, type: 3}
+  - {fileID: 8300000, guid: 7fbdb2d30600b934fb9958664d8f2c25, type: 3}
+  - {fileID: 8300000, guid: add041ebd79c12848b1e7e167fe9a7bc, type: 3}

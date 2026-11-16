@@ -108,19 +108,19 @@ TextureImporter:
       name: Coloso_Aturdido_0
       rect:
         serializedVersion: 2
-        x: 6
+        x: 0
         y: 0
-        width: 50
-        height: 53
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: d34cbecd9e35aca60800000000000000
+      spriteID: a42988c6cb471e54f8c2e62f713f57a9
       internalID: 7695055177214837821
       vertices: []
       indices: 
@@ -130,19 +130,19 @@ TextureImporter:
       name: Coloso_Aturdido_1
       rect:
         serializedVersion: 2
-        x: 70
+        x: 64
         y: 0
-        width: 50
-        height: 52
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: dbdb5ba35d914ebb0800000000000000
+      spriteID: 22f9b78530fe4b04ab753fa83b333d79
       internalID: -4907769290323280451
       vertices: []
       indices: 
@@ -152,7 +152,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: f232fb452ee0f2742ab3641bab50f219
     internalID: 0
     vertices: []
     indices: 

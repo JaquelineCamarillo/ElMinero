@@ -114,19 +114,19 @@ TextureImporter:
       name: Roca_Lanzada_0
       rect:
         serializedVersion: 2
-        x: 1
+        x: 0
         y: 0
-        width: 15
-        height: 15
+        width: 16
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: e9b897329e8323540800000000000000
+      spriteID: 6fc06ad367d98964f849aa70922858c6
       internalID: 4986110311426263966
       vertices: []
       indices: 
@@ -136,19 +136,19 @@ TextureImporter:
       name: Roca_Lanzada_1
       rect:
         serializedVersion: 2
-        x: 17
+        x: 16
         y: 0
-        width: 15
-        height: 15
+        width: 16
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 2c42516dfe8bb9850800000000000000
+      spriteID: 479fc843ec9d5914ca441091e36cf96d
       internalID: 6384900236956214466
       vertices: []
       indices: 
@@ -158,19 +158,19 @@ TextureImporter:
       name: Roca_Lanzada_2
       rect:
         serializedVersion: 2
-        x: 33
+        x: 32
         y: 0
-        width: 15
-        height: 15
+        width: 16
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 0dbd7f2e7c70d29a0800000000000000
+      spriteID: f506ee4e48f7f8f4d8619bfc943ed416
       internalID: -6256335752259970096
       vertices: []
       indices: 
@@ -180,19 +180,19 @@ TextureImporter:
       name: Roca_Lanzada_3
       rect:
         serializedVersion: 2
-        x: 49
+        x: 48
         y: 0
-        width: 15
-        height: 15
+        width: 16
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: e29fd19da3434d8b0800000000000000
+      spriteID: cdd5e21dfc0d55e4ebbc88a636702850
       internalID: -5128416648312784594
       vertices: []
       indices: 
@@ -202,7 +202,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 9eca01799a50af74083258a2a3cb079c
     internalID: 0
     vertices: []
     indices: 

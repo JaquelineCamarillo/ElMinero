@@ -78,6 +78,7 @@ namespace ElMinero.Plataformas
 
             // Etapa 1: Agrietarse y temblar
             if (spriteCracked != null && sr != null) sr.sprite = spriteCracked;
+            if (ElMinero.Managers.AudioManager.Instance != null) ElMinero.Managers.AudioManager.Instance.PlayPlataformaCruje(transform.position);
 
             while (elapsed < collapseDelay)
             {
@@ -97,6 +98,7 @@ namespace ElMinero.Plataformas
 
             // Colapsar
             transform.position = originalPosition;
+            if (ElMinero.Managers.AudioManager.Instance != null) ElMinero.Managers.AudioManager.Instance.PlayPlataformaColapso(transform.position);
             isCollapsed = true;
             if (col != null) col.enabled = false;
             if (sr != null) sr.enabled = false;

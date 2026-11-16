@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using ElMinero.Utilidades;
 using ElMinero.Managers;
@@ -6,19 +7,28 @@ using ElMinero.Jugador;
 namespace ElMinero.Obstaculos
 {
     /// <summary>
-    /// Bola de fuego que cae desde el techo de la mina (Nivel 3).
-    /// Cae con aceleración gravitacional (gravityScale = 2.5).
-    /// Al colisionar con el suelo o el jugador, inflige daño y estalla desapareciendo.
+    /// Bola de fuego que cae del techo (nivel 3).
+    /// Rigidbody2D Dynamic (gravityScale 2.5) con collider trigger.
+    /// Al tocar el Suelo explota (polvo y chispas) y regresa al pool de su generador.
+    /// Vive como máximo 4 s para que ninguna se quede en la escena.
     /// </summary>
-    [RequireComponent(typeof(CircleCollider2D), typeof(Rigidbody2D))]
+    [RequireComponent(typeof(Rigidbody2D), typeof(CircleCollider2D))]
     public class Fireball : MonoBehaviour
     {
-        [Tooltip("Daño infligido al jugador.")]
         [SerializeField] private int damage = 1;
+        [SerializeField] private float vidaMaxima = 4f;
+        [SerializeField] private Sprite[] cuadrosExplosion;
 
         private Rigidbody2D rb;
         private CircleCollider2D col;
-        private bool hasExploded = false;
+        private float vida;
+        private bool explotada;
+        private Action<Fireball> alTerminar;
+
+        public void Configurar(Sprite[] explosion)
+        {
+            cuadrosExplosion = explosion;
+        }
 
         private void Awake()
         {
@@ -29,61 +39,66 @@ namespace ElMinero.Obstaculos
             int layerPeligro = LayerMask.NameToLayer(Constantes.Layers.Peligro);
             if (layerPeligro != -1) gameObject.layer = layerPeligro;
 
-            if (rb != null)
-            {
-                rb.bodyType = RigidbodyType2D.Dynamic;
-                rb.gravityScale = 2.5f;
-            }
-
-            if (col != null)
-            {
-                col.radius = 0.45f;
-            }
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.gravityScale = 2.5f;
+            rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            col.isTrigger = true;
+            col.radius = 0.4f;
         }
 
-        private void OnCollisionEnter2D(Collision2D collision)
+        /// <summary>Saca la bola del pool en la posición indicada.</summary>
+        public void Lanzar(Vector3 posicion, Action<Fireball> callbackTerminar)
         {
-            if (hasExploded) return;
+            alTerminar = callbackTerminar;
+            transform.position = posicion;
+            vida = 0f;
+            explotada = false;
+            gameObject.SetActive(true);
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
 
-            if (collision.gameObject.CompareTag(Constantes.Tags.Player))
-            {
-                var health = collision.gameObject.GetComponent<PlayerHealth>();
-                if (health != null)
-                {
-                    bool golpe = health.TakeDamage(damage);
-                    if (golpe && AudioManager.Instance != null)
-                    {
-                        AudioManager.Instance.PlayDanio();
-                    }
-                }
-            }
-
-            Explotar();
+        private void Update()
+        {
+            vida += Time.deltaTime;
+            if (vida >= vidaMaxima) Terminar(false);
         }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (hasExploded) return;
+            if (explotada) return;
 
             if (other.CompareTag(Constantes.Tags.Player))
             {
                 var health = other.GetComponent<PlayerHealth>();
-                if (health != null)
+                if (health != null && health.TakeDamage(damage) && AudioManager.Instance != null)
                 {
-                    bool golpe = health.TakeDamage(damage);
-                    if (golpe && AudioManager.Instance != null)
-                    {
-                        AudioManager.Instance.PlayDanio();
-                    }
+                    AudioManager.Instance.PlayDanio();
                 }
-                Explotar();
+                Terminar(true);
+                return;
+            }
+
+            if (other.gameObject.layer == LayerMask.NameToLayer(Constantes.Layers.Suelo) && !other.isTrigger)
+            {
+                Terminar(true);
             }
         }
 
-        private void Explotar()
+        private void Terminar(bool conExplosion)
         {
-            hasExploded = true;
-            Destroy(gameObject);
+            if (explotada) return;
+            explotada = true;
+
+            if (conExplosion)
+            {
+                EfectoTemporal.Crear(transform.position, cuadrosExplosion, 14f, new Color(1f, 0.6f, 0.25f), 1.4f);
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayRocaImpacto();
+            }
+
+            rb.linearVelocity = Vector2.zero;
+            gameObject.SetActive(false);
+            alTerminar?.Invoke(this);
         }
     }
 }

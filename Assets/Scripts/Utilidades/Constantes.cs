@@ -66,7 +66,7 @@ namespace ElMinero.Utilidades
             public const string Derrota = "Derrota";
             public const string Splash = "Splash";
             public const string Intro = "Intro";
-            public const string Final = "Final";
+            public const string Final = "Final_Templo";
             public const string Creditos = "Creditos";
         }
 
@@ -79,7 +79,6 @@ namespace ElMinero.Utilidades
             public const string VolumenMusica = "VolumenMusica";
             public const string VolumenSFX = "VolumenSFX";
             public const string PantallaCompleta = "PantallaCompleta";
-            public const string CalidadGrafica = "CalidadGrafica";
             public const string NombreJugador = "NombreJugador";
             public const string NombrePorDefecto = "Minero";
             public const string RecordPuntaje = "RecordPuntaje";

@@ -72,6 +72,7 @@ namespace ElMinero.Coleccionables
         {
             isMultiplierActive = true;
             multiplierTimer = multiplierDuration;
+            if (ElMinero.Managers.AudioManager.Instance != null) ElMinero.Managers.AudioManager.Instance.PlayRachaX2();
             currentStreak = 0;
             OnMultiplierStateChanged?.Invoke(true, multiplierDuration);
             OnStreakCountChanged?.Invoke(currentStreak, requiredStreak);

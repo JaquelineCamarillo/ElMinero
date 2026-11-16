@@ -113,17 +113,17 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 10
+        width: 12
         height: 14
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 2
+      pivot: {x: 0.5, y: 1}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 2481dfe32ad196060800000000000000
+      spriteID: 69c62302b39cd6444a952f7c033ec3e6
       internalID: 6947116482874382402
       vertices: []
       indices: 
@@ -133,19 +133,19 @@ TextureImporter:
       name: Campana_1
       rect:
         serializedVersion: 2
-        x: 11
+        x: 12
         y: 0
-        width: 14
+        width: 12
         height: 14
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 2
+      pivot: {x: 0.5, y: 1}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 4b09f34915b186610800000000000000
+      spriteID: 0e1f76d2428598a4698c8dfcb0876d7a
       internalID: 1614570503605817524
       vertices: []
       indices: 
@@ -155,19 +155,19 @@ TextureImporter:
       name: Campana_2
       rect:
         serializedVersion: 2
-        x: 26
+        x: 24
         y: 0
-        width: 10
+        width: 12
         height: 14
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 2
+      pivot: {x: 0.5, y: 1}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: d7be3b91bff3c5450800000000000000
+      spriteID: 896a5b5188f06ed4c81cb80493c5de1c
       internalID: 6078803944743889789
       vertices: []
       indices: 
@@ -177,7 +177,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: f1d437d008f16784ea7a2f04ef4cff36
     internalID: 0
     vertices: []
     indices: 

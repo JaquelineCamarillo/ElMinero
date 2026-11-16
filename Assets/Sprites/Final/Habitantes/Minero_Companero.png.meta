@@ -114,19 +114,19 @@ TextureImporter:
       name: Minero_Companero_0
       rect:
         serializedVersion: 2
-        x: 8
+        x: 0
         y: 0
-        width: 16
-        height: 29
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 60009b2993fa38e20800000000000000
+      spriteID: bede9921ef78d62498335553699f8ab4
       internalID: 3351715209503375366
       vertices: []
       indices: 
@@ -136,19 +136,19 @@ TextureImporter:
       name: Minero_Companero_1
       rect:
         serializedVersion: 2
-        x: 40
+        x: 32
         y: 0
-        width: 16
-        height: 28
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 104e109cbf97511a0800000000000000
+      spriteID: dab7a09246d16e94f82784e446970e6c
       internalID: -6839426336776133631
       vertices: []
       indices: 
@@ -158,19 +158,19 @@ TextureImporter:
       name: Minero_Companero_2
       rect:
         serializedVersion: 2
-        x: 69
+        x: 64
         y: 0
-        width: 22
+        width: 32
         height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 1a69fa5a016094720800000000000000
+      spriteID: fffdc17adea065e4eb336b8b6edd8f0b
       internalID: 2830800509348058785
       vertices: []
       indices: 
@@ -180,19 +180,19 @@ TextureImporter:
       name: Minero_Companero_3
       rect:
         serializedVersion: 2
-        x: 101
+        x: 96
         y: 0
-        width: 22
-        height: 29
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 1de0487d6b5d6e0e0800000000000000
+      spriteID: 1eabca99c3f299d48933260c5ee5d780
       internalID: -2240868783293722927
       vertices: []
       indices: 
@@ -202,7 +202,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: a112f1b1a08e618418856c5b0ffa31e3
     internalID: 0
     vertices: []
     indices: 

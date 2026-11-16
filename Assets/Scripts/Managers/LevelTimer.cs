@@ -38,6 +38,7 @@ namespace ElMinero.Managers
             remainingTime = duracion;
             isRunning = true;
             isUrgent = false;
+            if (AudioManager.Instance != null) AudioManager.Instance.SetMusicUrgency(false);
             OnTimeChanged?.Invoke(remainingTime);
         }
 
@@ -55,12 +56,20 @@ namespace ElMinero.Managers
         {
             if (!isRunning) return;
 
+            float antes = remainingTime;
             remainingTime -= Time.deltaTime;
 
             if (remainingTime <= urgentTimeThreshold && !isUrgent)
             {
                 isUrgent = true;
                 OnUrgentStateChanged?.Invoke(true);
+                if (AudioManager.Instance != null) AudioManager.Instance.SetMusicUrgency(true);
+            }
+
+            // Tic-tac en cada segundo de los últimos 10
+            if (isUrgent && remainingTime > 0f && Mathf.CeilToInt(remainingTime) < Mathf.CeilToInt(antes))
+            {
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayTicReloj();
             }
 
             if (remainingTime <= 0f)
@@ -80,6 +89,7 @@ namespace ElMinero.Managers
             remainingTime = initialTime;
             isRunning = true;
             isUrgent = false;
+            if (AudioManager.Instance != null) AudioManager.Instance.SetMusicUrgency(false);
             OnUrgentStateChanged?.Invoke(false);
             OnTimeChanged?.Invoke(remainingTime);
         }

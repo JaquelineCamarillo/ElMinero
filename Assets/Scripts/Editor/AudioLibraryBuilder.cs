@@ -86,6 +86,27 @@ namespace ElMinero.Editor
             library.sfxEstrella3 = AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Estrella_3.wav");
             library.sfxDesbloqueoNivel = AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + "Desbloqueo_Nivel.wav");
 
+            // Jefe final, nivel 3 y escena del Templo de San Cayetano
+            library.musicJefeColoso = AssetDatabase.LoadAssetAtPath<AudioClip>(pMusica + "Musica_Jefe_Coloso.ogg");
+            library.musicJefeDerrotado = AssetDatabase.LoadAssetAtPath<AudioClip>(pMusica + "Musica_Jefe_Derrotado.ogg");
+            library.musicFinalAmanecer = AssetDatabase.LoadAssetAtPath<AudioClip>(pMusica + "Musica_Final_Amanecer.ogg");
+
+            string[] extras = new string[]
+            {
+                "Coloso_Rugido", "Coloso_Pisoton", "Coloso_Embestida_Loop", "Coloso_ChoquePared",
+                "Coloso_Golpeado", "Coloso_Derrotado", "Onda_Choque", "Roca_Lanzada",
+                "Compuerta_Cierra", "Jefe_Aparece", "Campanas_Templo", "Aves_Amanecer_Loop",
+                "Aplausos_Pueblo", "Malacate_Loop", "Fuego_Loop", "Derrumbe", "Temblor"
+            };
+            var listaExtras = new System.Collections.Generic.List<AudioClip>();
+            foreach (string nombre in extras)
+            {
+                AudioClip c = AssetDatabase.LoadAssetAtPath<AudioClip>(pSfx + nombre + ".wav");
+                if (c != null) listaExtras.Add(c);
+                else Debug.LogWarning("[El Minero] AudioLibrary: no se encontró " + pSfx + nombre + ".wav");
+            }
+            library.clipsExtra = listaExtras.ToArray();
+
             EditorUtility.SetDirty(library);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

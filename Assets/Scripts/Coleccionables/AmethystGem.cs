@@ -18,6 +18,7 @@ namespace ElMinero.Coleccionables
 
         protected override void OnCollect(PlayerController player)
         {
+            if (AudioManager.Instance != null) AudioManager.Instance.PlayRecolectarGema();
             if (LevelManager.Instance != null)
             {
                 LevelManager.Instance.RecolectarGema(this);

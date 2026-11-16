@@ -47,6 +47,15 @@ namespace ElMinero.Jugador
             if (playerController != null && playerController.IsInvulnerable) return false;
 
             currentLives = Mathf.Max(0, currentLives - damage);
+
+            // Sonido: golpe normal, o el de perder la última vida
+            var audio = ElMinero.Managers.AudioManager.Instance;
+            if (audio != null)
+            {
+                if (currentLives <= 0) audio.PlayPerderVida();
+                else audio.PlayDanio();
+            }
+
             OnHealthChanged?.Invoke(currentLives);
             OnLifeLost?.Invoke(currentLives);
 
@@ -64,6 +73,16 @@ namespace ElMinero.Jugador
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Suma vidas sin pasar del máximo (recompensa por vencer al jefe).
+        /// </summary>
+        public void AgregarVida(int cantidad = 1)
+        {
+            if (IsDead) return;
+            currentLives = Mathf.Min(maxLives, currentLives + Mathf.Max(0, cantidad));
+            OnHealthChanged?.Invoke(currentLives);
         }
 
         /// <summary>

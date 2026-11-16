@@ -53,6 +53,12 @@ El juego fue desarrollado sobre **Unity 6.6 (6000.6.3f1)** haciendo uso de los s
 
 ---
 
+## Jefe final y escena del Templo
+
+Jefe final y escena del Templo de San Cayetano: arte y audio generados con asistencia de IA (Claude, Anthropic). "El Coloso de Plata Roja" es una leyenda ficticia creada para el juego.
+
+---
+
 ## 5. Patrimonio Histórico y Cultural
 
 Este videojuego es un homenaje a la historia y a los trabajadores de las históricas minas de Guanajuato, México:

@@ -170,81 +170,126 @@
 
 ---
 
-## 4. ResoluciÃ³n Integral de Incidencias y Paquete de Recursos v3 (Ramas ix/*)
+## 4. Resolución Integral de Incidencias y Paquete de Recursos v3 (Ramas fix/*)
 
-Para responder a la retroalimentaciÃ³n tÃ©cnica y optimizar el rendimiento y la experiencia de usuario, se crearon e integraron 8 ramas de correcciÃ³n bajo control de versiones estricto:
+Para responder a la retroalimentación técnica y optimizar el rendimiento y la experiencia de usuario, se crearon e integraron 8 ramas de corrección bajo control de versiones estricto:
 
-### 4.1 Rama ix/audio
-- **Causa raÃ­z:** En Unity 6, la exposiciÃ³n dinÃ¡mica de parÃ¡metros del AudioMixer (VolMusica / VolEfectos) fallaba arrojando errores en consola (Exposed name does not exist). AdemÃ¡s, los clips de audio quedaban nulos ({fileID: 0}) al compilar builds externas al editor. La mÃºsica del nivel 1 era idÃ©ntica a la del menÃº y el nivel 2 quedaba en silencio porque AudioManager.PlayMusicNivel no se invocaba.
-- **SoluciÃ³n implementada:**
-  - CreaciÃ³n de AudioLibrary.cs (ScriptableObject) en Assets/Resources/AudioLibrary.asset cargado en runtime mediante Resources.Load<AudioLibrary>("AudioLibrary"), asegurando que todos los clips estÃ©n presentes en .exe, WebGL y APK.
-  - AudioManager.cs aplica el volumen directamente sobre las fuentes de mÃºsica, el pool de SFX y las fuentes 3D registradas dinÃ¡micamente (RegistrarFuenteEfectos).
-  - Enrutamiento musical explÃ­cito en LevelManager.Start(), IntroController, SplashController y FinalController (MenÃº = vals guanajuatense, N1 = misteriosa, N2 = rÃ­tmica, N3 = urgente, Final = victoria).
-- **Ramas y Merge:** Rama ix/audio fusionada a main y sincronizada en remoto.
+### 4.1 Rama fix/audio
+- **Causa raíz:** En Unity 6, la exposición dinámica de parámetros del AudioMixer (VolMusica / VolEfectos) fallaba arrojando errores en consola (Exposed name does not exist). Además, los clips de audio quedaban nulos ({fileID: 0}) al compilar builds externas al editor. La música del nivel 1 era idéntica a la del menú y el nivel 2 quedaba en silencio porque AudioManager.PlayMusicNivel no se invocaba.
+- **Solución implementada:**
+  - Creación de AudioLibrary.cs (ScriptableObject) en Assets/Resources/AudioLibrary.asset cargado en runtime mediante Resources.Load<AudioLibrary>("AudioLibrary"), asegurando que todos los clips estén presentes en .exe, WebGL y APK.
+  - AudioManager.cs aplica el volumen directamente sobre las fuentes de música, el pool de SFX y las fuentes 3D registradas dinámicamente (RegistrarFuenteEfectos).
+  - Enrutamiento musical explícito en LevelManager.Start(), IntroController, SplashController y FinalController (Menú = vals guanajuatense, N1 = misteriosa, N2 = rítmica, N3 = urgente, Final = victoria).
+- **Ramas y Merge:** Rama fix/audio fusionada a main y sincronizada en remoto.
 
-### 4.2 Rama ix/ui-tamanos
-- **Causa raÃ­z:** Varios paneles de UI no mantenÃ­an proporciones canÃ³nicas (desbordes de pantalla), tamaÃ±os de fuente inferiores a 26 pt y el selector de calidad grÃ¡fica con TMP_Dropdown arrojaba error de plantilla faltante.
-- **SoluciÃ³n implementada:**
-  - SpriteImportSetup.cs importÃ³ y rebanÃ³ los nuevos assets v3 (Castillete 48Ã—80 Bottom Center, Bola de Fuego 16Ã—16, Humo 16Ã—16, Llamas de Incendio 16Ã—32 Bottom Center, TelaraÃ±a 16Ã—16 Top Center, Fondos de MenÃº y Logo Grande).
-  - En OptionsPanel.cs se sustituyÃ³ el dropdown por un selector cÃ­clico con flechas â—€  Alta  â–¶ sobre los niveles de QualitySettings.names.
-  - En UIPrefabBuilder.cs se calibraron las dimensiones canÃ³nicas modales (Opciones 1200Ã—860, CrÃ©ditos 1200Ã—860, Selector de Niveles 1500Ã—900, Resultados 1200Ã—900, Game Over 1200Ã—760, LevelStartCard 1100Ã—650, Controles 1100Ã—700) forzando tamaÃ±o tipogrÃ¡fico mÃ­nimo de 26 pt y multiplicador 9-slice pixelsPerUnitMultiplier = 0.25f.
-- **Ramas y Merge:** Rama ix/ui-tamanos fusionada a main y sincronizada en remoto.
+### 4.2 Rama fix/ui-tamanos
+- **Causa raíz:** Varios paneles de UI no mantenían proporciones canónicas (desbordes de pantalla), tamaños de fuente inferiores a 26 pt y el selector de calidad gráfica con TMP_Dropdown arrojaba error de plantilla faltante.
+- **Solución implementada:**
+  - SpriteImportSetup.cs importó y rebanó los nuevos assets v3 (Castillete 48×80 Bottom Center, Bola de Fuego 16×16, Humo 16×16, Llamas de Incendio 16×32 Bottom Center, Telaraña 16×16 Top Center, Fondos de Menú y Logo Grande).
+  - En OptionsPanel.cs se sustituyó el dropdown por un selector cíclico con flechas ◀  Alta  ▶ sobre los niveles de QualitySettings.names.
+  - En UIPrefabBuilder.cs se calibraron las dimensiones canónicas modales (Opciones 1200×860, Créditos 1200×860, Selector de Niveles 1500×900, Resultados 1200×900, Game Over 1200×760, LevelStartCard 1100×650, Controles 1100×700) forzando tamaño tipográfico mínimo de 26 pt y multiplicador 9-slice pixelsPerUnitMultiplier = 0.25f.
+- **Ramas y Merge:** Rama fix/ui-tamanos fusionada a main y sincronizada en remoto.
 
-### 4.3 Rama ix/menu
-- **Causa raÃ­z:** MenÃº principal plano y estÃ¡tico sin profundidad visual, con tÃ­tulos reducidos y alineaciones desproporcionadas.
-- **SoluciÃ³n implementada:**
-  - CreaciÃ³n de MenuParallax.cs con oscilaciÃ³n sinusoidal suave en reposo y respuesta fÃ­sica al puntero/mouse en 3 capas de fondo (Capa0_Cielo factor 0.2, Capa1_Ciudad factor 0.5, Capa2_Frente factor 1.0).
-  - IntegraciÃ³n del nuevo tÃ­tulo Logo_ElMinero_Grande.png (1160Ã—256), sprite de Refugio en reposo (~200 px) sobre los rieles, panel derecho estilizado (620Ã—740) con botones de 540 px e input de nombre, y texto de versiÃ³n a 28 pt.
-- **Ramas y Merge:** Rama ix/menu fusionada a main y sincronizada en remoto.
+### 4.3 Rama fix/menu
+- **Causa raíz:** Menú principal plano y estático sin profundidad visual, con títulos reducidos y alineaciones desproporcionadas.
+- **Solución implementada:**
+  - Creación de MenuParallax.cs con oscilación sinusoidal suave en reposo y respuesta física al puntero/mouse en 3 capas de fondo (Capa0_Cielo factor 0.2, Capa1_Ciudad factor 0.5, Capa2_Frente factor 1.0).
+  - Integración del nuevo título Logo_ElMinero_Grande.png (1160×256), sprite de Refugio en reposo (~200 px) sobre los rieles, panel derecho estilizado (620×740) con botones de 540 px e input de nombre, y texto de versión a 28 pt.
+- **Ramas y Merge:** Rama fix/menu fusionada a main y sincronizada en remoto.
 
-### 4.4 Rama ix/paneles
-- **Causa raÃ­z:** El panel de pausa no ocultaba sus botones al abrir opciones provocando solapamiento; las tarjetas de inicio de nivel mostraban un marco en blanco si faltaba miniatura; caracteres especiales rotos en narrativas.
-- **SoluciÃ³n implementada:**
-  - PauseMenu.cs oculta la botonera de pausa al abrir opciones, ubica el panel de opciones como Ãºltimo hijo visual (SetAsLastSibling) y se suscribe al evento AlCerrar para restaurar la pausa sin conflicto.
-  - IntroController.cs codificado en UTF-8 limpio con panel de 1500Ã—520 y texto a 46 pt.
-  - LevelStartCard.cs oculta el componente de miniatura limpiamente (color.a = 0) si no existe imagen asignada, y permite confirmaciÃ³n/cierre inmediato con mando y teclado.
-- **Ramas y Merge:** Rama ix/paneles fusionada a main y sincronizada en remoto.
+### 4.4 Rama fix/paneles
+- **Causa raíz:** El panel de pausa no ocultaba sus botones al abrir opciones provocando solapamiento; las tarjetas de inicio de nivel mostraban un marco en blanco si faltaba miniatura; caracteres especiales rotos en narrativas.
+- **Solución implementada:**
+  - PauseMenu.cs oculta la botonera de pausa al abrir opciones, ubica el panel de opciones como último hijo visual (SetAsLastSibling) y se suscribe al evento AlCerrar para restaurar la pausa sin conflicto.
+  - IntroController.cs codificado en UTF-8 limpio con panel de 1500×520 y texto a 46 pt.
+  - LevelStartCard.cs oculta el componente de miniatura limpiamente (color.a = 0) si no existe imagen asignada, y permite confirmación/cierre inmediato con mando y teclado.
+- **Ramas y Merge:** Rama fix/paneles fusionada a main y sincronizada en remoto.
 
-### 4.5 Rama ix/elevador
-- **Causa raÃ­z:** El elevador modificaba la jerarquÃ­a del jugador con 	ransform.SetParent, generando desajustes de escala y desconexiÃ³n visual con el cable del malacate.
-- **SoluciÃ³n implementada:**
-  - MÃ¡quina de estados completa en MineElevator.cs: EsperandoParaSubir, Subiendo, EsperandoParaBajar, Bajando.
+### 4.5 Rama fix/elevador
+- **Causa raíz:** El elevador modificaba la jerarquía del jugador con transform.SetParent, generando desajustes de escala y desconexión visual con el cable del malacate.
+- **Solución implementada:**
+  - Máquina de estados completa en MineElevator.cs: EsperandoParaSubir, Subiendo, EsperandoParaBajar, Bajando.
   - Retraso de 0.5 s para arrancar al subir y 3.0 s de espera antes de descender.
-  - Arrastre fÃ­sico mediante desplazamiento delta en Rigidbody2D sin emparentar objetos.
+  - Arrastre físico mediante desplazamiento delta en Rigidbody2D sin emparentar objetos.
   - Cable continuo renderizado con LineRenderer anclado a la rueda superior del malacate.
   - Castillete_Malacate posicionado firmemente sobre la repisa superior del tiro en el Nivel 3 (sin flotar).
-- **Ramas y Merge:** Rama ix/elevador fusionada a main y sincronizada en remoto.
+- **Ramas y Merge:** Rama fix/elevador fusionada a main y sincronizada en remoto.
 
-### 4.6 Rama ix/enemigos
-- **Causa raÃ­z:** Conflictos de colisiones en enemigos con objetos coleccionables y comportamientos anÃ³malos de detecciÃ³n de suelo.
-- **SoluciÃ³n implementada:**
-  - ConfiguraciÃ³n formal de la Capa 12 (Enemigo) en Constantes.cs y matriz de colisiones de ElMineroBuilder: los enemigos colisionan con Suelo y Jugador, e ignoran coleccionables.
-  - SpiderDrop.cs lanza raycast hacia arriba para anclar Telarana_Techo.png al techo de la mina y dibuja su hilo elÃ¡stico con LineRenderer.
+### 4.6 Rama fix/enemigos
+- **Causa raíz:** Conflictos de colisiones en enemigos con objetos coleccionables y comportamientos anómalos de detección de suelo.
+- **Solución implementada:**
+  - Configuración formal de la Capa 12 (Enemigo) en Constantes.cs y matriz de colisiones de ElMineroBuilder: los enemigos colisionan con Suelo y Jugador, e ignoran coleccionables.
+  - SpiderDrop.cs lanza raycast hacia arriba para anclar Telarana_Techo.png al techo de la mina y dibuja su hilo elástico con LineRenderer.
   - ScorpionAI.cs detecta suelo exclusivamente en la capa Suelo desde la base de sus patas ignorando su propio collider.
-- **Ramas y Merge:** Rama ix/enemigos fusionada a main y sincronizada en remoto.
+- **Ramas y Merge:** Rama fix/enemigos fusionada a main y sincronizada en remoto.
 
-### 4.7 Rama ix/objetos-flotantes
-- **Causa raÃ­z:** Bloques de derrumbe y checkpoints desfasados del piso del tilemap en ciertas secciones.
-- **SoluciÃ³n implementada:**
-  - BloqueDerrumbe.cs calcula con raycast descendente el punto exacto del suelo para sellar el tÃºnel de piso a techo de manera hermÃ©tica.
-  - Checkpoint.cs ancla su pivote Bottom Center con raycast al suelo, asigna sprites rebanados y luz cÃ¡lida Light2D (intensidad 1.2, radio 4.0).
-  - RunawayCart.cs inicia oculta, emite seÃ±al "Â¡!" de 1 s, rueda a 9 u/s y se reinicia mediante IResettable.
-  - CreaciÃ³n de LevelValidator.cs (Herramientas > El Minero > Validar niveles) para auditar y plantar automÃ¡ticamente cualquier objeto proceduralmente.
-- **Ramas y Merge:** Rama ix/objetos-flotantes fusionada a main y sincronizada en remoto.
+### 4.7 Rama fix/objetos-flotantes
+- **Causa raíz:** Bloques de derrumbe y checkpoints desfasados del piso del tilemap en ciertas secciones.
+- **Solución implementada:**
+  - BloqueDerrumbe.cs calcula con raycast descendente el punto exacto del suelo para sellar el túnel de piso a techo de manera hermética.
+  - Checkpoint.cs ancla su pivote Bottom Center con raycast al suelo, asigna sprites rebanados y luz cálida Light2D (intensidad 1.2, radio 4.0).
+  - RunawayCart.cs inicia oculta, emite señal "¡!" de 1 s, rueda a 9 u/s y se reinicia mediante IResettable.
+  - Creación de LevelValidator.cs (Herramientas > El Minero > Validar niveles) para auditar y plantar automáticamente cualquier objeto proceduralmente.
+- **Ramas y Merge:** Rama fix/objetos-flotantes fusionada a main y sincronizada en remoto.
 
-### 4.8 Rama ix/fuego
-- **Causa raÃ­z:** Carencia de los obstÃ¡culos dinÃ¡micos de fuego del paquete v3 en el clÃ­max del Nivel 3.
-- **SoluciÃ³n implementada:**
-  - Fireball.cs: Proyectil dinÃ¡mico con gravedad 2.5 que inflige 1 corazÃ³n de daÃ±o y se destruye al impactar suelo o al jugador.
-  - FireballSpawner.cs: Generador en el techo que emite advertencia de humo (Humo.png) durante 0.8 s antes de soltar la bola de fuego, periÃ³dico y con soporte para IResettable.
-  - FireWallChase.cs y FireChaseTrigger.cs: Muro de fuego perseguidor en los Ãºltimos 35 tiles de La Valenciana; al activarse muestra "Â¡LA MINA SE INCENDIA!" (56 pt, 2 s), avanza a 2.4 u/s con sonido de fuego rugiente en bucle, castiga con 1 punto de vida regresando al checkpoint si alcanza a Refugio, y se detiene automÃ¡ticamente en la salida a la superficie.
-- **Ramas y Merge:** Rama ix/fuego fusionada a main y sincronizada en remoto.
+### 4.8 Rama fix/fuego
+- **Causa raíz:** Carencia de los obstáculos dinámicos de fuego del paquete v3 en el clímax del Nivel 3.
+- **Solución implementada:**
+  - Fireball.cs: Proyectil dinámico con gravedad 2.5 que inflige 1 corazón de daño y se destruye al impactar suelo o al jugador.
+  - FireballSpawner.cs: Generador en el techo que emite advertencia de humo (Humo.png) durante 0.8 s antes de soltar la bola de fuego, periódico y con soporte para IResettable.
+  - FireWallChase.cs y FireChaseTrigger.cs: Muro de fuego perseguidor en los últimos 35 tiles de La Valenciana; al activarse muestra "¡LA MINA SE INCENDIA!" (56 pt, 2 s), avanza a 2.4 u/s con sonido de fuego rugiente en bucle, castiga con 1 punto de vida regresando al checkpoint si alcanza a Refugio, y se detiene automáticamente en la salida a la superficie.
+- **Ramas y Merge:** Rama fix/fuego fusionada a main y sincronizada en remoto.
 
 ---
 
-## 5. Resumen de Calidad y ValidaciÃ³n Final
+## 5. Resumen de Calidad y Validación Final
 
-- **CompilaciÃ³n en Unity 6.6:** 0 errores de compilaciÃ³n CS en modo batch (atch.log).
-- **ValidaciÃ³n de Niveles:** LevelValidator ejecutado en modo batch con salida limpia (cÃ³digo de salida 0).
+- **Compilación en Unity 6.6:** 0 errores de compilación CS en modo batch (batch.log).
+- **Validación de Niveles:** LevelValidator ejecutado en modo batch con salida limpia (código de salida 0).
 - **Ejecutable Windows:** Builds/Windows/ElMinero.exe compilado exitosamente (109 MB, 7 escenas empaquetadas).
-- **Control de Versiones:** 100% de ramas integradas y subidas al repositorio pÃºblico de GitHub sin recurrir a force push.
+- **Control de Versiones:** 100% de ramas integradas y subidas al repositorio público de GitHub sin recurrir a force push.
+
+---
+
+## 6. Versión 1.1 — Interfaz, nivel 3 desde mapa, jefe final y escena del Templo (13 de noviembre de 2026)
+
+Trabajo hecho con Claude (Anthropic) directamente en la carpeta del proyecto. Todo el código se compiló fuera de Unity contra las DLL de Unity 6.6 del proyecto (Roslyn, C# 9) con **0 errores**; la construcción de escenas se hace con `Herramientas > El Minero > Construir TODO`.
+
+### 6.1 Interfaz (Parte A)
+- `UIPrefabBuilder.cs`: se restauraron los métodos auxiliares (`ConfigurarSpriteSwap`, `CrearIcono`, `CrearTexto`, `CrearSlider`, `CrearToggle`) y la firma de `CrearCreditsPanelPrefab()` que se habían perdido en una edición incompleta y rompían la compilación. Se reemplazó `enableWordWrapping` (obsoleto en Unity 6.6) por `textWrappingMode`.
+- Tarjeta de inicio de nivel: el cuerpo de dos columnas ya no se sale del marco (64 + 380 + 48 + 760 + 64 = 1316 < 1400) y el dato histórico usa alto controlado por el layout.
+- Panel de controles: el área de contenido controla la altura de cada renglón para que todo quepa dentro del marco.
+- Menú: panel de 600 × 820 en (−80, −120) para que quepan los 6 botones sin encimarse con el título.
+- Opción "Calidad" retirada por completo (código, constante de PlayerPrefs y comentarios).
+- `UIValidator.cs`: corregidas las llamadas a `MostrarResultados`/`MostrarGameOver`; las capturas pasan temporalmente los Canvas a Screen Space – Camera para que la UI salga en `Docs/Capturas/`. Se llama desde `Construir TODO`.
+- Créditos: se agregó la línea de arte y audio generados con asistencia de IA.
+
+### 6.2 Nivel 3 desde `Mapa_Nivel3.txt` (B2, B3)
+- `LevelBuilder_Nivel3.cs` (nuevo, `LevelBuilder` ahora es `partial`): `LeerMapa` + `ConstruirNivel3DesdeMapa(TextAsset)`. Autotile por vecinos (tabla del GDD), fondo con tiles 19/20/15 de semilla fija, plataformas `=`/`~` cada 3 caracteres, zonas letales por tramo + DeathPit global, coleccionables, enemigos, antorchas, derrumbes (el bloque cae 4 u atrás y se apoya en el piso real), rieles continuos de x = 74 a 100 y vagoneta con trigger vertical 1 × 6.
+- Se borró el código antiguo del nivel 3 (`ConstruirTerrenoNivel3`, piso plano, elevador de y −1.8 a 2.8, fuegos estáticos y muro de fuego mal colocado).
+- Límites de cámara con `CinemachineConfiner2D` (nivel completo y arena del jefe).
+- `LevelValidator`: compara la escena del nivel 3 con el mapa (vetas, gemas, checkpoints, jefe, elevador, muro de fuego y que no queden `FireHazard`).
+- `LevelConfig_Nivel3`: 220 s, 16 vetas, 4 gemas; temblor cada 12–16 s.
+
+### 6.3 Fuego (B2.1)
+- `FireWallChase.cs` reescrito: inactivo hasta el trigger X; aparece 9 u detrás del jugador; 7 llamas animadas (4 cuadros, 10 FPS, desfase aleatorio); sigue la altura del jugador; al tocarlo quita 1 vida, se apaga y rearma el trigger; se desvanece en x = 206 o al tocar la salida.
+- `FireChaseTrigger.cs`: se puede rearmar. `Fireball.cs`/`FireballSpawner.cs`: pool, gravedad 2.5, explotan en el Suelo, vida máxima 4 s y solo se lanzan con el jugador a menos de 14 u.
+
+### 6.4 Elevador del tiro (B3.4)
+- `MineElevator.cs` reescrito: detección del jugador por posición sobre el piso de la jaula, piso one-way con `PlatformEffector2D` sin colliders en las barras, 3 u/s, rueda del castillete animada solo en movimiento con `Malacate_Loop`, cable `Tiled` que cambia de largo, rocas del tiro solo mientras sube con el jugador (sombra sobre el piso de la jaula) y regreso abajo al reaparecer.
+
+### 6.5 Jefe final (B4)
+- Scripts nuevos en `Assets/Scripts/Jefe/`: `BossColoso.cs`, `BossArena.cs`, `PuntoDebilColoso.cs`, `ShockwaveProjectile.cs`, `ThrownRock.cs`; y `UI/BossHealthBarUI.cs`, `UI/AvisoPantalla.cs`.
+- `AnimationGenerator`: `Controladores/Jefe/Coloso.controller` con los estados de la hoja y los triggers `Preparar`, `Embestir`, `Aturdir`, `Golpe`, `Pisoton`, `Lanzar`, `Morir` (y `Idle`, `Caminar`).
+- `LevelManager`: evento `OnJugadorReaparecio`, `AgregarPuntosBonus` y `NivelCompletado`. `PlayerController`: `BloquearControl`, `Rebotar` y `Empujar`. `PlayerHealth`: `AgregarVida`.
+
+### 6.6 Escena `Final_Templo` (B5)
+- `LevelBuilder_FinalTemplo.cs` (nuevo) y scripts en `Assets/Scripts/Final/`: `FinalTemploController.cs`, `PanelFinalTemplo.cs`, `HabitanteCelebra.cs`, `PalomaAsustadiza.cs`.
+- Build Settings y `Constantes.Escenas.Final` apuntan a `Final_Templo`. El panel de Resultados del nivel 3 guarda el mineral distintivo de cada nivel para el resumen final.
+
+### 6.7 Otras correcciones encontradas en la revisión
+- `RockSpawner`: las rocas y la sombra de aviso se instanciaban **desactivadas** (la plantilla está desactivada), por lo que nunca caían; ahora se activan. Se agregaron `SetActivo`, `SoltarAhora` y la sombra sobre un objeto (jaula).
+- `BloqueDerrumbe`: el collider tenía un desfase de 1.5 con el sprite centrado y el rayo podía nacer dentro del techo (por eso flotaba); ahora el collider coincide con el dibujo y el bloque se apoya en el piso bajo el punto de caída.
+- `AudioLibrary`/`AudioManager`: música y efectos del jefe, del Templo y del ambiente, cargados desde `Resources` para que suenen en el build (`ObtenerClip`, `PlaySFXNombre`, `PlayMusicNombre`).
+- `BITACORA.md` y `CAMBIOS_GDD.md` tenían texto con codificación dañada; se corrigieron a UTF-8.
+

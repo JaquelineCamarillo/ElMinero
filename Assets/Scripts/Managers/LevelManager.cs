@@ -46,6 +46,10 @@ namespace ElMinero.Managers
         // Eventos C#
         public event Action<int> OnScoreUpdated;       // Notifica puntaje total combinado
         public event Action<string> OnBonusEarned;      // Notifica bono obtenido ("¡Bono todas las vetas: +50!")
+        public event Action OnJugadorReaparecio;        // El jugador reapareció en un checkpoint o al inicio
+
+        public bool NivelCompletado { get; private set; }
+        public Vector3 CheckpointActual => currentCheckpoint;
 
         public LevelConfig Config => levelConfig;
         public LevelTimer Timer => timer;
@@ -248,6 +252,21 @@ namespace ElMinero.Managers
                 }
                 playerController.TriggerInvulnerability(1.5f);
             }
+
+            OnJugadorReaparecio?.Invoke();
+        }
+
+        /// <summary>
+        /// Suma puntos de bonificación (por ejemplo, +300 al vencer al jefe) y lo anuncia en el HUD.
+        /// </summary>
+        public void AgregarPuntosBonus(int puntos, string mensaje)
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.AddScore(puntos);
+            }
+            if (!string.IsNullOrEmpty(mensaje)) OnBonusEarned?.Invoke(mensaje);
+            NotificarPuntaje();
         }
 
         private void ManejarMuerte()
@@ -379,6 +398,8 @@ namespace ElMinero.Managers
 
         public void CompletarNivel()
         {
+            if (NivelCompletado) return;
+            NivelCompletado = true;
             if (timer != null) timer.Detener();
 
             // Bono por recolectar todas las vetas de plata
@@ -439,6 +460,8 @@ namespace ElMinero.Managers
 
         public void ReiniciarNivelCompleto(string motivo = "")
         {
+            NivelCompletado = false;
+
             // 1. Descartar puntaje acumulado en este nivel
             if (GameManager.Instance != null)
             {
@@ -477,6 +500,7 @@ namespace ElMinero.Managers
             }
 
             NotificarPuntaje();
+            OnJugadorReaparecio?.Invoke();
             Debug.Log($"[El Minero] Nivel reiniciado completamente. Motivo: {motivo}");
         }
     }

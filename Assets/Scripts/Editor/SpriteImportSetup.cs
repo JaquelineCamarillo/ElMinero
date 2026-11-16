@@ -50,6 +50,18 @@ namespace ElMinero.Editor
                 // 9. Tilesets y generación de Tile Assets
                 ConfigurarTilesetsYCrearTiles();
 
+                // 10. Jefe final, nivel 3 (castillete, maquinaria quemada) y escena del Templo
+                ConfigurarSpritesJefeYFinal();
+
+                // 11. Sprites del Menú Principal (destellos, niebla, viñeta, resplandor)
+                ConfigurarSpritesMenu();
+
+                // 12. Ambientación del Nivel 1 (siluetas, lámparas, goteras)
+                ConfigurarSpritesMina();
+
+                // 13. Decoración de los paneles de madera
+                ConfigurarSpritesDecoracionPaneles();
+
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
                 Debug.Log("[El Minero] ¡Todos los sprites y tilesets configurados correctamente con PPU = 16 y filtros Point!");
@@ -268,6 +280,23 @@ namespace ElMinero.Editor
             Configurar9Slice("Assets/Sprites/UI/Boton_Madera.png", new Vector4(4, 4, 4, 4));
             Configurar9Slice("Assets/Sprites/UI/Boton_Madera_Presionado.png", new Vector4(4, 4, 4, 4));
             Configurar9Slice("Assets/Sprites/UI/Boton_Madera_Resaltado.png", new Vector4(4, 4, 4, 4));
+            Configurar9Slice("Assets/Sprites/UI/Campo_Texto.png", new Vector4(4, 4, 4, 4));
+
+            // UI del Jefe
+            Configurar9Slice("Assets/Sprites/UI/Jefe/Barra_Jefe_Marco.png", new Vector4(6, 6, 6, 6));
+            Configurar9Slice("Assets/Sprites/UI/Jefe/Barra_Jefe_Relleno.png", new Vector4(2, 2, 2, 2));
+            ConfigurarSingleSprite("Assets/Sprites/UI/Jefe/Retrato_Coloso.png", pivotCenter);
+
+            // Miniaturas en Resources
+            if (Directory.Exists("Assets/Resources/Miniaturas"))
+            {
+                string[] minFiles = Directory.GetFiles("Assets/Resources/Miniaturas", "*.png");
+                foreach (var mPath in minFiles)
+                {
+                    string uPath = mPath.Replace('\\', '/');
+                    ConfigurarSingleSprite(uPath, pivotCenter);
+                }
+            }
 
             // Botón Nivel con borde 6
             Configurar9Slice("Assets/Sprites/UI/Boton_Nivel.png", new Vector4(6, 6, 6, 6));
@@ -368,8 +397,200 @@ namespace ElMinero.Editor
         }
 
         // ====================================================================
+        // 10. JEFE FINAL, NIVEL 3 Y ESCENA DEL TEMPLO (paquete v4)
+        // ====================================================================
+        public static void ConfigurarSpritesJefeYFinal()
+        {
+            Vector2 abajo = new Vector2(0.5f, 0f);
+            Vector2 centro = new Vector2(0.5f, 0.5f);
+            Vector2 arriba = new Vector2(0.5f, 1f);
+
+            // Jefe: cuadros de 64x64, pivot abajo-centro
+            string[] hojasColoso = { "Idle", "Caminar", "Preparar_Embestida", "Embestida", "Aturdido", "Golpeado", "Pisoton", "Lanzar", "Derrota" };
+            foreach (string h in hojasColoso)
+            {
+                SliceGrid($"Assets/Sprites/Jefe/Coloso_{h}.png", 64, 64, abajo, SpriteAlignment.BottomCenter);
+            }
+            SliceGrid("Assets/Sprites/Jefe/Roca_Lanzada.png", 16, 16, centro, SpriteAlignment.Center);
+            SliceGrid("Assets/Sprites/Jefe/Onda_Choque.png", 32, 16, abajo, SpriteAlignment.BottomCenter);
+            SliceGrid("Assets/Sprites/Jefe/Estrellas_Aturdido.png", 24, 12, centro, SpriteAlignment.Center);
+            SliceGrid("Assets/Sprites/Jefe/Polvo_Grande.png", 32, 16, centro, SpriteAlignment.Center);
+
+            // Nivel 3
+            SliceGrid("Assets/Sprites/Entorno/Castillete_Tiro.png", 80, 96, abajo, SpriteAlignment.BottomCenter);
+            SliceGrid("Assets/Sprites/Entorno/Viga_Quemada.png", 48, 8, arriba, SpriteAlignment.TopCenter);
+            ConfigurarSingleSprite("Assets/Sprites/Entorno/Maquinaria_Quemada.png", abajo);
+
+            // Escena final
+            ConfigurarSpritePivote("Assets/Sprites/Final/Templo_SanCayetano.png", abajo);
+            ConfigurarSpritePivote("Assets/Sprites/Final/Tiro_SanCayetano.png", abajo);
+            ConfigurarSpritePivote("Assets/Sprites/Final/Arbol_Pirul.png", abajo);
+            ConfigurarSpritePivote("Assets/Sprites/Final/Maguey.png", abajo);
+            ConfigurarSpritePivote("Assets/Sprites/Final/Nopal.png", abajo);
+            ConfigurarSpritePivote("Assets/Sprites/Final/Banca.png", abajo);
+            ConfigurarSpritePivote("Assets/Sprites/Final/Cruz_Atrial.png", abajo);
+            SliceGrid("Assets/Sprites/Final/Campana.png", 12, 14, arriba, SpriteAlignment.TopCenter);
+            SliceGrid("Assets/Sprites/Final/Farol_Plaza.png", 16, 48, abajo, SpriteAlignment.BottomCenter);
+            SliceGrid("Assets/Sprites/Final/Papel_Picado.png", 64, 16, arriba, SpriteAlignment.TopCenter);
+            SliceGrid("Assets/Sprites/Final/Paloma.png", 16, 16, abajo, SpriteAlignment.BottomCenter);
+            SliceGrid("Assets/Sprites/Final/Habitantes/Senora_Rebozo.png", 32, 32, abajo, SpriteAlignment.BottomCenter);
+            SliceGrid("Assets/Sprites/Final/Habitantes/Nino.png", 32, 32, abajo, SpriteAlignment.BottomCenter);
+            SliceGrid("Assets/Sprites/Final/Habitantes/Minero_Companero.png", 32, 32, abajo, SpriteAlignment.BottomCenter);
+
+            // Fondos del amanecer (FullRect para poder dibujarlos en modo Tiled)
+            string[] fondos =
+            {
+                "Assets/Sprites/Fondos/Final/FondoFinal_Capa0_Amanecer.png",
+                "Assets/Sprites/Fondos/Final/FondoFinal_Capa1_Pueblo.png",
+                "Assets/Sprites/Fondos/Final/FondoFinal_Capa2_Cerro.png",
+                "Assets/Sprites/Fondos/Final/FondoFinal_Completo.png"
+            };
+            foreach (string f in fondos) ConfigurarTiledSprite(f, centro);
+
+            // Tileset exterior (empedrado, cantera, barda, tierra) y sus Tiles
+            SliceGrid("Assets/Tiles/Exterior/Tileset_Exterior.png", 16, 16, centro, SpriteAlignment.Center);
+            EditorSpriteUtil.CrearTilesPorIndice("Assets/Tiles/Exterior/Tileset_Exterior.png", "Assets/Tiles/Exterior", "Exterior");
+
+            // Reparto de joyas (v2): habitantes extra, puestos, macetas, burbuja, confeti y chispas
+            ConfigurarSpritesFinalJoyas();
+
+            // Miniaturas de iconos de minerales para el panel final (ya están como hojas en Coleccionables)
+            AssetDatabase.SaveAssets();
+        }
+
+        public static void ConfigurarSpritesFinalJoyas()
+        {
+            Vector2 abajo = new Vector2(0.5f, 0f);
+            Vector2 centro = new Vector2(0.5f, 0.5f);
+            AssetDatabase.ImportAsset("Assets/Sprites/Final", ImportAssetOptions.ImportRecursive);
+            foreach (string h in new[] { "Abuela", "Nina", "Arriero" })
+            {
+                SliceGrid($"Assets/Sprites/Final/Habitantes/{h}.png", 32, 32, abajo, SpriteAlignment.BottomCenter);
+            }
+            ConfigurarSpritePivote("Assets/Sprites/Final/Puesto_Rosa.png", abajo);
+            ConfigurarSpritePivote("Assets/Sprites/Final/Puesto_Verde.png", abajo);
+            ConfigurarSpritePivote("Assets/Sprites/Final/Maceta_Cempasuchil.png", abajo);
+            ConfigurarSpritePivote("Assets/Sprites/Final/Burbuja.png", new Vector2(0.5f, 0f));
+            ConfigurarSpritePivote("Assets/Sprites/Final/Confeti.png", centro);
+            ConfigurarSpritePivote("Assets/Sprites/Final/Chispa.png", centro);
+        }
+
+        // ====================================================================
+        // NIVEL 1 (v2): ambientación de la mina
+        // ====================================================================
+        public static void ConfigurarSpritesMina()
+        {
+            string ruta = "Assets/Sprites/Entorno/Mina/";
+            AssetDatabase.ImportAsset(ruta.TrimEnd('/'), ImportAssetOptions.ImportRecursive);
+            ConfigurarSpritePivote(ruta + "Roca_Frente_Abajo_A.png", new Vector2(0.5f, 0f));
+            ConfigurarSpritePivote(ruta + "Roca_Frente_Abajo_B.png", new Vector2(0.5f, 0f));
+            ConfigurarSpritePivote(ruta + "Roca_Frente_Arriba_A.png", new Vector2(0.5f, 1f));
+            ConfigurarSpritePivote(ruta + "Roca_Frente_Arriba_B.png", new Vector2(0.5f, 1f));
+            ConfigurarSpritePivote(ruta + "Lampara_Mina.png", new Vector2(0.5f, 1f));
+            ConfigurarSpritePivote(ruta + "Gota.png", new Vector2(0.5f, 0.5f));
+            ConfigurarSpriteSuave(ruta + "Abismo.png", new Vector2(0.5f, 0.5f));
+        }
+
+        // ====================================================================
+        // PANELES (v2): esquinas de hierro, emblema y textura
+        // ====================================================================
+        public static void ConfigurarSpritesDecoracionPaneles()
+        {
+            string ruta = "Assets/Sprites/UI/Decoracion/";
+            AssetDatabase.ImportAsset(ruta.TrimEnd('/'), ImportAssetOptions.ImportRecursive);
+            ConfigurarSpritePivote(ruta + "Esquina_Panel.png", new Vector2(0.5f, 0.5f));
+            ConfigurarSpritePivote(ruta + "Emblema_Panel.png", new Vector2(0.5f, 0.5f));
+            ConfigurarSpritePivote(ruta + "Textura_Panel.png", new Vector2(0.5f, 0.5f));
+            ConfigurarSpritePivote(ruta + "Placa_Lateral.png", new Vector2(0.5f, 0.5f));
+            ConfigurarSpritePivote(ruta + "Remate_Inferior.png", new Vector2(0.5f, 0.5f));
+            ConfigurarSpritePivote(ruta + "Marco_Interior.png", new Vector2(0.5f, 0.5f));
+            Configurar9Slice(ruta + "Marco_Interior.png", new Vector4(8, 8, 8, 8));
+            Configurar9Slice(ruta + "Cinta_Titulo.png", new Vector4(12, 4, 12, 4));
+            Configurar9Slice(ruta + "Marco_Miniatura.png", new Vector4(4, 4, 4, 4));
+            ConfigurarSpritePivote(ruta + "Medalla.png", new Vector2(0.5f, 0.5f));
+
+            // La textura se repite (Tiled): malla completa y envoltura en Repeat
+            var imp = AssetImporter.GetAtPath(ruta + "Textura_Panel.png") as TextureImporter;
+            if (imp != null)
+            {
+                var ajustes = new TextureImporterSettings();
+                imp.ReadTextureSettings(ajustes);
+                ajustes.spriteMeshType = SpriteMeshType.FullRect;
+                imp.SetTextureSettings(ajustes);
+                imp.wrapMode = TextureWrapMode.Repeat;
+                imp.SaveAndReimport();
+            }
+        }
+
+        // ====================================================================
+        // MENÚ PRINCIPAL (v2)
+        // ====================================================================
+        public static void ConfigurarSpritesMenu()
+        {
+            string ruta = "Assets/Sprites/UI/Menu/";
+            Vector2 centro = new Vector2(0.5f, 0.5f);
+            AssetDatabase.ImportAsset(ruta.TrimEnd('/'), ImportAssetOptions.ImportRecursive);
+
+            // Pixel art (filtro Point)
+            ConfigurarSingleSprite(ruta + "Menu_Destello.png", centro);
+            ConfigurarSingleSprite(ruta + "Menu_EstrellaFugaz.png", new Vector2(1f, 0.5f));
+            ConfigurarSingleSprite(ruta + "Menu_Luciernaga.png", centro);
+            ConfigurarSingleSprite(ruta + "Menu_Separador.png", centro);
+
+            // Degradados suaves (filtro Bilinear)
+            ConfigurarSpriteSuave(ruta + "Menu_Niebla.png", centro);
+            ConfigurarSpriteSuave(ruta + "Menu_Vineta.png", centro);
+            ConfigurarSpriteSuave(ruta + "Menu_Resplandor.png", centro);
+        }
+
+        public static void ConfigurarSpriteSuave(string assetPath, Vector2 pivot)
+        {
+            var importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+            if (importer == null) return;
+
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.spritePixelsPerUnit = StandardPPU;
+            importer.filterMode = FilterMode.Bilinear;
+            importer.wrapMode = TextureWrapMode.Clamp;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.spritePivot = pivot;
+            importer.mipmapEnabled = false;
+            importer.alphaIsTransparency = true;
+
+            var settings = new TextureImporterSettings();
+            importer.ReadTextureSettings(settings);
+            settings.spriteMeshType = SpriteMeshType.FullRect;
+            importer.SetTextureSettings(settings);
+
+            importer.SaveAndReimport();
+        }
+
+        // ====================================================================
         // HELPERS GENÉRICOS DE IMPORTACIÓN Y SLICING
         // ====================================================================
+
+        /// <summary>Sprite único con pivote personalizado garantizado (alineación Custom).</summary>
+        public static void ConfigurarSpritePivote(string assetPath, Vector2 pivot)
+        {
+            var importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+            if (importer == null) return;
+
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.spritePixelsPerUnit = StandardPPU;
+            importer.filterMode = FilterMode.Point;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.mipmapEnabled = false;
+
+            var ajustes = new TextureImporterSettings();
+            importer.ReadTextureSettings(ajustes);
+            ajustes.spriteAlignment = (int)SpriteAlignment.Custom;
+            ajustes.spritePivot = pivot;
+            importer.SetTextureSettings(ajustes);
+
+            importer.SaveAndReimport();
+        }
 
         public static void ConfigurarSingleSprite(string assetPath, Vector2 pivot)
         {
@@ -383,6 +604,17 @@ namespace ElMinero.Editor
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             importer.spritePivot = pivot;
             importer.mipmapEnabled = false;
+
+            // Unity solo respeta el pivote si la alineación es "Custom": sin esto, los sprites
+            // con pivote abajo (letreros, salidas, jaula...) quedaban centrados y medio enterrados.
+            if (pivot != new Vector2(0.5f, 0.5f))
+            {
+                var ajustes = new TextureImporterSettings();
+                importer.ReadTextureSettings(ajustes);
+                ajustes.spriteAlignment = (int)SpriteAlignment.Custom;
+                ajustes.spritePivot = pivot;
+                importer.SetTextureSettings(ajustes);
+            }
 
             importer.SaveAndReimport();
         }

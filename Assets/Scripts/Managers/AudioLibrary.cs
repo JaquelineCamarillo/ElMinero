@@ -61,5 +61,29 @@ namespace ElMinero.Managers
         public AudioClip sfxEstrella2;
         public AudioClip sfxEstrella3;
         public AudioClip sfxDesbloqueoNivel;
+
+        [Header("Jefe final, nivel 3 y escena del Templo")]
+        public AudioClip musicJefeColoso;
+        public AudioClip musicJefeDerrotado;
+        public AudioClip musicFinalAmanecer;
+        [Tooltip("Efectos nuevos (Coloso, compuertas, campanas, aves, aplausos...). Se buscan por nombre de archivo.")]
+        public AudioClip[] clipsExtra;
+
+        /// <summary>Busca un clip por su nombre de archivo (sin extensión).</summary>
+        public AudioClip BuscarClip(string nombre)
+        {
+            if (string.IsNullOrEmpty(nombre)) return null;
+            if (musicJefeColoso != null && musicJefeColoso.name == nombre) return musicJefeColoso;
+            if (musicJefeDerrotado != null && musicJefeDerrotado.name == nombre) return musicJefeDerrotado;
+            if (musicFinalAmanecer != null && musicFinalAmanecer.name == nombre) return musicFinalAmanecer;
+            if (clipsExtra != null)
+            {
+                foreach (var c in clipsExtra)
+                {
+                    if (c != null && c.name == nombre) return c;
+                }
+            }
+            return null;
+        }
     }
 }

@@ -65,6 +65,7 @@ namespace ElMinero.Niveles
         private IEnumerator EjecutarTemblor()
         {
             isTremoring = true;
+            if (ElMinero.Managers.AudioManager.Instance != null) ElMinero.Managers.AudioManager.Instance.PlayTemblor();
 
             // 1. Generar impulso continuo o pulsos durante 1.5s
             if (impulseSource != null)

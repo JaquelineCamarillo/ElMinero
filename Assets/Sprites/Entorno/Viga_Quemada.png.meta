@@ -107,18 +107,40 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 96
+        width: 48
         height: 8
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 2
+      pivot: {x: 0.5, y: 1}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 1682bc33656bb4900800000000000000
+      spriteID: 826eae7ff77e0254bbcd958698bfacce
       internalID: 669829450947045473
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Viga_Quemada_1
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 0
+        width: 48
+        height: 8
+      alignment: 2
+      pivot: {x: 0.5, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e9345bfcdff486b40bf852d7b170a222
+      internalID: -1313394612
       vertices: []
       indices: 
       edges: []
@@ -127,7 +149,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5767cb0e7d940204fb600340629d501c
     internalID: 0
     vertices: []
     indices: 
@@ -138,6 +160,7 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       Viga_Quemada_0: 669829450947045473
+      Viga_Quemada_1: -1313394612
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

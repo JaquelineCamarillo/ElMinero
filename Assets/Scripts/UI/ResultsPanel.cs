@@ -79,7 +79,7 @@ namespace ElMinero.UI
             }
             else
             {
-                escenaSiguiente = "Final";
+                escenaSiguiente = ElMinero.Utilidades.Constantes.Escenas.Final;
                 if (textoBotonSiguiente != null) textoBotonSiguiente.text = "Salir de la mina";
             }
 
@@ -134,6 +134,12 @@ namespace ElMinero.UI
                 PlayerPrefs.SetInt($"Estrellas_{nombreEscena}", estrellasGanadas);
             }
 
+            // Mineral distintivo del nivel (lo usa el panel final del Templo)
+            if (mineralDistintivoRecolectado)
+            {
+                PlayerPrefs.SetInt($"Mineral_{nombreEscena}", 1);
+            }
+
             PlayerPrefs.Save();
 
             // Configurar textos
@@ -144,7 +150,15 @@ namespace ElMinero.UI
                 textoPlata.text = bono ? $"Plata: {plataRecolectada} / {totalPlata} <color=#FFD700>¡+50 BONO!</color>" : $"Plata: {plataRecolectada} / {totalPlata}";
             }
             if (textoTiempo != null) textoTiempo.text = $"Tiempo restante: {tiempoRestante:F1}s";
-            if (textoVidas != null) textoVidas.text = $"Vidas restantes: {vidasRestantes}";
+            if (textoVidas != null)
+            {
+                string lineaVidas = $"Vidas restantes: {vidasRestantes}";
+                if (numeroNivelActual == 3 && PlayerPrefs.GetInt("JefeVencido_N3", 0) == 1)
+                {
+                    lineaVidas += "  ·  <color=#FFD27A>Coloso vencido</color>";
+                }
+                textoVidas.text = lineaVidas;
+            }
             if (textoPuntajeNivel != null) textoPuntajeNivel.text = $"Puntos del nivel: {puntajeNivel:N0}";
 
             int p1 = PlayerPrefs.GetInt("MejorPuntaje_Nivel1_MinaRayas", 0);

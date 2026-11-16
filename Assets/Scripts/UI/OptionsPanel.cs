@@ -11,9 +11,9 @@ using UnityEngine.InputSystem;
 namespace ElMinero.UI
 {
     /// <summary>
-    /// Controlador del panel de opciones según la especificación exacta de la sección 3.4 y correcciones D/E.
-    /// Gestiona sliders de volumen directo, toggle de música, selector de calidad con flechas (◀  Alta  ▶),
-    /// subpanel de controles, modal de borrado de progreso y evento AlCerrar.
+    /// Controlador del panel de opciones según la especificación de interfaz actualizada.
+    /// Gestiona sliders de volumen directo, toggle de música, subpanel de controles,
+    /// modal de borrado de progreso y evento AlCerrar.
     /// </summary>
     public class OptionsPanel : MonoBehaviour
     {
@@ -21,11 +21,6 @@ namespace ElMinero.UI
         [SerializeField] private Slider sliderMusica;
         [SerializeField] private Slider sliderEfectos;
         [SerializeField] private Toggle toggleMusica;
-
-        [Header("Selector de Calidad")]
-        [SerializeField] private Button botonCalidadAnterior;
-        [SerializeField] private Button botonCalidadSiguiente;
-        [SerializeField] private TextMeshProUGUI textoCalidad;
 
         [Header("Subpanel de Controles")]
         [SerializeField] private Button botonControles;
@@ -41,8 +36,6 @@ namespace ElMinero.UI
 
         [Header("Navegación")]
         [SerializeField] private Button botonVolver;
-
-        private int indiceCalidadActual = 2;
 
         public event Action AlCerrar;
 
@@ -100,16 +93,6 @@ namespace ElMinero.UI
                 toggleMusica.onValueChanged.AddListener(OnToggleMusicaChanged);
             }
 
-            if (botonCalidadAnterior != null)
-            {
-                botonCalidadAnterior.onClick.AddListener(() => CambiarCalidad(-1));
-            }
-
-            if (botonCalidadSiguiente != null)
-            {
-                botonCalidadSiguiente.onClick.AddListener(() => CambiarCalidad(1));
-            }
-
             if (botonControles != null)
             {
                 botonControles.onClick.AddListener(AbrirControles);
@@ -146,13 +129,10 @@ namespace ElMinero.UI
             float volMusica = PlayerPrefs.GetFloat(SettingsManager.PREF_VOL_MUSICA, 0.8f);
             float volEfectos = PlayerPrefs.GetFloat(SettingsManager.PREF_VOL_EFECTOS, 0.8f);
             bool musicaActiva = PlayerPrefs.GetInt(SettingsManager.PREF_MUSICA_ACTIVA, 1) == 1;
-            int calidad = PlayerPrefs.GetInt(SettingsManager.PREF_CALIDAD, 2);
 
             if (sliderMusica != null) sliderMusica.value = volMusica;
             if (sliderEfectos != null) sliderEfectos.value = volEfectos;
             if (toggleMusica != null) toggleMusica.isOn = musicaActiva;
-
-            AplicarCalidad(calidad);
         }
 
         private void OnMusicaChanged(float val)
@@ -196,33 +176,6 @@ namespace ElMinero.UI
             if (AudioManager.Instance != null) AudioManager.Instance.PlayClickUI();
         }
 
-        private void CambiarCalidad(int delta)
-        {
-            string[] nombres = QualitySettings.names;
-            int total = nombres.Length;
-            if (total == 0) return;
-
-            indiceCalidadActual = (indiceCalidadActual + delta + total) % total;
-            AplicarCalidad(indiceCalidadActual);
-            if (AudioManager.Instance != null) AudioManager.Instance.PlayClickUI();
-        }
-
-        private void AplicarCalidad(int indice)
-        {
-            string[] nombres = QualitySettings.names;
-            if (nombres == null || nombres.Length == 0) return;
-
-            indiceCalidadActual = Mathf.Clamp(indice, 0, nombres.Length - 1);
-            QualitySettings.SetQualityLevel(indiceCalidadActual, true);
-            PlayerPrefs.SetInt(SettingsManager.PREF_CALIDAD, indiceCalidadActual);
-            PlayerPrefs.Save();
-
-            if (textoCalidad != null)
-            {
-                textoCalidad.text = nombres[indiceCalidadActual];
-            }
-        }
-
         private void AbrirControles()
         {
             if (AudioManager.Instance != null) AudioManager.Instance.PlayClickUI();
@@ -263,6 +216,7 @@ namespace ElMinero.UI
             PlayerPrefs.DeleteKey("Mineral_Nivel1_MinaRayas");
             PlayerPrefs.DeleteKey("Mineral_Nivel2_ElNopal");
             PlayerPrefs.DeleteKey("Mineral_Nivel3_LaValenciana");
+            PlayerPrefs.DeleteKey("JefeVencido_N3");
 
             PlayerPrefs.Save();
 

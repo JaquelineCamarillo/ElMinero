@@ -111,19 +111,19 @@ TextureImporter:
       name: Coloso_Pisoton_0
       rect:
         serializedVersion: 2
-        x: 6
+        x: 0
         y: 0
-        width: 52
-        height: 52
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 8ac3ca5d7227635c0800000000000000
+      spriteID: d9ed1d4b35b63d847b7e44ddc5008242
       internalID: -4236072884081247064
       vertices: []
       indices: 
@@ -133,19 +133,19 @@ TextureImporter:
       name: Coloso_Pisoton_1
       rect:
         serializedVersion: 2
-        x: 66
-        y: 7
-        width: 60
-        height: 57
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 64
+        y: 0
+        width: 64
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: a1e90fc19957f0b60800000000000000
+      spriteID: c42955ff0070e2e40b0117b93a8387aa
       internalID: 7714513987184926234
       vertices: []
       indices: 
@@ -158,16 +158,16 @@ TextureImporter:
         x: 128
         y: 0
         width: 64
-        height: 54
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        height: 64
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: c66ce110925fa9cc0800000000000000
+      spriteID: c061c5a61751d324a9e5627b03ac8f7c
       internalID: -3703378187097553300
       vertices: []
       indices: 
@@ -177,7 +177,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 8b517df23811a6b438db1a67d2a4c740
     internalID: 0
     vertices: []
     indices: 

@@ -3,8 +3,8 @@ using UnityEngine;
 namespace ElMinero.Managers
 {
     /// <summary>
-    /// Gestiona las preferencias de configuración del juego (volumen, calidad gráfica, opciones).
-    /// Centraliza la persistencia en PlayerPrefs y la sincronización con AudioManager y QualitySettings.
+    /// Gestiona las preferencias de configuración del juego (volumen de música y efectos, música activa, progreso).
+    /// Centraliza la persistencia en PlayerPrefs y la sincronización con AudioManager.
     /// </summary>
     public class SettingsManager : MonoBehaviour
     {
@@ -14,7 +14,6 @@ namespace ElMinero.Managers
         public const string PREF_VOL_MUSICA = "VolMusica";
         public const string PREF_VOL_EFECTOS = "VolEfectos";
         public const string PREF_MUSICA_ACTIVA = "MusicaActiva";
-        public const string PREF_CALIDAD = "CalidadGrafica";
         public const string PREF_NIVEL_DESBLOQUEADO = "NivelDesbloqueado";
         public const string PREF_NOMBRE_JUGADOR = "NombreJugador";
 
@@ -44,7 +43,6 @@ namespace ElMinero.Managers
             float volMusica = PlayerPrefs.GetFloat(PREF_VOL_MUSICA, 0.8f);
             float volEfectos = PlayerPrefs.GetFloat(PREF_VOL_EFECTOS, 0.8f);
             bool musicaActiva = PlayerPrefs.GetInt(PREF_MUSICA_ACTIVA, 1) == 1;
-            int calidad = PlayerPrefs.GetInt(PREF_CALIDAD, 2);
 
             if (AudioManager.Instance != null)
             {
@@ -52,14 +50,11 @@ namespace ElMinero.Managers
                 AudioManager.Instance.SetMusicVolume(musicaActiva ? volMusica : 0f);
                 AudioManager.Instance.SetSFXVolume(volEfectos);
             }
-
-            QualitySettings.SetQualityLevel(Mathf.Clamp(calidad, 0, QualitySettings.names.Length - 1), true);
         }
 
         public float GetVolumenMusica() => PlayerPrefs.GetFloat(PREF_VOL_MUSICA, 0.8f);
         public float GetVolumenEfectos() => PlayerPrefs.GetFloat(PREF_VOL_EFECTOS, 0.8f);
         public bool GetMusicaActiva() => PlayerPrefs.GetInt(PREF_MUSICA_ACTIVA, 1) == 1;
-        public int GetCalidad() => PlayerPrefs.GetInt(PREF_CALIDAD, 2);
 
         public void SetVolumenMusica(float valor)
         {
@@ -96,24 +91,15 @@ namespace ElMinero.Managers
             }
         }
 
-        public void SetCalidad(int indice)
-        {
-            indice = Mathf.Clamp(indice, 0, QualitySettings.names.Length - 1);
-            PlayerPrefs.SetInt(PREF_CALIDAD, indice);
-            PlayerPrefs.Save();
-            QualitySettings.SetQualityLevel(indice, true);
-        }
-
         /// <summary>
         /// Borra todo el progreso del jugador (estrellas, récords, niveles y nombre),
-        /// preservando intactos los ajustes de audio y calidad gráfica.
+        /// preservando intactos los ajustes de audio.
         /// </summary>
         public void BorrarProgreso()
         {
             float volMusica = GetVolumenMusica();
             float volEfectos = GetVolumenEfectos();
             bool musicaActiva = GetMusicaActiva();
-            int calidad = GetCalidad();
 
             // Borrar todo PlayerPrefs
             PlayerPrefs.DeleteAll();
@@ -122,7 +108,6 @@ namespace ElMinero.Managers
             PlayerPrefs.SetFloat(PREF_VOL_MUSICA, volMusica);
             PlayerPrefs.SetFloat(PREF_VOL_EFECTOS, volEfectos);
             PlayerPrefs.SetInt(PREF_MUSICA_ACTIVA, musicaActiva ? 1 : 0);
-            PlayerPrefs.SetInt(PREF_CALIDAD, calidad);
             PlayerPrefs.SetInt(PREF_NIVEL_DESBLOQUEADO, 1);
             PlayerPrefs.SetString(PREF_NOMBRE_JUGADOR, "Refugio");
             PlayerPrefs.Save();

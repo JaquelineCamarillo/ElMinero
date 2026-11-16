@@ -171,3 +171,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ElMinero.Obstaculos.Fireball
   damage: 1
+  vidaMaxima: 4
+  cuadrosExplosion: []
